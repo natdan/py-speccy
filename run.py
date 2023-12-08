@@ -1,6 +1,5 @@
 from pygame_emulator import PyGameEmulator
 from spectrum.machine import Spectrum
-from utils.load import Load
 
 
 spectrum = Spectrum()
@@ -9,10 +8,13 @@ spectrum.init()
 emulator = PyGameEmulator(spectrum, show_fps=True, ratio=3)
 emulator.init()
 
-load = Load(spectrum.z80, spectrum.ports)
-
-# load.load_sna("snapshots/zexall.sna")
-load.load_sna("snapshots/nirvana-demo.sna")
+# Comment these out if you want to start with normal reset and basic
+#
+# spectrum.load_sna("snapshots/screen_timing.sna")
+# spectrum.load_sna("snapshots/screen_timing_early.sna")
+# spectrum.load_sna("snapshots/screen_timing_late.sna")
+# spectrum.load_sna("snapshots/zexall.sna")
+spectrum.load_sna("snapshots/nirvana-demo.sna")
 
 # spectrum.video.fast = True
 # spectrum.z80.show_debug_info = True

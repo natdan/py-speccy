@@ -7,7 +7,7 @@ from z80.z80 import Z80, IM0, IM1, IM2
 
 # This implementation is from PyZX
 # https://github.com/Q-Master/PyZX/blob/master/load.py
-class Load:
+class Loader:
     def __init__(self, z80: Z80, ports: SpectrumPorts):
         self.z80 = z80
         self.ports = ports

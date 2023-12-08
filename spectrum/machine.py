@@ -3,6 +3,7 @@ from typing import Callable
 
 import sys
 
+from utils.loader import Loader
 from z80.memory import Memory
 from z80.z80 import Z80
 from spectrum.keyboard import Keyboard
@@ -31,6 +32,8 @@ class Spectrum:
 
         self.z80 = Z80(self.bus_access, self.memory)
 
+        self.loader = Loader(self.z80, self.ports)
+
         self.video_update_time = 0
 
         self.video.init()
@@ -57,3 +60,6 @@ class Spectrum:
 
     def execute(self, tstate_limit: int) -> None:
         self.z80.execute(tstate_limit)
+
+    def load_sna(self, filename: str) -> None:
+        self.loader.load_sna(filename)
