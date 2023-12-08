@@ -7,7 +7,7 @@ import pygame
 from pygame import Surface
 
 from spectrum.keyboard import Keyboard
-from spectrum.machine import Spectrum
+from spectrum.spectrum import Spectrum
 from spectrum.spectrum_bus_access import ZXSpectrum48ClockAndBusAccess
 from spectrum.video import COLORS, TSTATES_PER_INTERRUPT, FULL_SCREEN_WIDTH, FULL_SCREEN_HEIGHT, Video
 
@@ -26,7 +26,7 @@ class PyGameEmulator:
         self.show_fps = show_fps
         self.ratio = ratio
 
-        self.machine = spectrum
+        self.spectrum = spectrum
         self.video: Video = spectrum.video
         self.keyboard: Keyboard = spectrum.keyboard
         self.bus_access: ZXSpectrum48ClockAndBusAccess = spectrum.bus_access
@@ -68,7 +68,7 @@ class PyGameEmulator:
         pygame.display.flip()
 
     def update(self, frames: int, tstates: int) -> None:
-        pygame.transform.scale(self.machine.video.zx_screen_with_border, self.scaled_spectrum_screen_size(), self.pre_screen)
+        pygame.transform.scale(self.spectrum.video.zx_screen_with_border, self.scaled_spectrum_screen_size(), self.pre_screen)
         self.screen.blit(self.pre_screen, (0, 0))
 
         video_frame = False
@@ -133,7 +133,7 @@ class PyGameEmulator:
                 raise KeyboardInterrupt()
 
     def process_interrupt(self) -> None:
-        self.machine.end_frame()
+        self.spectrum.end_frame()
         self.process_keyboard()
         self.update(self.bus_access.frames, self.bus_access.tstates)
 
@@ -141,7 +141,7 @@ class PyGameEmulator:
         try:
             while True:
                 while self.state == EmulatorState.RUNNING:
-                    self.machine.execute(TSTATES_PER_INTERRUPT)
+                    self.spectrum.execute(TSTATES_PER_INTERRUPT)
                     self.process_interrupt()
                 while self.state == EmulatorState.PAUSED:
                     self.update(self.bus_access.frames, self.bus_access.tstates)

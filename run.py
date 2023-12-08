@@ -1,5 +1,5 @@
 from pygame_emulator import PyGameEmulator
-from spectrum.machine import Spectrum
+from spectrum.spectrum import Spectrum
 
 
 spectrum = Spectrum()

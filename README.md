@@ -12,7 +12,7 @@ Main intention for this emulator is to provide clock correct version of
 original ZX Spectrum 48k for development and debugging purposes.
 
 With code entirely made in Python it might not achieve full 100% speed
-on single core on every machine, but idea is to have fully accessible
+on a single core on every machine, but idea is to have fully accessible
 Z80 emulation along with correct memory contention timings. As such it is
 ideal for reasearch and development for this platform.
 
