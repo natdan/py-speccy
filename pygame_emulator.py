@@ -35,7 +35,6 @@ class PyGameEmulator:
 
         self.screen: Optional[Surface] = None
         self.pre_screen: Optional[Surface] = None
-        # self.scaled_spectrum_size = (FULL_SCREEN_WIDTH * self.ratio, FULL_SCREEN_HEIGHT * self.ratio)
 
         self.state = EmulatorState.RUNNING
 

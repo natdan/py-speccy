@@ -104,6 +104,8 @@ class Video:
         self.zx_screen_with_border.set_palette(COLORS)
 
     def update(self) -> None:
+        self.finish_screen()
+
         # TODO - collect timings of changes of border and recreate it afterwards here
         if self.ports.current_border != self.old_border:
             self.zx_screen_with_border.fill(self.ports.current_border)

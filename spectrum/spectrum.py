@@ -52,9 +52,11 @@ class Spectrum:
 
         sys.setswitchinterval(255)  # we don't use threads, kind of speed up
 
+    def update_video(self) -> None:
+        self.video.update()
+
     def end_frame(self) -> None:
         self.bus_access.end_frame(TSTATES_PER_INTERRUPT)
-        self.video.finish_screen()
         self.video.update()
         self.video.start_screen()
 
@@ -63,3 +65,7 @@ class Spectrum:
 
     def load_sna(self, filename: str) -> None:
         self.loader.load_sna(filename)
+
+    def execute_one_instruction(self) -> bool:
+        self.z80.execute_one_cycle()
+        return self.bus_access.tstates >= TSTATES_PER_INTERRUPT
