@@ -8,14 +8,15 @@ import time
 import pygame
 from pygame import Surface, Rect
 
-from gui.registers_gui import RegistersGUI
+from gui.hexdump import HexDumpComponent
+from gui.registers_component import RegistersComponent
 from gui.ui_size import UISize
 from pyros_support_ui.box_blue_sf_theme import BoxBlueSFThemeFactory
 from pyros_support_ui.components import UIAdapter, Collection
 from spectrum.keyboard import Keyboard
 from spectrum.spectrum import Spectrum
 from spectrum.spectrum_bus_access import ZXSpectrum48ClockAndBusAccess
-from spectrum.video import COLORS, TSTATES_PER_INTERRUPT, FULL_SCREEN_WIDTH, FULL_SCREEN_HEIGHT, Video
+from spectrum.video import COLORS, TSTATES_PER_INTERRUPT, FULL_SCREEN_WIDTH, FULL_SCREEN_HEIGHT, Video, TSTATES_PER_LINE, TSTATES_RETRACE
 
 CAPTION = "ZX Spectrum 48k Emulator"
 KEY_REPEAT_INITIAL_DELAY = 10
@@ -52,28 +53,60 @@ class DebugEnvironment:
 
         pygame.init()
         self.font = pygame.font.SysFont("Monaco", 20)
+        self.small_font = pygame.font.SysFont("Monaco", 15)
         self.zx_font = pygame.font.Font(os.path.join(os.path.dirname(__file__), "gui", "zx-spectrum.ttf"), 14)
 
         self.ui_adapter = UIAdapter(self.screen, do_init=False)
-        self.ui_factory = BoxBlueSFThemeFactory(self.ui_adapter, font=self.font, antialias=True)
-        self.top_component = Collection(self.scaled_spectrum_screen_size())
+        self.ui_factory = BoxBlueSFThemeFactory(self.ui_adapter, font=self.font, small_font=self.small_font, antialias=True)
+
+        spectrum_screen_size = self.scaled_spectrum_screen_size()
+        self.top_component = Collection(Rect(0,0, spectrum_screen_size[0], spectrum_screen_size[1]))
         self.ui_adapter.top_component = self.top_component
         self.top_component.add_component(self.ui_factory.label(Rect(5, 5, 0, 0), "State: ", font=self.zx_font))
         self.state_label = self.ui_factory.label(Rect(100, 5, 0, 0), self._state.value, font=self.zx_font)
         self.top_component.add_component(self.state_label)
-        self.registers = RegistersGUI(
+        self.registers_component = RegistersComponent(
             Rect(
-                tuple(self.spectrum_screen_offset + (0, self.scaled_spectrum_screen_size()[1] + 10)) + (0, 0)
+                tuple(self.spectrum_screen_offset + (0, spectrum_screen_size[1] + 10)) + (0, 0)
             ),
             self.ui_factory, self.spectrum.z80
         )
-        self.top_component.add_component(self.registers)
+        self.top_component.add_component(self.registers_component)
+
+        self.memory_dump = HexDumpComponent(Rect(
+                tuple(self.spectrum_screen_offset + (spectrum_screen_size[0] + 10, 0)) + (380, 200)
+            ),
+            self.ui_factory,
+            self.spectrum.z80,
+            ["PC"]
+        )
+        self.top_component.add_component(self.memory_dump)
+
+        self.stack_pointer_dump = HexDumpComponent(Rect(
+                tuple(self.spectrum_screen_offset + (spectrum_screen_size[0] + 10, 205)) + (380, 200)
+            ),
+            self.ui_factory,
+            self.spectrum.z80,
+            ["SP"]
+        )
+        self.top_component.add_component(self.stack_pointer_dump)
+
+        self.stack_pointer_dump = HexDumpComponent(Rect(
+                tuple(self.spectrum_screen_offset + (spectrum_screen_size[0] + 10, 410)) + (380, 200)
+            ),
+            self.ui_factory,
+            self.spectrum.z80,
+            ["HL", "IX", "IY"]
+        )
+        self.top_component.add_component(self.stack_pointer_dump)
 
         self.key_repeat_method: Optional[Callable] = None
         self.key_repeat_method_key_mods = 0
         self.repeat_timer = 0
         self.current_key_mods = 0
         self.step = 1
+
+        self.show_trace = True
 
         self.fast = False
         self.show_fps = True
@@ -96,7 +129,7 @@ class DebugEnvironment:
         icon = pygame.image.load('icon.png')
 
         self.screen = pygame.display.set_mode(
-            size=self.scaled_spectrum_screen_size() + (200, 130),
+            size=self.scaled_spectrum_screen_size() + (410, 130),
             flags=pygame.HWSURFACE | pygame.DOUBLEBUF,
             depth=8)
         self.pre_screen = pygame.surface.Surface(
@@ -105,17 +138,20 @@ class DebugEnvironment:
             depth=8)
         self.pre_screen.set_palette(COLORS)
 
-        pygame.draw.rect(
-            self.screen, self.spectrum_screen_border_color,
-            tuple(self.spectrum_screen_offset - (self.spectrum_screen_border_width, self.spectrum_screen_border_width))
-            + (self.scaled_spectrum_screen_size() + (self.spectrum_screen_border_width * 2, self.spectrum_screen_border_width * 2)),
-            width=3)
+        self.spectrum_screen_border_rect()
 
         self.update_ui()
 
         pygame.display.set_caption(CAPTION)
         pygame.display.set_icon(icon)
         pygame.display.flip()
+
+    def spectrum_screen_border_rect(self) -> None:
+        pygame.draw.rect(
+            self.screen, self.spectrum_screen_border_color,
+            tuple(self.spectrum_screen_offset - (self.spectrum_screen_border_width, self.spectrum_screen_border_width))
+            + (self.scaled_spectrum_screen_size() + (self.spectrum_screen_border_width * 2, self.spectrum_screen_border_width * 2)),
+            width=3)
 
     @property
     def state(self) -> EmulatorState: return self._state
@@ -130,6 +166,36 @@ class DebugEnvironment:
     def update(self, frames: int, tstates: int) -> None:
         pygame.transform.scale(self.spectrum.video.zx_screen_with_border, self.scaled_spectrum_screen_size(), self.pre_screen)
         self.screen.blit(self.pre_screen, self.spectrum_screen_offset)
+        if self.state != EmulatorState.RUNNING and self.show_trace:
+            x_offset = self.spectrum_screen_offset[0]
+            y_offset = self.spectrum_screen_offset[1]
+            if tstates >= TSTATES_PER_INTERRUPT:
+                tstates -= TSTATES_PER_INTERRUPT
+            if tstates < FULL_SCREEN_HEIGHT * TSTATES_PER_LINE:
+                line = tstates // TSTATES_PER_LINE
+
+                line_tstate = tstates - line * TSTATES_PER_LINE
+
+                line *= self.ratio
+                line_tstate = (line_tstate // 16) * 16 * self.ratio
+                if line_tstate < TSTATES_PER_LINE - TSTATES_RETRACE:
+                    pygame.draw.line(self.screen, (0, 128, 0),
+                                     (x_offset, y_offset + line),
+                                     (x_offset + FULL_SCREEN_WIDTH * self.ratio, y_offset + line))
+
+                    # line_tstate += 2
+                    pygame.draw.line(self.screen, (128, 255, 128),
+                                     (x_offset + line_tstate * 2 * self.ratio, y_offset + line),
+                                     (x_offset + (line_tstate * 2 + 16) * self.ratio, y_offset + line))
+                else:
+                    pygame.draw.line(self.screen, (0, 0, 128),
+                                     (x_offset, y_offset + line),
+                                     (x_offset + FULL_SCREEN_WIDTH * self.ratio, y_offset + line))
+            else:
+                pygame.draw.line(self.screen, (0, 0, 128),
+                                 (x_offset, y_offset),
+                                 (x_offset + FULL_SCREEN_WIDTH * self.ratio, y_offset + FULL_SCREEN_HEIGHT * self.ratio),
+                                 width=3)
 
         video_frame = False
         if self.fast:
@@ -228,6 +294,7 @@ class DebugEnvironment:
 
     def update_ui(self) -> None:
         self.screen.fill((0, 0, 0))
+        self.spectrum_screen_border_rect()
         self.ui_adapter.draw(self.screen)
         self.update(self.bus_access.frames, self.bus_access.tstates)
 
@@ -251,7 +318,7 @@ class DebugEnvironment:
                             self.process_interrupt()
                         if self.step > 0:
                             self.step -= 1
-                    self.spectrum.update_video()
+                    self.spectrum.update_screen()
                     self.update(self.bus_access.frames, self.bus_access.tstates)
                     self.state = EmulatorState.PAUSED
 

@@ -52,12 +52,12 @@ class Spectrum:
 
         sys.setswitchinterval(255)  # we don't use threads, kind of speed up
 
-    def update_video(self) -> None:
-        self.video.update()
+    def update_screen(self) -> None:
+        self.video.update_screen()
 
     def end_frame(self) -> None:
         self.bus_access.end_frame(TSTATES_PER_INTERRUPT)
-        self.video.update()
+        self.video.update_screen()
         self.video.start_screen()
 
     def execute(self, tstate_limit: int) -> None:

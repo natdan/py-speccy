@@ -21,8 +21,8 @@ FIRST_PIXEL_LINE = 64
 
 SCREEN_WIDTH = 256
 SCREEN_HEIGHT = 192
-FULL_SCREEN_WIDTH = 384
-FULL_SCREEN_HEIGHT = 256
+FULL_SCREEN_WIDTH = 352     # 352 = 48 + 256 + 48
+FULL_SCREEN_HEIGHT = 296    # 296 = 48 + 192 + 56
 CAPTION = 'PyZX'
 
 COLOR_ON_NORMAL = 205
@@ -103,14 +103,14 @@ class Video:
         self.zx_screen_with_border = pygame.surface.Surface((FULL_SCREEN_WIDTH, FULL_SCREEN_HEIGHT), pygame.HWSURFACE, 8)
         self.zx_screen_with_border.set_palette(COLORS)
 
-    def update(self) -> None:
+    def update_screen(self) -> None:
         self.finish_screen()
 
         # TODO - collect timings of changes of border and recreate it afterwards here
         if self.ports.current_border != self.old_border:
             self.zx_screen_with_border.fill(self.ports.current_border)
             self.old_border = self.ports.current_border
-        self.zx_screen_with_border.blit(self.zx_screen, (64, 32))
+        self.zx_screen_with_border.blit(self.zx_screen, (48, 48))
 
     def fill_screen_map(self) -> None:
         # zx_videoram = self.memory.mem[16384:16384 + 6912]
