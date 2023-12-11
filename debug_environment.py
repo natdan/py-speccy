@@ -11,8 +11,8 @@ from pygame import Surface, Rect
 from gui.hexdump import HexDumpComponent
 from gui.registers_component import RegistersComponent
 from gui.ui_size import UISize
-from pyros_support_ui.box_blue_sf_theme import BoxBlueSFThemeFactory
-from pyros_support_ui.components import UIAdapter, Collection
+from gui.box_blue_sf_theme import BoxBlueSFThemeFactory
+from gui.components import UIAdapter, Collection
 from spectrum.keyboard import Keyboard
 from spectrum.spectrum import Spectrum
 from spectrum.spectrum_bus_access import ZXSpectrum48ClockAndBusAccess
@@ -277,6 +277,8 @@ class DebugEnvironment:
                     self.keyboard.do_key(False, event.key, self.current_key_mods)
             elif event.type == pygame.QUIT:
                 raise KeyboardInterrupt()
+            elif self.state != EmulatorState.RUNNING:
+              self.ui_adapter.process_event(event)
 
         if self.repeat_timer > 0:
             self.repeat_timer -= 1

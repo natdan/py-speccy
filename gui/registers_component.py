@@ -1,6 +1,6 @@
 from pygame import Rect
 
-from pyros_support_ui.components import BaseUIFactory, Collection
+from gui.components import BaseUIFactory, Collection
 from z80.z80 import Z80
 
 

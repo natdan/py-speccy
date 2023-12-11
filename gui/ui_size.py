@@ -2,7 +2,7 @@ from typing import Union
 
 
 class UISize(tuple):
-    def __new__(self, width, height):
+    def __new__(cls, width, height):
         return tuple.__new__(UISize, (width, height))
 
     def __init__(self, *args, **kwargs) -> None:
