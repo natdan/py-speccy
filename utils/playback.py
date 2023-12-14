@@ -44,21 +44,25 @@ class VideoState:
 class BusState:
     def __init__(self) -> None:
         self.tstates = 0
+        self.border = 0
         self.next_screen_byte_index = 0
 
     def update_from(self, bus_access: ZXSpectrum48ClockAndBusAccess) -> None:
         self.tstates = bus_access.tstates
         self.next_screen_byte_index = bus_access.next_screen_byte_index
+        self.border = bus_access.ports.current_border
 
     def restore_to(self, bus_access: ZXSpectrum48ClockAndBusAccess) -> None:
         bus_access.tstates = self.tstates
         bus_access.next_screen_byte_index = self.next_screen_byte_index
+        bus_access.ports.current_border = self.border
 
     @classmethod
     def create_from(cls, bus_access: ZXSpectrum48ClockAndBusAccess) -> 'BusState':
         bus_state = BusState()
         bus_state.tstates = bus_access.tstates
         bus_state.next_screen_byte_index = bus_access.next_screen_byte_index
+        bus_state.border = bus_access.ports.current_border
         return bus_state
 
 

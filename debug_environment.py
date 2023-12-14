@@ -16,7 +16,7 @@ from gui.components import UIAdapter, Collection
 from spectrum.keyboard import Keyboard
 from spectrum.spectrum import Spectrum
 from spectrum.spectrum_bus_access import ZXSpectrum48ClockAndBusAccess
-from spectrum.video import COLORS, TSTATES_PER_INTERRUPT, FULL_SCREEN_WIDTH, FULL_SCREEN_HEIGHT, Video, TSTATES_PER_LINE, TSTATES_RETRACE
+from spectrum.video import COLORS, TSTATES_PER_INTERRUPT, FULL_SCREEN_WIDTH, FULL_SCREEN_HEIGHT, Video, TSTATES_PER_LINE, TSTATES_HORIZONTAL_RETRACE, TSTATES_VERTICAL_RETRACE, TSTATES_LEFT_BORDER
 from utils.playback import Playback
 
 CAPTION = "ZX Spectrum 48k Emulator"
@@ -176,15 +176,16 @@ class DebugEnvironment:
             y_offset = self.spectrum_screen_offset[1]
             if tstates >= TSTATES_PER_INTERRUPT:
                 tstates -= TSTATES_PER_INTERRUPT
-            if tstates < FULL_SCREEN_HEIGHT * TSTATES_PER_LINE:
-                line = tstates // TSTATES_PER_LINE
 
-                line_tstate = tstates - line * TSTATES_PER_LINE
+            if TSTATES_VERTICAL_RETRACE <= tstates:
+                local_ts = tstates - TSTATES_VERTICAL_RETRACE + TSTATES_LEFT_BORDER  # to correct for where the border happens
+                line = local_ts // TSTATES_PER_LINE
+                line_tstate = local_ts- line * TSTATES_PER_LINE
 
                 line *= self.ratio
                 fine_line_state = line_tstate
                 line_tstate = (line_tstate // 16) * 16
-                if line_tstate < TSTATES_PER_LINE - TSTATES_RETRACE:
+                if line_tstate < TSTATES_PER_LINE - TSTATES_HORIZONTAL_RETRACE:
                     pygame.draw.line(self.screen, (0, 128, 0),
                                      (x_offset, y_offset + line),
                                      (x_offset + FULL_SCREEN_WIDTH * self.ratio, y_offset + line))
@@ -196,16 +197,15 @@ class DebugEnvironment:
                     pygame.draw.line(self.screen, (0, 0, 128),
                                      (x_offset, y_offset + line),
                                      (x_offset + FULL_SCREEN_WIDTH * self.ratio, y_offset + line))
-                    beam_position = (TSTATES_PER_LINE - fine_line_state) * FULL_SCREEN_WIDTH * self.ratio / TSTATES_RETRACE
+                    beam_position = (TSTATES_PER_LINE - fine_line_state) * FULL_SCREEN_WIDTH * self.ratio / TSTATES_HORIZONTAL_RETRACE
                     pygame.draw.circle(self.screen, (0, 0, 140), (x_offset + beam_position, y_offset + line), 4)
             else:
                 pygame.draw.line(self.screen, (0, 0, 128),
                                  (x_offset, y_offset),
                                  (x_offset + FULL_SCREEN_WIDTH * self.ratio, y_offset + FULL_SCREEN_HEIGHT * self.ratio),
                                  width=3)
-                retrace_states = TSTATES_PER_INTERRUPT - FULL_SCREEN_HEIGHT * TSTATES_PER_LINE
-                beam_position_x = (TSTATES_PER_INTERRUPT - tstates) * FULL_SCREEN_WIDTH * self.ratio / retrace_states
-                beam_position_y = (TSTATES_PER_INTERRUPT - tstates) * FULL_SCREEN_HEIGHT * self.ratio / retrace_states
+                beam_position_x = (TSTATES_VERTICAL_RETRACE - tstates) * FULL_SCREEN_WIDTH * self.ratio / TSTATES_VERTICAL_RETRACE
+                beam_position_y = (TSTATES_VERTICAL_RETRACE - tstates) * FULL_SCREEN_HEIGHT * self.ratio / TSTATES_VERTICAL_RETRACE
                 pygame.draw.circle(self.screen, (0, 0, 140), (x_offset + beam_position_x, y_offset + beam_position_y), 4)
 
         video_frame = False
@@ -247,19 +247,17 @@ class DebugEnvironment:
 
     def key_left(self, key_mods: int) -> bool:
         if self.state == EmulatorState.PAUSED:
-            if key_mods == 0:
-                self.playback.restore_previous()
-            elif key_mods & pygame.KMOD_SHIFT != 0:
+            if key_mods & pygame.KMOD_SHIFT != 0:
                 self.playback.restore_previous(100)
+            else:
+                self.playback.restore_previous()
+
             return True
         return False
 
     def key_right(self, key_mods: int) -> bool:
         if self.state == EmulatorState.PAUSED:
-            if key_mods == 0:
-                self.step = 1
-                self.state = EmulatorState.STEPPING
-            elif key_mods & pygame.KMOD_SHIFT != 0:
+            if key_mods & pygame.KMOD_SHIFT != 0:
                 self.step = 100
                 self.state = EmulatorState.STEPPING
             elif key_mods & pygame.KMOD_CTRL != 0:
@@ -267,6 +265,9 @@ class DebugEnvironment:
                 self.state = EmulatorState.STEPPING
             elif key_mods & pygame.KMOD_ALT != 0:
                 self.state = EmulatorState.ONE_FRAME
+            else:
+                self.step = 1
+                self.state = EmulatorState.STEPPING
             return True
         return False
 
