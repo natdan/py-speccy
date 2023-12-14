@@ -1,7 +1,6 @@
 from typing import Callable
 
 from z80.bus_access import ClockAndBusAccess
-from z80.memory import Memory
 
 
 IM0 = 0
@@ -28,11 +27,8 @@ FLAG_SZHP_MASK = FLAG_SZP_MASK | HALFCARRY_MASK
 # This implementation is more or less transcription of JSpeccy's Java implementation
 # from https://github.com/jsanchezv/JSpeccy/blob/master/src/main/java/z80core/Z80.java
 class Z80:
-    def __init__(self,
-                 bus_access: ClockAndBusAccess,
-                 memory: Memory) -> None:
+    def __init__(self, bus_access: ClockAndBusAccess) -> None:
         self.bus_access = bus_access
-        self.memory = memory
 
         self.show_debug_info = False
 
@@ -375,7 +371,7 @@ class Z80:
               f"t: {self.bus_access.tstates:06} "
               f"PC: 0x{self.regPC:04x} "
               f"SP: 0x{self.regSP:04x} "
-              f"OPCODE: {self.memory.peekb(self.regPC):02x}({self.memory.peekb(self.regPC):03d}) "
+              f"OPCODE: {self.bus_access.memory.peekb(self.regPC):02x}({self.bus_access.memory.peekb(self.regPC):03d}) "
               f"A:0x{self.regA:02x} "
               f"HL:0x{self.get_reg_HL():04x} "
               f"BC:0x{self.get_reg_BC():04x} "
@@ -392,14 +388,14 @@ class Z80:
               f"IFF1:{1 if self.ffIFF1 else 0} "
               f"IFF2:{1 if self.ffIFF2 else 0} "
               f"Mem: 0x{self.regPC:04x}: "
-              f"{self.memory.peekb(self.regPC):02x}, "
-              f"{self.memory.peekb(self.regPC + 1):02x}, "
-              f"{self.memory.peekb(self.regPC + 2):02x}, "
-              f"{self.memory.peekb(self.regPC + 3):02x}, "
-              f"{self.memory.peekb(self.regPC + 4):02x}, "
-              f"{self.memory.peekb(self.regPC + 5):02x}, "
-              f"{self.memory.peekb(self.regPC + 6):02x}, "
-              f"{self.memory.peekb(self.regPC + 7):02x}")
+              f"{self.bus_access.memory.peekb(self.regPC):02x}, "
+              f"{self.bus_access.memory.peekb(self.regPC + 1):02x}, "
+              f"{self.bus_access.memory.peekb(self.regPC + 2):02x}, "
+              f"{self.bus_access.memory.peekb(self.regPC + 3):02x}, "
+              f"{self.bus_access.memory.peekb(self.regPC + 4):02x}, "
+              f"{self.bus_access.memory.peekb(self.regPC + 5):02x}, "
+              f"{self.bus_access.memory.peekb(self.regPC + 6):02x}, "
+              f"{self.bus_access.memory.peekb(self.regPC + 7):02x}")
 
     def reset(self) -> None:
         if self.pinReset:

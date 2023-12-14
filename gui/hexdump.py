@@ -97,8 +97,8 @@ class HexDumpComponent(Collection):
         for a in range(addr, addr + len(self.lines.components) * 8, 8):
             if 0 <= a < 65536 - 8:
                 text = f"0x{a:04x}: " + \
-                    ",".join([f"{self.z80.memory.peekb(a + i):02x}" for i in range(8)]) + \
-                    " |" + "".join([byte_to_char(self.z80.memory.peekb(a + i)) for i in range(8)]) + "|"
+                    ",".join([f"{self.z80.bus_access.memory.peekb(a + i):02x}" for i in range(8)]) + \
+                    " |" + "".join([byte_to_char(self.z80.bus_access.memory.peekb(a + i)) for i in range(8)]) + "|"
                 self.lines.components[line].text = text
             else:
                 self.lines.components[line].text = ""

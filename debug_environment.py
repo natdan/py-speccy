@@ -17,6 +17,7 @@ from spectrum.keyboard import Keyboard
 from spectrum.spectrum import Spectrum
 from spectrum.spectrum_bus_access import ZXSpectrum48ClockAndBusAccess
 from spectrum.video import COLORS, TSTATES_PER_INTERRUPT, FULL_SCREEN_WIDTH, FULL_SCREEN_HEIGHT, Video, TSTATES_PER_LINE, TSTATES_RETRACE
+from utils.playback import Playback
 
 CAPTION = "ZX Spectrum 48k Emulator"
 KEY_REPEAT_INITIAL_DELAY = 10
@@ -40,6 +41,8 @@ class DebugEnvironment:
         self.keyboard: Keyboard = spectrum.keyboard
         self.bus_access: ZXSpectrum48ClockAndBusAccess = spectrum.bus_access
 
+        self.playback = Playback(self.spectrum)
+
         self.video_clock = pygame.time.Clock()
 
         self.screen: Optional[Surface] = None
@@ -60,7 +63,7 @@ class DebugEnvironment:
         self.ui_factory = BoxBlueSFThemeFactory(self.ui_adapter, font=self.font, small_font=self.small_font, antialias=True)
 
         spectrum_screen_size = self.scaled_spectrum_screen_size()
-        self.top_component = Collection(Rect(0,0, spectrum_screen_size[0], spectrum_screen_size[1]))
+        self.top_component = Collection(Rect(0, 0, spectrum_screen_size[0], spectrum_screen_size[1]))
         self.ui_adapter.top_component = self.top_component
         self.top_component.add_component(self.ui_factory.label(Rect(5, 5, 0, 0), "State: ", font=self.zx_font))
         self.state_label = self.ui_factory.label(Rect(100, 5, 0, 0), self._state.value, font=self.zx_font)
@@ -69,7 +72,8 @@ class DebugEnvironment:
             Rect(
                 tuple(self.spectrum_screen_offset + (0, spectrum_screen_size[1] + 10)) + (0, 0)
             ),
-            self.ui_factory, self.spectrum.z80
+            self.ui_factory, self.spectrum.z80,
+            self.playback
         )
         self.top_component.add_component(self.registers_component)
 
@@ -119,6 +123,7 @@ class DebugEnvironment:
 
         self.key_down_methods: dict[int, Callable[[int], bool]] = {
             pygame.K_F1: self.key_pause,
+            pygame.K_LEFT: self.key_left,
             pygame.K_RIGHT: self.key_right
         }
 
@@ -177,13 +182,13 @@ class DebugEnvironment:
                 line_tstate = tstates - line * TSTATES_PER_LINE
 
                 line *= self.ratio
-                line_tstate = (line_tstate // 16) * 16 * self.ratio
+                fine_line_state = line_tstate
+                line_tstate = (line_tstate // 16) * 16
                 if line_tstate < TSTATES_PER_LINE - TSTATES_RETRACE:
                     pygame.draw.line(self.screen, (0, 128, 0),
                                      (x_offset, y_offset + line),
                                      (x_offset + FULL_SCREEN_WIDTH * self.ratio, y_offset + line))
 
-                    # line_tstate += 2
                     pygame.draw.line(self.screen, (128, 255, 128),
                                      (x_offset + line_tstate * 2 * self.ratio, y_offset + line),
                                      (x_offset + (line_tstate * 2 + 16) * self.ratio, y_offset + line))
@@ -191,11 +196,17 @@ class DebugEnvironment:
                     pygame.draw.line(self.screen, (0, 0, 128),
                                      (x_offset, y_offset + line),
                                      (x_offset + FULL_SCREEN_WIDTH * self.ratio, y_offset + line))
+                    beam_position = (TSTATES_PER_LINE - fine_line_state) * FULL_SCREEN_WIDTH * self.ratio / TSTATES_RETRACE
+                    pygame.draw.circle(self.screen, (0, 0, 140), (x_offset + beam_position, y_offset + line), 4)
             else:
                 pygame.draw.line(self.screen, (0, 0, 128),
                                  (x_offset, y_offset),
                                  (x_offset + FULL_SCREEN_WIDTH * self.ratio, y_offset + FULL_SCREEN_HEIGHT * self.ratio),
                                  width=3)
+                retrace_states = TSTATES_PER_INTERRUPT - FULL_SCREEN_HEIGHT * TSTATES_PER_LINE
+                beam_position_x = (TSTATES_PER_INTERRUPT - tstates) * FULL_SCREEN_WIDTH * self.ratio / retrace_states
+                beam_position_y = (TSTATES_PER_INTERRUPT - tstates) * FULL_SCREEN_HEIGHT * self.ratio / retrace_states
+                pygame.draw.circle(self.screen, (0, 0, 140), (x_offset + beam_position_x, y_offset + beam_position_y), 4)
 
         video_frame = False
         if self.fast:
@@ -233,6 +244,21 @@ class DebugEnvironment:
                     pygame.display.set_caption(f'{CAPTION} - PAUSED')
 
             pygame.display.flip()
+
+    def key_left(self, key_mods: int) -> bool:
+        if self.state == EmulatorState.PAUSED:
+            if key_mods == 0:
+                self.playback.restore_previous()
+            elif key_mods & pygame.KMOD_SHIFT != 0:
+                self.step = 100
+                self.playback.restore_previous(100)
+            elif key_mods & pygame.KMOD_CTRL != 0:
+                self.step = -1
+                self.state = EmulatorState.STEPPING
+            elif key_mods & pygame.KMOD_ALT != 0:
+                self.state = EmulatorState.ONE_FRAME
+            return True
+        return False
 
     def key_right(self, key_mods: int) -> bool:
         if self.state == EmulatorState.PAUSED:
@@ -278,7 +304,7 @@ class DebugEnvironment:
             elif event.type == pygame.QUIT:
                 raise KeyboardInterrupt()
             elif self.state != EmulatorState.RUNNING:
-              self.ui_adapter.process_event(event)
+                self.ui_adapter.process_event(event)
 
         if self.repeat_timer > 0:
             self.repeat_timer -= 1
@@ -303,15 +329,19 @@ class DebugEnvironment:
     def run(self) -> None:
         try:
             while True:
-                while self.state == EmulatorState.RUNNING:
+                if self.state == EmulatorState.RUNNING:
+                    while self.state == EmulatorState.RUNNING:
+                        self.spectrum.execute(TSTATES_PER_INTERRUPT)
+                        self.process_interrupt()
+                    self.playback.record()
+                elif self.state == EmulatorState.PAUSED:
+                    while self.state == EmulatorState.PAUSED:
+                        self.update(self.bus_access.frames, self.bus_access.tstates)
+                        self.process_keyboard()
+                        self.update_ui()
+                elif self.state == EmulatorState.ONE_FRAME:
                     self.spectrum.execute(TSTATES_PER_INTERRUPT)
-                    self.process_interrupt()
-                while self.state == EmulatorState.PAUSED:
-                    self.update(self.bus_access.frames, self.bus_access.tstates)
-                    self.process_keyboard()
-                    self.update_ui()
-                if self.state == EmulatorState.ONE_FRAME:
-                    self.spectrum.execute(TSTATES_PER_INTERRUPT)
+                    self.playback.record()
                     self.process_interrupt()
                     self.state = EmulatorState.PAUSED
                 elif self.state == EmulatorState.STEPPING:
@@ -320,6 +350,7 @@ class DebugEnvironment:
                             self.process_interrupt()
                         if self.step > 0:
                             self.step -= 1
+                        self.playback.record()
                     self.spectrum.update_screen()
                     self.update(self.bus_access.frames, self.bus_access.tstates)
                     self.state = EmulatorState.PAUSED

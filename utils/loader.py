@@ -3,6 +3,7 @@ import struct
 
 from spectrum.spectrum_ports import SpectrumPorts
 from z80.z80 import Z80, IM0, IM1, IM2
+from z80.z80_state import Z80State
 
 
 # This implementation is from PyZX
@@ -56,6 +57,8 @@ class Loader:
         with open(name, 'rb') as f:
             z80file = f.read()
         mz80file = memoryview(z80file)
+
+        state = Z80State(mz80file)
 
         self.z80.regA, regF, regBC, regHL, self.z80.regPC, self.z80.regSP, self.z80.regI, regR, tbyte, regDE, \
             regBCx, regDEx, regHLx, self.z80.regAx, regFx, self.z80.regIY, self.z80.regIX, iff1, iff2, im = self._z80_header.unpack_from(mz80file, 0)
@@ -252,7 +255,7 @@ class Loader:
         self.z80.regA = (regAF >> 8) & 0xff
 
         self.ports.out_port(254, (border % 8))  # border
-        self.z80.memory.mem[16384:] = msnafile[27:]
+        self.z80.bus_access.memory.mem[16384:] = msnafile[27:]
 
         # self.z80.regPC = self.z80.pop()  # self.z80.poppc()
         self.z80.regPC = 0x72  # JSpeccy's implementation uses RET instruction from the ROM

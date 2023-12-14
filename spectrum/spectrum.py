@@ -30,7 +30,7 @@ class Spectrum:
             self.ports,
             self.video.update_next_screen_word)
 
-        self.z80 = Z80(self.bus_access, self.memory)
+        self.z80 = Z80(self.bus_access)
 
         self.loader = Loader(self.z80, self.ports)
 

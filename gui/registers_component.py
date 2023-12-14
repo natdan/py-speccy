@@ -1,12 +1,14 @@
 from pygame import Rect
 
 from gui.components import BaseUIFactory, Collection
+from utils.playback import Playback
 from z80.z80 import Z80
 
 
 class RegistersComponent(Collection):
-    def __init__(self, rect: Rect, ui_factory: BaseUIFactory, z80: Z80) -> None:
+    def __init__(self, rect: Rect, ui_factory: BaseUIFactory, z80: Z80, playback: Playback) -> None:
         super().__init__(rect)
+        self.playback = playback
         self.z80 = z80
         self.first_row_label = ui_factory.label(Rect(rect.x, rect.y, 0, 0), "")
         self.second_row_label = ui_factory.label(Rect(rect.x, rect.y + 25, 0, 0), "")
@@ -20,7 +22,10 @@ class RegistersComponent(Collection):
             f"T:{self.z80.bus_access.tstates:06} "
             f"PC:{self.z80.regPC:04x} "
             f"SP:{self.z80.regSP:04x} "
-            f"OP:{self.z80.memory.peekb(self.z80.regPC):02x}({self.z80.memory.peekb(self.z80.regPC):03d}) ")
+            f"OP:{self.z80.bus_access.memory.peekb(self.z80.regPC):02x}({self.z80.bus_access.memory.peekb(self.z80.regPC):03d}) "
+            f"PS:{len(self.playback.backlog):06} "
+            f"T:{self.playback.top:06} "
+        )
         self.second_row_label.text = (
             f"A:{self.z80.regA:02x} "
             f"HL:{self.z80.get_reg_HL():04x} "
