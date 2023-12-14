@@ -250,13 +250,7 @@ class DebugEnvironment:
             if key_mods == 0:
                 self.playback.restore_previous()
             elif key_mods & pygame.KMOD_SHIFT != 0:
-                self.step = 100
                 self.playback.restore_previous(100)
-            elif key_mods & pygame.KMOD_CTRL != 0:
-                self.step = -1
-                self.state = EmulatorState.STEPPING
-            elif key_mods & pygame.KMOD_ALT != 0:
-                self.state = EmulatorState.ONE_FRAME
             return True
         return False
 
