@@ -9,6 +9,7 @@ import pygame
 from pygame import Surface, Rect
 
 from gui.hexdump import HexDumpComponent
+from gui.internal_debug_component import InternalDebugComponent
 from gui.registers_component import RegistersComponent
 from gui.ui_size import UISize
 from gui.box_blue_sf_theme import BoxBlueSFThemeFactory
@@ -72,10 +73,17 @@ class DebugEnvironment:
             Rect(
                 tuple(self.spectrum_screen_offset + (0, spectrum_screen_size[1] + 10)) + (0, 0)
             ),
-            self.ui_factory, self.spectrum.z80,
-            self.playback
+            self.ui_factory, self.spectrum.z80
         )
         self.top_component.add_component(self.registers_component)
+        self.internal_debug_component = InternalDebugComponent(
+            Rect(
+                tuple(self.spectrum_screen_offset + (spectrum_screen_size[0] + 10, spectrum_screen_size[1] + 10)) + (0, 0)
+            ),
+            self.ui_factory,
+            self.playback
+        )
+        self.top_component.add_component(self.internal_debug_component)
 
         self.memory_dump = HexDumpComponent(Rect(
                 tuple(self.spectrum_screen_offset + (spectrum_screen_size[0] + 10, 0)) + (380, 200)
@@ -96,7 +104,7 @@ class DebugEnvironment:
         self.top_component.add_component(self.stack_pointer_dump)
 
         self.stack_pointer_dump = HexDumpComponent(Rect(
-                tuple(self.spectrum_screen_offset + (spectrum_screen_size[0] + 10, 410)) + (380, 200)
+                tuple(self.spectrum_screen_offset + (spectrum_screen_size[0] + 10, 410)) + (380, 190)
             ),
             self.ui_factory,
             self.spectrum.z80,
@@ -273,6 +281,8 @@ class DebugEnvironment:
 
     def key_pause(self, _key_mods: int) -> bool:
         self.state = EmulatorState.RUNNING if self.state == EmulatorState.PAUSED else EmulatorState.PAUSED
+        if self.state == EmulatorState.RUNNING:
+            self.playback.reset()
         return False
 
     def process_keyboard(self) -> None:

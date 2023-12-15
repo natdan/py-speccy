@@ -2,14 +2,14 @@ import sys
 import struct
 
 from spectrum.spectrum_ports import SpectrumPorts
-from z80.z80 import Z80, IM0, IM1, IM2
+from z80.z80_cpu import Z80CPU, IM0, IM1, IM2
 from z80.z80_state import Z80State
 
 
 # This implementation is from PyZX
 # https://github.com/Q-Master/PyZX/blob/master/load.py
 class Loader:
-    def __init__(self, z80: Z80, ports: SpectrumPorts):
+    def __init__(self, z80: Z80CPU, ports: SpectrumPorts):
         self.z80 = z80
         self.ports = ports
         self._z80_header = struct.Struct('<BBHHHHBBBHHHHBBHHBBB')

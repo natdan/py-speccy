@@ -1,6 +1,6 @@
 from typing import Optional
 
-from z80.z80 import Z80
+from z80.z80_cpu import Z80CPU
 
 
 class Z80State:
@@ -178,7 +178,7 @@ class Z80State:
         self.state[29] = value
 
     @classmethod
-    def create_from(self, z80: Z80, border_colour: int) -> 'Z80State':
+    def create_from(self, z80: Z80CPU, border_colour: int) -> 'Z80State':
         state = Z80State()
         state.regA = z80.regA
         state.regF = z80.get_flags()
@@ -202,7 +202,7 @@ class Z80State:
         state.modeINT = z80.modeINT
         return state
 
-    def update_from(self, z80: Z80, border_colour: int) -> None:
+    def update_from(self, z80: Z80CPU, border_colour: int) -> None:
         self.regA = z80.regA
         self.regF = z80.get_flags()
         self.regBC = z80.get_reg_BC()
@@ -225,7 +225,7 @@ class Z80State:
         self.modeINT = z80.modeINT
 
     # Returns border colour
-    def restore_to(self, z80: Z80) -> int:
+    def restore_to(self, z80: Z80CPU) -> int:
         z80.regA = self.regA
         z80.set_flags(self.regF)
         z80.set_reg_BC(self.regBC)

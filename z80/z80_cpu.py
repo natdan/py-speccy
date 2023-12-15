@@ -26,7 +26,7 @@ FLAG_SZHP_MASK = FLAG_SZP_MASK | HALFCARRY_MASK
 
 # This implementation is more or less transcription of JSpeccy's Java implementation
 # from https://github.com/jsanchezv/JSpeccy/blob/master/src/main/java/z80core/Z80.java
-class Z80:
+class Z80CPU:
     def __init__(self, bus_access: ClockAndBusAccess) -> None:
         self.bus_access = bus_access
 

@@ -6,13 +6,13 @@ from typing import Optional
 from pygame import Rect, Surface
 
 from gui.components import BaseUIFactory, Collection, LeftRightLayout, TopDownLayout, ALIGNMENT, UiHint, BorderDecoration, Component
-from z80.z80 import Z80
+from z80.z80_cpu import Z80CPU
 
 SEPARATOR_HEIGHT = 3
 
 
 class HexDumpComponent(Collection):
-    def __init__(self, rect: Rect, ui_factory: BaseUIFactory, z80: Z80, registers: list[str]) -> None:
+    def __init__(self, rect: Rect, ui_factory: BaseUIFactory, z80: Z80CPU, registers: list[str]) -> None:
         super().__init__(rect)
         self._ui_factory = ui_factory
         self.z80 = z80

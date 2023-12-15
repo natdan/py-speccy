@@ -5,7 +5,7 @@ import sys
 
 from utils.loader import Loader
 from z80.memory import Memory
-from z80.z80 import Z80
+from z80.z80_cpu import Z80CPU
 from spectrum.keyboard import Keyboard
 from spectrum.spectrum_bus_access import ZXSpectrum48ClockAndBusAccess
 from spectrum.spectrum_ports import SpectrumPorts
@@ -30,7 +30,7 @@ class Spectrum:
             self.ports,
             self.video.update_next_screen_word)
 
-        self.z80 = Z80(self.bus_access)
+        self.z80 = Z80CPU(self.bus_access)
 
         self.loader = Loader(self.z80, self.ports)
 
