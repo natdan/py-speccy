@@ -1,0 +1,296 @@
+grammar z80;
+
+scanner Z80AssemblerScanner {
+
+    "="; ";"; ","; "."; "("; ")"; "+"; "-";
+
+    "adc"; "add"; "and";
+    "bit"; "call"; "ccf"; "cp"; "cpd"; "cpdr"; "cpi"; "cpir";
+    "daa"; "dec"; "di"; "djnz";
+    "ei"; "ex"; "exx"; "halt"; "im"; "in"; "inc"; "ind"; "indr"; "ini"; "inir";
+    "jp"; "jr";
+    "ld"; "ldd"; "lddr"; "ldi"; "ldir";
+    "neg"; "nop";
+    "or"; "otdr"; "otir"; "out"; "outd"; "outi";
+    "pop"; "push"; "res"; "ret"; "reti"; "retn";
+    "rl"; "rla"; "rlc"; "rlca"; "rld";
+    "rr"; "rra"; "rrc"; "rrca"; "rrd";
+    "rst";
+    "sbc"; "scf"; "set";
+    "sla"; "sra"; "srl"; "sub";
+    "xor";
+    "a"; "b"; "c"; "d"; "e"; "h"; "l"; "i"; "r";
+    "bc"; "de"; "hl"; "ix"; "iy"; "af"; "af'"; "sp";
+    "nz"; "z"; "nc"; "c"; "po"; "pe"; "p"; "m";
+
+    eol     = CHR(10);
+
+    private digit   = '0' .. '9';
+    private letter  = 'A' .. 'Z' | 'a' .. 'z';
+
+    literal
+        = "'" (('\\' CHR(32)..CHR(127)) | (CHR(32) .. CHR(91) | CHR(93) .. CHR(127) ) ) "'"
+        | "CHR" "(" digit { digit } ")"
+        <%
+            c = ' '
+            if s.startswith("CHR("):
+                try:
+                    c = chr(int(s[4:-1]))
+                except Exception:
+                    pass
+            elif s.startswith("'\\"):
+                c = s[2]
+            else:
+                c = s[1]
+
+            return Token(c, self.TOKEN_literal, self.start_line, self.start_pos)
+        %>
+        ;
+
+    private char    = ' ' | CHR(33) | '\\' CHR(34) | CHR(35) .. CHR(127) ;
+
+    string
+        = '"' { char } '"'
+        <%
+            i = s.find('\\')
+            if i > 0:
+                l = 0
+                sb = ""
+                while i > 0:
+                    sb += s[l:i]
+                    sb += s[i + 1]
+                    l = i + 2
+                    i = s.find('\\', l)
+
+                s = sb
+
+            return Token(s[1:-1], self.TOKEN_string, self.start_line, self.start_pos)
+        %>
+        ;
+
+    ident = ( '.' | '_' | letter) { letter | digit | '_' | '.' };
+
+    unsigned_number = digit { digit } ["h" | "H"];
+
+    private allbuteol = CHR(1) .. CHR(9) | CHR(11) .. CHR(127);
+
+    comments    = ";" { allbuteol } eol ;
+    private whitespace  = ( " " | CHR(1) .. CHR(9) | CHR(11) .. CHR(31) ) ;
+
+}
+
+
+parser Z80AssemblerParser using scanner Z80AssemblerScanner {
+
+
+<%
+
+%>
+
+    z80 = {
+            [instruction] (comments | eol)
+          } eof ;
+
+    instruction = (
+          "adc" adc_op
+        | "add" add_op
+        | "and" s_op<"and">
+        | "bit" bit_op<"bit">
+        | "call" call_op
+        | "ccf"
+        | "cp" s_op<"cp">
+        | "cpd"
+        | "cpdr"
+        | "cpi"
+        | "cpir"
+        | "daa"
+        | "dec" m_op<"dec">
+        | "di"
+        | "djnz" relative
+        | "ei"
+        | "ex" ex_op
+        | "exx"
+        | "halt"
+        | "im" im_op
+        | "in" in_op
+        | "inc" m_op<"inc">
+        | "ind"
+        | "indr"
+        | "ini"
+        | "inir"
+        | "jp" jp_op
+        | "jr" jr_op
+        | "ld" ld_op
+        | "ldd"
+        | "lddr"
+        | "ldi"
+        | "ldir"
+        | "neg"
+        | "nop"
+        | "or" s_op<"or">
+        | "otdr"
+        | "otir"
+        | "out" out_op
+        | "outd"
+        | "outi"
+        | "pop" pop_op<"pop">
+        | "push" pop_op<"push">
+        | "res" bit_op<"res">
+        | "ret" ret_op
+        | "reti"
+        | "retn"
+        | "rl" m_op<"rl">
+        | "rla"
+        | "rlc" m_op<"rlc">
+        | "rlca"
+        | "rld"
+        | "rr"  m_op<"rr">
+        | "rra"
+        | "rrc" m_op<"rrc">
+        | "rrca"
+        | "rrd"
+        | "rst" immediate
+        | "sbc" sbc_op
+        | "scf"
+        | "set" bit_op<"set">
+        | "sla" m_op<"sla">
+        | "sra" m_op<"sra">
+        | "srl" m_op<"srl">
+        | "sub" s_op<"sub">
+        | "xor" s_op<"xor">
+        );
+
+    ld_op =
+          ( "("
+              ( "hl" ")" "," ("a" | register | immediate )
+              | ("ix" | "iy") ("+" | "-") unsigned_number ")" "," ("a" | register | immediate)
+              | "bc" ")" "," "a"
+              | "de" ")" "," "a"
+              | addr16 ")" "," ("a" | "hl" | "ix" | "iy" | dd)
+              )
+          | "sp" "," ("hl" | "ix" | "iy" | "(" addr16 ")" | immediate )
+          | dd "," ("(" addr16 ")" | immediate )
+          | "ix" "," ("(" addr16 ")" | immediate )
+          | "iy" "," ("(" addr16 ")" | immediate )
+          | "i" "," "a"
+          | "r" "," "a"
+          | "a" ","
+              ("i"
+              | "r"
+              | "("
+                  ( "bc"
+                  | "de"
+                  | addr16
+                  )
+                 ")"
+              )
+          | register ","
+              ( register
+              | immediate
+              | "("
+                  ( "hl"
+                  | ("ix" | "iy") ("+" | "-") unsigned_number
+                  )
+                ")"
+              )
+          );
+
+    add_op =
+           ( "hl" "," ss
+           | "ix" "," pp
+           | "iy" "," rr
+           | a_op<"add">
+           );
+
+    adc_op =
+           ( "hl" "," ss
+           | a_op<"adc">
+           );
+
+    sbc_op =
+           ( "hl" "," ss
+           | a_op<"sbc">
+           );
+
+    call_op = (cc "," addr16) | addr16 ;
+
+    jp_op =
+          ( "(" ("hl" | "ix" | "iy") ")"
+          | (cc "," addr16)
+          | addr16
+          );
+
+    jr_op =
+          ( "nz" "," relative
+          | "z" "," relative
+          | "nc" "," relative
+          | "c" "," relative
+          | relative
+          );
+
+    out_op = "("
+            ( "c" ")" "," register
+            | immediate ")" "," "a"
+            );
+
+    in_op = ( "a" "," "(" immediate ")"
+            | register "," "(" "c" ")"
+            );
+
+    ex_op = ( "de" "," "hl"
+            | "af" "," "af'"
+            | "(" "sp" ")" ","
+                ( "hl" | "ix" | "iy" )
+            );
+
+    pop_op<op: str> = qq | "ix" | "iy";
+
+    ret_op = [cc];
+
+    im_op = unsigned_number;
+
+    a_op<op: str> = "a" ","
+        ( register
+        | immediate
+        | "(" ("hl"
+              | ("ix" | "iy") ("+" | "-") unsigned_number
+              )
+          ")"
+        );
+
+    s_op<op: str> =
+        ( register
+        | immediate
+        | "(" ("hl"
+              | ("ix" | "iy") ("+" | "-") unsigned_number
+              )
+          ")"
+        );
+
+    m_op<op: str> =
+        ( register
+        | "(" ("hl"
+              | ("ix" | "iy") ("+" | "-") unsigned_number
+              )
+          ")"
+        );
+
+    bit_op<op: str> = unsigned_number ","
+        ( register
+        | "(" ("hl"
+              | ("ix" | "iy") ("+" | "-") unsigned_number
+              )
+          ")"
+        );
+
+    addr16 = unsigned_number | ident;
+    relative = (["+"|"-"] unsigned_number) | ident;
+    immediate = (["+"|"-"] unsigned_number) | ident;
+    register = "a" | "b" | "c" | "d" | "e" | "h" | "l";
+    cc = "nz" | "z" | "nc" | "c" | "po" | "pe" | "p" | "m";
+    qq = "bc" | "de" | "hl" | "af";
+    ss = "bc" | "de" | "hl" | "sp";
+    pp = "bc" | "de" | "ix" | "sp";
+    rr = "bc" | "de" | "iy" | "sp";
+    dd = "bc" | "de" | "hl" | "sp";
+}
