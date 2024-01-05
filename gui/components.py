@@ -2,8 +2,10 @@ from enum import Enum, auto
 from typing import Tuple, List, Optional
 
 import pygame
-from pygame import Rect
+from pygame import Rect, Surface
 from pygame.font import Font
+
+from gui.ui_size import UISize
 
 
 class ALIGNMENT(Enum):
@@ -35,6 +37,9 @@ class Component:
 
     def draw(self, surface) -> None:
         pass
+
+    def calculate_size(self) -> UISize:
+        return UISize(self.rect.width, self.rect.height)
 
     def redefine_rect(self, rect: Rect) -> None:
         self.rect = rect
@@ -71,19 +76,22 @@ class BaseLayout:
 
 
 class TopDownLayout(BaseLayout):
-    def __init__(self, margin: int = 0):
+    def __init__(self, margin: int = 0, stretch: bool = False):
         super().__init__()
         self.margin = margin
+        self.stretch = stretch
 
     def arrange(self, rect: Rect, components: List[Component]) -> None:
         y = rect.y
         for component in components:
-            if component.rect is not None and component.rect.height != 0:
-                height = component.rect.height
-            else:
-                height = (rect.height - self.margin * (len(components) - 1)) // len(components)
-            component.redefine_rect(Rect(rect.x, y, rect.width, height))
-            y += self.margin + height
+            component_size = component.calculate_size()
+            height = component_size.height
+            # if component.rect is not None and component.rect.height != 0:
+            #     height = component.rect.height
+            # else:
+            #     height = (rect.height - self.margin * (len(components) - 1)) // len(components)
+            component.redefine_rect(Rect(rect.x, y, rect.width if self.stretch else component_size.width, height))
+            y += self.margin + component.rect.height
 
 
 class LeftRightLayout(BaseLayout):
@@ -135,6 +143,20 @@ class Collection(Component):
         for component in self.components:
             if component.visible:
                 component.draw(surface)
+
+    def calculate_size(self) -> UISize:
+        if self.layout:
+            self.layout.arrange(self.rect, self.components)
+
+        max_width = 0
+        max_height = 0
+
+        for component in self.components:
+            component_rect = component.rect
+            if component_rect.right > max_width: max_width = component_rect.right
+            if component_rect.bottom > max_height: max_height = component_rect.bottom
+
+        return UISize(max_width - self.rect.x, max_height - self.rect.y)
 
     def find_component(self, pos) -> Optional[Component]:
         for component in reversed(self.components):
@@ -213,6 +235,11 @@ class Panel(Collection):
         if self.decoration is not None:
             self.decoration.draw(surface)
         super().draw(surface)
+
+    def calculate_size(self) -> UISize:
+        width, height = super().calculate_size()
+
+        return UISize(width + self.horizontal_decoration_margin * 2, height + self.vertical_decoration_margin * 2)
 
 
 class Menu(Panel):
@@ -399,11 +426,19 @@ class Image(Component):
 
 
 class Label(Image):
-    def __init__(self, rect, text, colour=None, font=None, antialias=True, h_alignment=ALIGNMENT.LEFT, v_alignment=ALIGNMENT.TOP):
+    def __init__(self,
+                 rect: Rect,
+                 text: str,
+                 colour=None,
+                 background_colour=None,
+                 font=None,
+                 antialias=True,
+                 h_alignment=ALIGNMENT.LEFT, v_alignment=ALIGNMENT.TOP):
         super(Label, self).__init__(rect, None, h_alignment, v_alignment)  # Call super constructor to store rectable
         self._text = text
         self.font = font
         self._colour = colour if colour is not None else pygame.color.THECOLORS['white']
+        self._background_colour = background_colour
         self.antialias = antialias
 
     @property
@@ -419,16 +454,46 @@ class Label(Image):
     def colour(self): return self._colour
 
     @colour.setter
-    def colour(self, colour):
+    def colour(self, colour) -> None:
         self._colour = colour
         self.invalidate_surface()
 
-    def invalidate_surface(self):
-        self._surface = None
+    @property
+    def background_colour(self): return self._background_colour
+
+    @background_colour.setter
+    def background_colour(self, background_colour) -> None:
+        self._background_colour = background_colour
+        self.invalidate_surface()
+
+    def invalidate_surface(self) -> None:
+        self._surface: Optional[Surface] = None
+
+    def create_rect(self) -> None:
+        if self._surface is None:
+            self.create_surface()
+        surface_size = self.calculate_size()
+        self.rect = Rect(0, 0, surface_size[0], surface_size[1])
+
+    def calculate_size(self) -> UISize:
+        if self._surface is None:
+            self.create_surface()
+        surface_size = self._surface.get_size()
+        return UISize(surface_size[0], surface_size[1])
+
+    def create_surface(self) -> Surface:
+        if self._surface is None:
+            self._surface = self._font().render(self._text, self.antialias, self.colour)
+            if self._background_colour:
+                new_surface = Surface(self._surface.get_size())
+                new_surface.fill(self._background_colour)
+                new_surface.blit(self._surface, (0, 0))
+                self._surface = new_surface
+        return self._surface
 
     def draw(self, surface):
         if self._surface is None:
-            self._surface = self._font().render(self._text, self.antialias, self.colour)
+            self.create_surface()
 
         super(Label, self).draw(surface)
 
