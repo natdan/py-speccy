@@ -44,13 +44,13 @@ class Modal(Collection):
         if self.modal_component:
             self.modal_component.mouse_down(mouse_pos)
         else:
-            super().mouse_over(mouse_pos)
+            super().mouse_down(mouse_pos)
 
     def mouse_up(self, mouse_pos) -> None:
         if self.modal_component:
             self.modal_component.mouse_up(mouse_pos)
         else:
-            super().mouse_over(mouse_pos)
+            super().mouse_up(mouse_pos)
 
     def draw(self, surface) -> None:
         super().draw(surface)

@@ -123,7 +123,10 @@ class DebugEnvironment:
         )
         self.top_component.add_component(self.stack_pointer_dump)
 
-        self._help_modal = HelpModal(self.top_component.rect, ui_factory=self.ui_factory)
+        def close_modal(*args) -> None:
+            self.top_component.hide_modal()
+
+        self._help_modal = HelpModal(self.top_component.rect, ui_factory=self.ui_factory, close_modal=close_modal)
 
         self._key_repeat_method: Optional[Callable] = None
         self._key_repeat_method_key = 0
