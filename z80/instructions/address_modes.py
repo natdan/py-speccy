@@ -19,9 +19,7 @@ class _R(AddrModeElement):
         7: "a",
     }
 
-    def to_str(self, **params) -> str:
-        r = params["r"]
-        return self.rs[r]
+    def to_str(self, **params) -> str: return self.rs[params["r"]]
 
 
 class _COMMA(AddrModeElement):
@@ -43,6 +41,22 @@ class _PIXDP(AddrModeElement):
         return f"(ix{'+' if d >= 0 else ''}{d})"
 
 
+class _IX(AddrModeElement):
+    def to_str(self, **params) -> str: return "ix"
+
+
+class _IY(AddrModeElement):
+    def to_str(self, **params) -> str: return "iy"
+
+
+class _PIXP(AddrModeElement):
+    def to_str(self, **params) -> str: return "(ix)"
+
+
+class _PIYP(AddrModeElement):
+    def to_str(self, **params) -> str: return "(iy)"
+
+
 class _PIYDP(AddrModeElement):
     def to_str(self, **params) -> str:
         d = params["d"]
@@ -54,14 +68,100 @@ class _BIT(AddrModeElement):
     def to_str(self, **params) -> str: return str(params["b"])
 
 
+class _NN(AddrModeElement):
+    def to_str(self, **params) -> str: return f"0x{params['nn']:04x}"
+
+
+class _CC(AddrModeElement):
+    CC = {
+        0: "nz",
+        1: "z",
+        2: "nc",
+        3: "c",
+        4: "po",
+        5: "pe",
+        6: "p",
+        7: "m"
+    }
+    def to_str(self, **params) -> str: return _CC.CC[params["cc"]]
+
+
+class _E(AddrModeElement):
+    def to_str(self, **params) -> str: return f"0x{params['e']:04x}"
+
+
+class _C(AddrModeElement):
+    def to_str(self, **params) -> str: return "c"
+
+
+class _NC(AddrModeElement):
+    def to_str(self, **params) -> str: return "nc"
+
+
+class _Z(AddrModeElement):
+    def to_str(self, **params) -> str: return "z"
+
+
+class _NZ(AddrModeElement):
+    def to_str(self, **params) -> str: return "nz"
+
+
+class _QQ(AddrModeElement):
+    QQ = {
+        0: "bc",
+        1: "de",
+        2: "hl",
+        3: "af"
+    }
+    def to_str(self, **params) -> str: return _QQ.QQ[params["qq"]]
+
+
+class _DE(AddrModeElement):
+    def to_str(self, **params) -> str: return "de"
+
+
+class _HL(AddrModeElement):
+    def to_str(self, **params) -> str: return "hl"
+
+
+class _PSPP(AddrModeElement):
+    def to_str(self, **params) -> str: return "(sp)"
+
+
+class _AF(AddrModeElement):
+    def to_str(self, **params) -> str: return "af"
+
+
+class _AFp(AddrModeElement):
+    def to_str(self, **params) -> str: return "af'"
+
+
 class AddrMode(Enum):
     SIMPLE = []
     R = [_R()]
     N = [_N()]
+    IX = [_IX()]
+    IY = [_IY()]
     PHLP = [_PHLP()]
+    PIXP = [_PIXP()]
+    PIYP = [_PIYP()]
     PIXDP = [_PIXDP()]
     PIYDP = [_PIYDP()]
     BR = [_BIT(), _COMMA(), _R()]
     BPHLP = [_BIT(), _COMMA(), _PHLP()]
     BPIXDP = [_BIT(), _COMMA(), _PIXDP()]
     BPIYDP = [_BIT(), _COMMA(), _PIYDP()]
+    NN = [_NN()]
+    CC = [_CC()]
+    CCNN = [_CC(), _COMMA(), _NN()]
+    E = [_E()]  # Relative
+    CE = [_C(), _COMMA(), _E()]
+    NCE = [_NC(), _COMMA(), _E()]
+    ZE = [_Z(), _COMMA(), _E()]
+    NZE = [_NZ(), _COMMA(), _E()]
+    QQ = [_QQ()]
+    DEHL = [_DE(), _COMMA(), _HL()]
+    AFAFp = [_AF(), _COMMA(), _AFp()]
+    SPHL = [_PSPP(), _COMMA(), _HL()]
+    SPIX = [_PSPP(), _COMMA(), _IX()]
+    SPIY = [_PSPP(), _COMMA(), _IY()]

@@ -5,6 +5,7 @@ from typing import Callable, Optional
 from z80.instructions.address_modes import AddrMode
 
 CB_CODE = 0xcb
+ED_CODE = 0xed
 IX_CODE = 0xdd
 IY_CODE = 0xfd
 
@@ -22,6 +23,7 @@ class Mnemonics(Enum):
     CPDR = "cpdr"
     CPI = "cpi"
     CPIR = "cpir"
+    CPL = "cpl"
     DAA = "daa"
     DEC = "dec"
     DI = "di"
@@ -106,6 +108,7 @@ class InstructionDecoder(ABC):
 
 DECODE_MAP: dict[int, InstructionDecoder] = {}
 DECODE_MAP_CB: dict[int, InstructionDecoder] = {}
+DECODE_MAP_ED: dict[int, InstructionDecoder] = {}
 DECODE_MAP_IDCB: dict[int, InstructionDecoder] = {}
 DECODE_MAP_IXY: dict[int, InstructionDecoder] = {}
 
@@ -151,6 +154,18 @@ class CBInstructionDecoder(InstructionDecoder):
         return Instruction(address, UnknownInstructionDef(prefix, instr), AddrMode.SIMPLE)
 
 
+class EDInstructionDecoder(InstructionDecoder):
+    def __init__(self) -> None:
+        super().__init__()
+
+    def decode(self, address: int, prefix: int, next_byte: NEXT_BYTE_CALLBACK, ixy: Optional[IXY] = None, **params) -> 'Instruction':
+        instr = next_byte()
+        if instr in DECODE_MAP_ED:
+            return DECODE_MAP_ED[instr].decode(address, instr, next_byte, ixy)
+
+        return Instruction(address, UnknownInstructionDef(prefix, instr), AddrMode.SIMPLE)
+
+
 class IXYCBInstructionDecoder(InstructionDecoder):
     def __init__(self) -> None:
         super().__init__()
@@ -167,6 +182,7 @@ class IXYCBInstructionDecoder(InstructionDecoder):
 DECODE_MAP[IX_CODE] = IXYInstructionDecoder(IXY.IX)
 DECODE_MAP[IY_CODE] = IXYInstructionDecoder(IXY.IY)
 DECODE_MAP[CB_CODE] = CBInstructionDecoder()
+DECODE_MAP[ED_CODE] = EDInstructionDecoder()
 DECODE_MAP_IXY[CB_CODE] = IXYCBInstructionDecoder()
 
 
@@ -198,6 +214,18 @@ class SimpleInstructionDef(InstructionDef):
 
     def update_decode_map(self) -> None:
         DECODE_MAP[self.code] = self
+
+    def decode(self, address: int, instr: int, next_byte: NEXT_BYTE_CALLBACK, ixy: Optional[IXY] = None, **params) -> 'Instruction':
+        return Instruction(address, self, AddrMode.SIMPLE, **params)
+
+
+class SimpleEDInstructionDef(InstructionDef):
+    def __init__(self, mnemonics: Mnemonics, code: int) -> None:
+        super().__init__(mnemonics)
+        self.code = code
+
+    def update_decode_map(self) -> None:
+        DECODE_MAP_ED[self.code] = self
 
     def decode(self, address: int, instr: int, next_byte: NEXT_BYTE_CALLBACK, ixy: Optional[IXY] = None, **params) -> 'Instruction':
         return Instruction(address, self, AddrMode.SIMPLE, **params)
@@ -257,32 +285,75 @@ class MOPInstructionDef(InstructionDef, ABC):
     def __init__(self,
                  mnemonic: Mnemonics,
                  reg_op: int,
-                 n_op: int,
                  hl_op: int) -> None:
         super().__init__(mnemonic)
         self.reg_op = reg_op
-        self.n_op = n_op
         self.hl_op = hl_op
 
     def update_decode_map(self) -> None:
         for r in range(8):
             if r != 6:
-                DECODE_MAP[self.reg_op + r] = self
-        DECODE_MAP[self.n_op] = self
+                DECODE_MAP[self.reg_op + r * 8] = self
         DECODE_MAP[self.hl_op] = self
         DECODE_MAP_IXY[self.hl_op] = self
 
     def decode(self, address: int, instr: int, next_byte: NEXT_BYTE_CALLBACK, ixy: Optional[IXY] = None, **params) -> Instruction:
-        if instr == self.n_op:
-            return Instruction(address, self, AddrMode.N, n=next_byte(), **params)
-        elif ixy:
+        if ixy:
             return Instruction(address, self, AddrMode.PIXDP if ixy == IXY.IX else AddrMode.PIYDP, d=next_byte(), **params)
+        elif instr == self.hl_op:
+            return Instruction(address, self, AddrMode.PHLP, **params)
+        elif instr & self.reg_op == self.reg_op:
+            return Instruction(address, self, AddrMode.R, r=(instr & 0x38) // 8, **params)
+        else:
+            raise ValueError(f"Cannot decode; {instr}, ixy={ixy}")
+
+
+class PushPopInstructionDef(InstructionDef, ABC):
+    def __init__(self,
+                 mnemonic: Mnemonics,
+                 qq_op: int,
+                 hl_op: int) -> None:
+        super().__init__(mnemonic)
+        self.qq_op = qq_op
+        self.hl_op = hl_op
+
+    def update_decode_map(self) -> None:
+        for r in range(4):
+            DECODE_MAP[self.qq_op + r * 16] = self
+        DECODE_MAP_IXY[self.hl_op] = self
+
+    def decode(self, address: int, instr: int, next_byte: NEXT_BYTE_CALLBACK, ixy: Optional[IXY] = None, **params) -> Instruction:
+        if ixy:
+            return Instruction(address, self, AddrMode.IX if ixy == IXY.IX else AddrMode.IY, **params)
+        elif instr & self.qq_op == self.qq_op:
+            return Instruction(address, self, AddrMode.QQ, qq=(instr & 0x30) // 16, **params)
+        else:
+            raise ValueError(f"Cannot decode; {instr}, ixy={ixy}")
+
+
+class CBMOPInstructionDef(InstructionDef, ABC):
+    def __init__(self,
+                 mnemonic: Mnemonics,
+                 reg_op: int,
+                 hl_op: int) -> None:
+        super().__init__(mnemonic)
+        self.reg_op = reg_op
+        self.hl_op = hl_op
+
+    def update_decode_map(self) -> None:
+        for r in range(8):
+            if r != 6:
+                DECODE_MAP_CB[self.reg_op + r] = self
+        DECODE_MAP_CB[self.hl_op] = self
+        DECODE_MAP_IDCB[self.hl_op] = self
+
+    def decode(self, address: int, instr: int, next_byte: NEXT_BYTE_CALLBACK, ixy: Optional[IXY] = None, **params) -> Instruction:
+        if ixy:
+            return Instruction(address, self, AddrMode.PIXDP if ixy == IXY.IX else AddrMode.PIYDP, **params)
         elif instr == self.hl_op:
             return Instruction(address, self, AddrMode.PHLP, **params)
         elif instr & 0xF8 == self.reg_op:
             return Instruction(address, self, AddrMode.R, r=instr & 0x7, **params)
-        elif ixy:
-            return Instruction(address, self, AddrMode.PIXDP if ixy == IXY.IX else AddrMode.PIYDP, n=next_byte(), **params)
         else:
             raise ValueError(f"Cannot decode; {instr}, ixy={ixy}")
 

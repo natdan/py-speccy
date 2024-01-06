@@ -2,17 +2,16 @@ import os.path
 
 import sys
 
-from spectrum.profiling_spectrum_bus_access import ProfilingZXSpectrum48ClockAndBusAccess
-from utils.loader import Loader
-
-from z80.instructions import Instruction, InstructionDef, UnknownInstructionDef, decode_instruction
-from z80.memory import Memory
-from z80.z80_cpu import Z80CPU
 from spectrum.keyboard import Keyboard
+from spectrum.profiling_spectrum_bus_access import ProfilingZXSpectrum48ClockAndBusAccess
 from spectrum.spectrum_bus_access import ZXSpectrum48ClockAndBusAccess
 from spectrum.spectrum_ports import SpectrumPorts
 from spectrum.video import TSTATES_PER_INTERRUPT, Video
-
+from utils.loader import Loader
+from z80.instructions import Instruction, decode_instruction, AddrMode
+from z80.instructions.instructions import HALT
+from z80.memory import Memory
+from z80.z80_cpu import Z80CPU
 
 ROMFILE = "zxspectrum48k.rom"
 
@@ -99,8 +98,10 @@ class Spectrum:
             # code = self.memory.mem[address]
             tstates = self._profiling_bus_access.tstates
             self.z80.execute_one_cycle()
-            instruction = decode_instruction(address, next_byte)
-            # instruction = Instruction(address, UnknownInstructionDef(code), AddrMode.SIMPLE)
+            if self.z80.halted:
+                instruction = Instruction(address, HALT(), AddrMode.SIMPLE)
+            else:
+                instruction = decode_instruction(address, next_byte)
             instruction.profile = self._profiling_bus_access.profile
             instruction.tstates = tstates
             self.instructions.append(instruction)
@@ -110,10 +111,10 @@ class Spectrum:
         for instruction in self.instructions:
             s = instruction.to_str(2)
             l = len(s)
-            if l < 15:
-                s += " " * (15 - l)
+            if l < 19:
+                s += " " * (19 - l)
 
-            print(f"{instruction.address:04x} ({instruction.tstates:05d}): {s} {' '.join(str(p) for p in instruction.profile)}")
+            print(f"0x{instruction.address:04x} ({instruction.tstates:05d}): {s} {' '.join(str(p) for p in instruction.profile)}")
 
     def load_sna(self, filename: str) -> None:
         self.loader.load_sna(filename)

@@ -103,6 +103,7 @@ parser Z80AssemblerParser using scanner Z80AssemblerScanner {
         | "cpdr"
         | "cpi"
         | "cpir"
+        | "cpl"
         | "daa"
         | "dec" m_op<"dec">
         | "di"
@@ -141,7 +142,7 @@ parser Z80AssemblerParser using scanner Z80AssemblerScanner {
         | "retn"
         | "rl" m_op<"rl">
         | "rla"
-        | "rlc" m_op<"rlc">
+        | "rlc" m_op<"rlc">  // Wrong. Only reg here!
         | "rlca"
         | "rld"
         | "rr"  m_op<"rr">
