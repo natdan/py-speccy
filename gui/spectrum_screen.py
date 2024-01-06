@@ -4,19 +4,19 @@ from pygame import Rect, Surface
 from emulator_state import EmulatorState
 from gui.components import Component
 from gui.ui_size import UISize
+from spectrum.spectrum import Spectrum
 from spectrum.video import FULL_SCREEN_WIDTH, TSTATES_VERTICAL_RETRACE, FULL_SCREEN_HEIGHT, TSTATES_PER_LINE, TSTATES_HORIZONTAL_RETRACE, TSTATES_LEFT_BORDER, TSTATES_PER_INTERRUPT
-from z80.bus_access import ClockAndBusAccess
 
 
 MARGIN = 6
 
 
 class SpectrumScreen(Component):
-    def __init__(self, rect: Rect, surface: Surface, bus_access: ClockAndBusAccess, ratio: int) -> None:
+    def __init__(self, rect: Rect, surface: Surface, spectrum: Spectrum, ratio: int) -> None:
         super().__init__(rect)
         self._surface = surface
         self.ratio = ratio
-        self.bus_access = bus_access
+        self.spectrum = spectrum
         self.show_trace = True
         self.state = EmulatorState.RUNNING
         self._spectrum_screen_border_width = 3
@@ -53,7 +53,7 @@ class SpectrumScreen(Component):
 
         surface.blit(self.surface, (x, y))
         if self.state != EmulatorState.RUNNING and self.show_trace:
-            tstates = self.bus_access.tstates
+            tstates = self.spectrum.bus_access.tstates
             if tstates >= TSTATES_PER_INTERRUPT:
                 tstates -= TSTATES_PER_INTERRUPT
 

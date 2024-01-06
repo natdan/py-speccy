@@ -19,7 +19,6 @@ from gui.box_blue_sf_theme import BoxBlueSFThemeFactory
 from gui.components import UIAdapter
 from spectrum.keyboard import Keyboard
 from spectrum.spectrum import Spectrum
-from spectrum.spectrum_bus_access import ZXSpectrum48ClockAndBusAccess
 from spectrum.video import COLORS, TSTATES_PER_INTERRUPT, FULL_SCREEN_WIDTH, FULL_SCREEN_HEIGHT, Video
 from utils.playback import Playback
 
@@ -40,7 +39,6 @@ class DebugEnvironment:
         self.spectrum = spectrum
         self.video: Video = spectrum.video
         self.keyboard: Keyboard = spectrum.keyboard
-        self._bus_access: ZXSpectrum48ClockAndBusAccess = spectrum.bus_access
 
         self.playback = Playback(self.spectrum)
 
@@ -72,7 +70,7 @@ class DebugEnvironment:
         self.spectrum_screen_component = SpectrumScreen(
             Rect(0, 20, spectrum_screen_size[0] + 10, spectrum_screen_size[1] + 10),
             self.pre_screen,
-            self.bus_access,
+            self.spectrum,
             self.ratio)
         self.top_component.add_component(self.spectrum_screen_component)
 
@@ -123,8 +121,7 @@ class DebugEnvironment:
         )
         self.top_component.add_component(self.stack_pointer_dump)
 
-        def close_modal(*args) -> None:
-            self.top_component.hide_modal()
+        def close_modal(*_) -> None: self.top_component.hide_modal()
 
         self._help_modal = HelpModal(self.top_component.rect, ui_factory=self.ui_factory, close_modal=close_modal)
 
@@ -146,6 +143,7 @@ class DebugEnvironment:
         self.key_down_methods: dict[int, Callable[[int, int], bool]] = {
             pygame.K_F1: self.key_help,
             pygame.K_F2: self.key_pause,
+            pygame.K_F6: self.key_profile,
             pygame.K_SLASH: self.key_help,
             pygame.K_LEFT: self.key_left,
             pygame.K_RIGHT: self.key_right
@@ -182,14 +180,6 @@ class DebugEnvironment:
     def ratio(self, ratio: int) -> None:
         self._ratio = ratio
         self.spectrum_screen_component.ratio = ratio
-
-    @property
-    def bus_access(self) -> ZXSpectrum48ClockAndBusAccess: return self._bus_access
-
-    @bus_access.setter
-    def bus_access(self, bus_access: ZXSpectrum48ClockAndBusAccess) -> None:
-        self._bus_access = bus_access
-        self.spectrum_screen_component.bus_access = bus_access
 
     @property
     def show_trace(self) -> bool: return self._show_trace
@@ -278,6 +268,11 @@ class DebugEnvironment:
             return True
         return False
 
+    def key_profile(self, _: int, _key_mods: int) -> bool:
+        if self.state == EmulatorState.PAUSED:
+            self.state = EmulatorState.PROFILE
+        return False
+
     def key_help(self, _: int, _key_mods: int) -> bool:
         if self.top_component.modal_component:
             self.top_component.hide_modal()
@@ -333,12 +328,12 @@ class DebugEnvironment:
         if self.state != EmulatorState.RUNNING:
             self.update_ui()
         else:
-            self.update(self._bus_access.frames, self._bus_access.tstates)
+            self.update(self.spectrum.bus_access.frames, self.spectrum.bus_access.tstates)
 
     def update_ui(self) -> None:
         self.screen.fill((0, 0, 0))
         self.ui_adapter.draw(self.screen)
-        self.update(self._bus_access.frames, self._bus_access.tstates)
+        self.update(self.spectrum.bus_access.frames, self.spectrum.bus_access.tstates)
 
     def run(self) -> None:
         try:
@@ -350,12 +345,16 @@ class DebugEnvironment:
                     self.playback.record()
                 elif self.state == EmulatorState.PAUSED:
                     while self.state == EmulatorState.PAUSED:
-                        # self.update(self._bus_access.frames, self._bus_access.tstates)
                         self.update_ui()
                         self.process_keyboard()
                 elif self.state == EmulatorState.ONE_FRAME:
                     self.spectrum.execute(TSTATES_PER_INTERRUPT)
-                    self.playback.record()
+                    self.playback.reset()
+                    self.process_interrupt()
+                    self.state = EmulatorState.PAUSED
+                elif self.state == EmulatorState.PROFILE:
+                    self.spectrum.profile(TSTATES_PER_INTERRUPT)
+                    self.playback.reset()
                     self.process_interrupt()
                     self.state = EmulatorState.PAUSED
                 elif self.state == EmulatorState.STEPPING:
@@ -366,7 +365,7 @@ class DebugEnvironment:
                             self._step -= 1
                         self.playback.record()
                     self.spectrum.update_screen()
-                    self.update(self._bus_access.frames, self._bus_access.tstates)
+                    self.update(self.spectrum.bus_access.frames, self.spectrum.bus_access.tstates)
                     self.state = EmulatorState.PAUSED
 
         except KeyboardInterrupt:

@@ -1,7 +1,7 @@
 import sys
 import inspect
 
-from z80.instructions.base import SOPInstructionDef, Mnemonics, BitOPInstructionDef, MOPInstructionDef
+from z80.instructions.base import SOPInstructionDef, Mnemonics, BitOPInstructionDef, MOPInstructionDef, SimpleInstructionDef
 
 from z80.instructions.base import MNEMONICS_TO_INSTRUCTION
 
@@ -46,10 +46,24 @@ class RES(BitOPInstructionDef):
         super().__init__(Mnemonics.RES, 0x80, 0x86)
 
 
-class RL(MOPInstructionDef):
-    def __init__(self) -> None:
-        super().__init__(Mnemonics.RL, 0x80, 0x86)
+# class RL(MOPInstructionDef):
+#     def __init__(self) -> None:
+#         super().__init__(Mnemonics.RL, 0x80, 0x86)
 
+
+class EXX(SimpleInstructionDef):
+    def __init__(self) -> None:
+        super().__init__(Mnemonics.EXX, 0xd9)
+
+
+class EI(SimpleInstructionDef):
+    def __init__(self) -> None:
+        super().__init__(Mnemonics.EI, 0xfb)
+
+
+class RET(SimpleInstructionDef):
+    def __init__(self) -> None:
+        super().__init__(Mnemonics.RET, 0xc9)
 
 
 this_module = sys.modules[__name__]

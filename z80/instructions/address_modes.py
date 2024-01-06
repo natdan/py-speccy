@@ -55,7 +55,7 @@ class _BIT(AddrModeElement):
 
 
 class AddrMode(Enum):
-    UNKNOWN = []
+    SIMPLE = []
     R = [_R()]
     N = [_N()]
     PHLP = [_PHLP()]

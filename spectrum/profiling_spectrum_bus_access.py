@@ -1,7 +1,7 @@
 from typing import Callable
 
-from spectrum.video import TSTATES_PER_INTERRUPT, TSTATES_PER_LINE, SCREEN_HEIGHT, SCREEN_WIDTH
-from z80.bus_access import ClockAndBusAccess
+from spectrum.spectrum_bus_access import ZXSpectrum48ClockAndBusAccess
+from z80.instructions.profile import FetchOpcode, PeekB, PokeB, PeekW, PokeW, AddrOnBus, InPort, OutPort
 from z80.memory import Memory
 from z80.ports import Ports
 
@@ -11,68 +11,20 @@ INTERRUPT_LENGTH = 24
 
 # This implementation heavily inspired by one from JSpeccy
 # https://github.com/jsanchezv/JSpeccy/blob/master/src/main/java/machine/Spectrum.java
-class ZXSpectrum48ClockAndBusAccess(ClockAndBusAccess):
+class ProfilingZXSpectrum48ClockAndBusAccess(ZXSpectrum48ClockAndBusAccess):
     def __init__(self,
                  memory: Memory,
                  ports: Ports,
                  update_next_screen_byte: Callable) -> None:
-        super().__init__(memory, ports)
-        self.frames = 0
-
-        self.int_line = False
-        self.update_next_screen_word = update_next_screen_byte
-
-        self.delay_tstates = [0] * (TSTATES_PER_INTERRUPT + 200)
-        self.screen_byte_tstate = [TSTATES_PER_INTERRUPT * 2] * (1 + SCREEN_HEIGHT * SCREEN_WIDTH // 16)
-        self.next_screen_byte_index = 0
-
-        screen_byte_inx = 0
-
-        for i in range(14335, 57247, TSTATES_PER_LINE):
-            for n in range(0, 128, 8):
-                frame = i + n
-                self.screen_byte_tstate[screen_byte_inx] = frame + 2
-                screen_byte_inx += 1
-
-                self.delay_tstates[frame] = 6
-                frame += 1
-                self.delay_tstates[frame] = 5
-                frame += 1
-                self.delay_tstates[frame] = 4
-                frame += 1
-                self.delay_tstates[frame] = 3
-                frame += 1
-                self.delay_tstates[frame] = 2
-                frame += 1
-                self.delay_tstates[frame] = 1
-                frame += 1
-                self.delay_tstates[frame] = 0
-                frame += 1
-                self.delay_tstates[frame] = 0
-
-    def copy_from_bus_access(self, other: 'ZXSpectrum48ClockAndBusAccess') -> None:
-        self.tstates = other.tstates
-        self.memory = other.memory
-        self.ports = other.ports
-
-        self.frames = other.frames
-
-        self.int_line = other.int_line
-        self.update_next_screen_word = other.update_next_screen_word
-
-        self.delay_tstates = other.delay_tstates
-        self.screen_byte_tstate = other.screen_byte_tstate
-        self.next_screen_byte_index = other.next_screen_byte_index
-
-    def end_frame(self, frame_tstates: int) -> None:
-        self.next_screen_byte_index = 0
-        self.tstates -= frame_tstates
-        self.frames += 1
+        super().__init__(memory, ports, update_next_screen_byte)
+        self.profile = []
 
     def fetch_opcode(self, address: int) -> int:
         if 16384 <= address < 32768:
+            self.profile.append(FetchOpcode(self.tstates, 4, self.delay_tstates[self.tstates]))
             self.tstates += self.delay_tstates[self.tstates] + 4
         else:
+            self.profile.append(FetchOpcode(self.tstates, 4))
             self.tstates += 4
 
         if self.tstates >= self.screen_byte_tstate[self.next_screen_byte_index]:
@@ -84,8 +36,10 @@ class ZXSpectrum48ClockAndBusAccess(ClockAndBusAccess):
 
     def peekb(self, address: int) -> int:
         if 16384 <= address < 32768:
+            self.profile.append(PeekB(self.tstates, 3, self.delay_tstates[self.tstates]))
             self.tstates += self.delay_tstates[self.tstates] + 3
         else:
+            self.profile.append(PeekB(self.tstates, 3))
             self.tstates += 3
 
         if self.tstates >= self.screen_byte_tstate[self.next_screen_byte_index]:
@@ -96,8 +50,10 @@ class ZXSpectrum48ClockAndBusAccess(ClockAndBusAccess):
 
     def peeksb(self, address: int) -> int:
         if 16384 <= address < 32768:
+            self.profile.append(PeekB(self.tstates, 3, self.delay_tstates[self.tstates]))
             self.tstates += self.delay_tstates[self.tstates] + 3
         else:
+            self.profile.append(PeekB(self.tstates, 3))
             self.tstates += 3
 
         if self.tstates >= self.screen_byte_tstate[self.next_screen_byte_index]:
@@ -108,8 +64,10 @@ class ZXSpectrum48ClockAndBusAccess(ClockAndBusAccess):
 
     def pokeb(self, address: int, value: int) -> None:
         if 16384 <= address < 32768:
+            self.profile.append(PokeB(self.tstates, 3, self.delay_tstates[self.tstates]))
             self.tstates += self.delay_tstates[self.tstates] + 3
         else:
+            self.profile.append(PokeB(self.tstates, 3))
             self.tstates += 3
 
         if self.tstates >= self.screen_byte_tstate[self.next_screen_byte_index]:
@@ -119,7 +77,10 @@ class ZXSpectrum48ClockAndBusAccess(ClockAndBusAccess):
         self.memory.pokeb(address, value & 0xFF)
 
     def peekw(self, address: int) -> int:
+        delay1 = 0
+        delay2 = 0
         if 16384 <= address < 32768:
+            delay1 = self.delay_tstates[self.tstates]
             self.tstates += self.delay_tstates[self.tstates] + 3
         else:
             self.tstates += 3
@@ -132,9 +93,12 @@ class ZXSpectrum48ClockAndBusAccess(ClockAndBusAccess):
 
         address = (address + 1) & 0xffff
         if 16384 <= address < 32768:
+            delay2 = self.delay_tstates[self.tstates]
             self.tstates += self.delay_tstates[self.tstates] + 3
         else:
             self.tstates += 3
+
+        self.profile.append(PeekW(self.tstates, 3, 3,  delay1, delay2))
 
         if self.tstates >= self.screen_byte_tstate[self.next_screen_byte_index]:
             self.update_next_screen_word()
@@ -145,7 +109,10 @@ class ZXSpectrum48ClockAndBusAccess(ClockAndBusAccess):
         return (msb << 8) + lsb
 
     def pokew(self, address: int, value: int) -> None:
+        delay1 = 0
+        delay2 = 0
         if 16384 <= address < 32768:
+            delay1 = self.delay_tstates[self.tstates]
             self.tstates += self.delay_tstates[self.tstates] + 3
         else:
             self.tstates += 3
@@ -158,9 +125,12 @@ class ZXSpectrum48ClockAndBusAccess(ClockAndBusAccess):
 
         address = (address + 1) & 0xffff
         if 16384 <= address < 32768:
+            delay2 = self.delay_tstates[self.tstates]
             self.tstates += self.delay_tstates[self.tstates] + 3
         else:
             self.tstates += 3
+
+        self.profile.append(PokeW(self.tstates, 3, 3,  delay1, delay2))
 
         if self.tstates >= self.screen_byte_tstate[self.next_screen_byte_index]:
             self.update_next_screen_word()
@@ -169,11 +139,15 @@ class ZXSpectrum48ClockAndBusAccess(ClockAndBusAccess):
         self.memory.pokeb(address, (value >> 8))
 
     def address_on_bus(self, address: int, tstates: int) -> None:
+        delays = []
         if 16384 <= address < 32768:
             for i in range(tstates):
+                delays.append(self.delay_tstates[self.tstates])
                 self.tstates += self.delay_tstates[self.tstates] + 1
         else:
             self.tstates += tstates
+
+        self.profile.append(AddrOnBus(self.tstates, tstates, *delays))
 
         while self.tstates >= self.screen_byte_tstate[self.next_screen_byte_index]:
             self.update_next_screen_word()
@@ -187,9 +161,12 @@ class ZXSpectrum48ClockAndBusAccess(ClockAndBusAccess):
             self.next_screen_byte_index += 1
 
     def in_port(self, port: int) -> int:
+        delays = []
         if 16384 <= port < 32768:
+            delays.append(self.delay_tstates[self.tstates])
             self.tstates += self.delay_tstates[self.tstates] + 1
         else:
+            delays.append(0)
             self.tstates += 1
 
         if self.tstates >= self.screen_byte_tstate[self.next_screen_byte_index]:
@@ -198,13 +175,25 @@ class ZXSpectrum48ClockAndBusAccess(ClockAndBusAccess):
 
         if port & 0x0001 != 0:
             if 16384 <= port < 32768:
+                delays.append(self.delay_tstates[self.tstates])
                 self.tstates += self.delay_tstates[self.tstates] + 1
+                delays.append(self.delay_tstates[self.tstates])
                 self.tstates += self.delay_tstates[self.tstates] + 1
+                delays.append(self.delay_tstates[self.tstates])
                 self.tstates += self.delay_tstates[self.tstates] + 1
+                delays.append(self.delay_tstates[self.tstates])
             else:
                 self.tstates += 3
+                delays.append(0)
+                delays.append(0)
+                delays.append(0)
         else:
             self.tstates += self.delay_tstates[self.tstates] + 3
+            delays.append(0)
+            delays.append(0)
+            delays.append(0)
+
+        self.profile.append(InPort(self.tstates, 4, *delays))
 
         if self.tstates >= self.screen_byte_tstate[self.next_screen_byte_index]:
             self.update_next_screen_word()
@@ -213,30 +202,36 @@ class ZXSpectrum48ClockAndBusAccess(ClockAndBusAccess):
         return self.ports.in_port(port)
 
     def out_port(self, port: int, value: int):
+        delays = []
         if 16384 <= port < 32768:
+            delays.append(self.delay_tstates[self.tstates])
             self.tstates += self.delay_tstates[self.tstates] + 1
         else:
             self.tstates += 1
+            delays.append(0)
 
         self.ports.out_port(port, value)
         if port & 0x0001 != 0:
             if 16384 <= port < 32768:
+                delays.append(self.delay_tstates[self.tstates])
                 self.tstates += self.delay_tstates[self.tstates] + 1
+                delays.append(self.delay_tstates[self.tstates])
                 self.tstates += self.delay_tstates[self.tstates] + 1
+                delays.append(self.delay_tstates[self.tstates])
                 self.tstates += self.delay_tstates[self.tstates] + 1
             else:
                 self.tstates += 3
+                delays.append(0)
+                delays.append(0)
+                delays.append(0)
         else:
             self.tstates += self.delay_tstates[self.tstates] + 3
+            delays.append(0)
+            delays.append(0)
+            delays.append(0)
+
+        self.profile.append(OutPort(self.tstates, 4, *delays))
 
         if self.tstates >= self.screen_byte_tstate[self.next_screen_byte_index]:
             self.update_next_screen_word()
             self.next_screen_byte_index += 1
-
-    def is_active_INT(self) -> bool:
-        current = self.tstates
-        if current >= TSTATES_PER_INTERRUPT:
-            current -= TSTATES_PER_INTERRUPT
-
-        self.int_line = 0 < current < INTERRUPT_LENGTH
-        return self.int_line
