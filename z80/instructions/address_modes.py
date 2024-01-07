@@ -22,6 +22,20 @@ class _R(AddrModeElement):
     def to_str(self, **params) -> str: return self.rs[params["r"]]
 
 
+class _R1(AddrModeElement):
+    rs = {
+        0: "b",
+        1: "c",
+        2: "d",
+        3: "e",
+        4: "h",
+        5: "l",
+        7: "a",
+    }
+
+    def to_str(self, **params) -> str: return self.rs[params["r1"]]
+
+
 class _COMMA(AddrModeElement):
     def to_str(self, **params) -> str: return ", "
 
@@ -139,7 +153,9 @@ class _AFp(AddrModeElement):
 class AddrMode(Enum):
     SIMPLE = []
     R = [_R()]
+    RR = [_R(), _COMMA(), _R1()]
     N = [_N()]
+    RN = [_R(), _COMMA(), _N()]
     IX = [_IX()]
     IY = [_IY()]
     PHLP = [_PHLP()]
@@ -165,3 +181,9 @@ class AddrMode(Enum):
     SPHL = [_PSPP(), _COMMA(), _HL()]
     SPIX = [_PSPP(), _COMMA(), _IX()]
     SPIY = [_PSPP(), _COMMA(), _IY()]
+    RPHLP = [_R(), _COMMA(), _PHLP()]
+    RPIXDP = [_R(), _COMMA(), _PIXDP()]
+    RPIYDP = [_R(), _COMMA(), _PIYDP()]
+    PHLPR = [_PHLP(), _COMMA(), _R()]
+    PIXDPR = [_PIXDP(), _COMMA(), _R()]
+    PIYDPR = [_PIYDP(), _COMMA(), _R()]

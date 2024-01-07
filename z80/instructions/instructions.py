@@ -150,7 +150,7 @@ class JP(InstructionDef):
             return Instruction(address, self, AddrMode.PHLP, **params)
         elif instr == 0xc3:
             return Instruction(address, self, AddrMode.NN, nn=next_byte() + 256 * next_byte(), **params)
-        elif instr & 0xc2 == 0xc2:
+        elif instr & 0xc7 == 0xc2:
             return Instruction(address, self, AddrMode.CCNN, cc=(instr & 0x38) // 8, nn=next_byte() + 256 * next_byte(), **params)
         else:
             raise ValueError(f"Cannot decode; {instr}, ixy={ixy}")
@@ -251,8 +251,46 @@ class RET(InstructionDef):
     def decode(self, address: int, instr: int, next_byte: NEXT_BYTE_CALLBACK, ixy: Optional[IXY] = None, **params) -> Instruction:
         if instr == 0xc9:
             return Instruction(address, self, AddrMode.SIMPLE, **params)
-        elif instr & 0xc0 == 0xc0:
+        elif instr & 0xc7 == 0xc0:
             return Instruction(address, self, AddrMode.CC, cc=(instr & 0x38) // 8, **params)
+        else:
+            raise ValueError(f"Cannot decode; {instr}, ixy={ixy}")
+
+
+class LD(InstructionDef):
+    def __init__(self):
+        super().__init__(Mnemonics.LD)
+
+    def update_decode_map(self) -> None:
+        for r1 in range(8):
+            if r1 != 6:
+                for r2 in range(8):
+                    if r2 != 6:
+                        DECODE_MAP[0x40 + r1 * 8 + r2] = self
+        for r in range(8):
+            if r != 6:
+                DECODE_MAP[0x06 + r * 8] = self
+                DECODE_MAP[0x46 + r * 8] = self
+                DECODE_MAP_IXY[0x46 + r * 8] = self
+                DECODE_MAP[0x70 + r] = self
+                DECODE_MAP_IXY[0x70 + r] = self
+
+    def decode(self, address: int, instr: int, next_byte: NEXT_BYTE_CALLBACK, ixy: Optional[IXY] = None, **params) -> Instruction:
+        if ixy:
+            if instr & 0xC7 == 0x46:
+                return Instruction(address, self, AddrMode.RPIXDP if ixy == IXY.IX else AddrMode.RPIYDP, r=(instr & 0x38) // 8, d=next_byte(), **params)
+            elif instr & 0xf8 == 0x70:
+                return Instruction(address, self, AddrMode.PIXDPR if ixy == IXY.IX else AddrMode.PIYDPR, r=instr & 0x7, d=next_byte(), **params)
+            else:
+                raise ValueError(f"Cannot decode; {instr}, ixy={ixy}")
+        elif instr & 0xf8 == 0x70:
+            return Instruction(address, self, AddrMode.PHLPR, r=instr & 0x7, **params)
+        elif instr & 0xC7 == 0x46:
+            return Instruction(address, self, AddrMode.RPHLP, r=(instr & 0x38) // 8, **params)
+        elif instr & 0xC7 == 0x06:
+            return Instruction(address, self, AddrMode.RN, r=(instr & 0x38) // 8, n=next_byte(), **params)
+        elif instr & 0xC0 == 0x40:
+            return Instruction(address, self, AddrMode.RR, r=(instr & 0x38) // 8, r1=instr & 7, **params)
         else:
             raise ValueError(f"Cannot decode; {instr}, ixy={ixy}")
 
