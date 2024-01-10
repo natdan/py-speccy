@@ -8,7 +8,8 @@ from spectrum.spectrum_bus_access import ZXSpectrum48ClockAndBusAccess
 from spectrum.spectrum_ports import SpectrumPorts
 from spectrum.video import TSTATES_PER_INTERRUPT, Video
 from utils.loader import Loader
-from z80.instructions import Instruction, decode_instruction, AddrMode
+from z80.instructions import Instruction, AddrMode
+from z80.instructions.instruction_def import decode_instruction
 from z80.instructions.instructions import HALT
 from z80.memory import Memory
 from z80.z80_cpu import Z80CPU

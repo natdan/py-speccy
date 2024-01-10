@@ -4,295 +4,272 @@ import sys
 import inspect
 
 from z80.instructions import AddrMode
-from z80.instructions.base import SOPInstructionDef, Mnemonics, BitOPInstructionDef, CBMOPInstructionDef, SimpleInstructionDef, SimpleEDInstructionDef, InstructionDef, DECODE_MAP, DECODE_MAP_IXY, NEXT_BYTE_CALLBACK, Instruction, IXY, MOPInstructionDef, PushPopInstructionDef
-
-from z80.instructions.base import MNEMONICS_TO_INSTRUCTION
+from z80.instructions.instruction_def import Mnemonics, InstructionDef, DECODE_MAP, DECODE_MAP_IXY, NEXT_BYTE_CALLBACK, Instruction, IXY, CBInstructionDef
 
 
-class AND(SOPInstructionDef):
+class AND(InstructionDef):
     def __init__(self) -> None:
-        super().__init__(Mnemonics.AND, 0xa0, 0xe6, 0xa6)
+        super().__init__(Mnemonics.AND,
+                         R1=0xa0,
+                         N=0xe6,
+                         PHLP=0xa6,
+                         PIXDP=0xa6,
+                         PIYDP=0xa6)
 
 
-class SUB(SOPInstructionDef):
+class SUB(InstructionDef):
     def __init__(self) -> None:
-        super().__init__(Mnemonics.SUB, 0x90, 0xd6, 0x96)
+        super().__init__(Mnemonics.SUB,
+                         R1=0x90,
+                         N=0xd6,
+                         PHLP=0x96,
+                         PIXDP=0x96,
+                         PIYDP=0x96)
 
 
-class OR(SOPInstructionDef):
+class OR(InstructionDef):
     def __init__(self) -> None:
-        super().__init__(Mnemonics.OR, 0xb0, 0xf6, 0xb6)
+        super().__init__(Mnemonics.OR,
+                         R1=0xb0,
+                         N=0xf6,
+                         PHLP=0xb6,
+                         PIXDP=0xb6,
+                         PIYDP=0xb6)
 
 
-class XOR(SOPInstructionDef):
+class XOR(InstructionDef):
     def __init__(self) -> None:
-        super().__init__(Mnemonics.XOR, 0xa8, 0xee, 0xae)
+        super().__init__(Mnemonics.XOR,
+                         R1=0xa8,
+                         N=0xee,
+                         PHLP=0xae,
+                         PIXDP=0xae,
+                         PIYDP=0xae)
 
 
-class CP(SOPInstructionDef):
+class CP(InstructionDef):
     def __init__(self) -> None:
-        super().__init__(Mnemonics.CP, 0xb8, 0xfe, 0xbe)
+        super().__init__(Mnemonics.CP,
+                         R1=0xb8,
+                         N=0xfe,
+                         PHLP=0xbe,
+                         PIXDP=0xbe,
+                         PIYDP=0xbe)
 
 
-class BIT(BitOPInstructionDef):
+class BIT(CBInstructionDef):
     def __init__(self) -> None:
-        super().__init__(Mnemonics.BIT, 0x40, 0x46)
+        super().__init__(Mnemonics.BIT,
+                         BR=0x40,
+                         BPHLP=0x46,
+                         BPIXDP=0x46,
+                         BPIYDP=0x46)
 
 
-class SET(BitOPInstructionDef):
+class SET(CBInstructionDef):
     def __init__(self) -> None:
-        super().__init__(Mnemonics.SET, 0xC0, 0xC6)
+        super().__init__(Mnemonics.SET,
+                         BR=0xc0,
+                         BPHLP=0xc6,
+                         BPIXDP=0xc6,
+                         BPIYDP=0xc6)
 
 
-class RES(BitOPInstructionDef):
+class RES(CBInstructionDef):
     def __init__(self) -> None:
-        super().__init__(Mnemonics.RES, 0x80, 0x86)
+        super().__init__(Mnemonics.RES,
+                         BR=0x80,
+                         BPHLP=0x86,
+                         BPIXDP=0x86,
+                         BPIYDP=0x86)
 
 
-class INC(MOPInstructionDef):
+class INC(InstructionDef):
     def __init__(self) -> None:
-        super().__init__(Mnemonics.INC, 0x04, 0x34)
+        super().__init__(Mnemonics.INC,
+                         R2=0x04,
+                         PHLP=0x34,
+                         PIXDP=0x34,
+                         PIYDP=0x34)
 
 
-class DEC(MOPInstructionDef):
+class DEC(InstructionDef):
     def __init__(self) -> None:
-        super().__init__(Mnemonics.DEC, 0x05, 0x35)
+        super().__init__(Mnemonics.DEC,
+                         R2=0x05,
+                         PHLP=0x35,
+                         PIXDP=0x35,
+                         PIYDP=0x35)
 
 
-class RL(CBMOPInstructionDef):
+class RL(CBInstructionDef):
     def __init__(self) -> None:
-        super().__init__(Mnemonics.RL, 0x10, 0x16)
+        super().__init__(Mnemonics.RL,
+                         R1=0x10,
+                         PHLP=0x16,
+                         CBPIXDP=0x16,
+                         CBPIYDP=0x16)
 
 
-class RR(CBMOPInstructionDef):
+class RR(CBInstructionDef):
     def __init__(self) -> None:
-        super().__init__(Mnemonics.RR, 0x18, 0x1e)
+        super().__init__(Mnemonics.RR,
+                         R1=0x18,
+                         PHLP=0x1e,
+                         CBPIXDP=0x1e,
+                         CBPIYDP=0x1e)
 
 
-class RRC(CBMOPInstructionDef):
+class RRC(CBInstructionDef):
     def __init__(self) -> None:
-        super().__init__(Mnemonics.RRC, 0x08, 0x0e)
+        super().__init__(Mnemonics.RRC,
+                         R1=0x08,
+                         PHLP=0x0e,
+                         CBPIXDP=0x0e,
+                         CBPIYDP=0x0e)
 
 
-class SLA(CBMOPInstructionDef):
+class SLA(CBInstructionDef):
     def __init__(self) -> None:
-        super().__init__(Mnemonics.SLA, 0x20, 0x26)
+        super().__init__(Mnemonics.SLA,
+                         R1=0x20,
+                         PHLP=0x26,
+                         CBPIXDP=0x26,
+                         CBPIYDP=0x26)
 
 
-class SRA(CBMOPInstructionDef):
+class SRA(CBInstructionDef):
     def __init__(self) -> None:
-        super().__init__(Mnemonics.SRA, 0x28, 0x2e)
+        super().__init__(Mnemonics.SRA,
+                         R1=0x28,
+                         PHLP=0x2e,
+                         CBPIXDP=0x2e,
+                         CBPIYDP=0x2e)
 
 
-class SRL(CBMOPInstructionDef):
+class SRL(CBInstructionDef):
     def __init__(self) -> None:
-        super().__init__(Mnemonics.SRL, 0x38, 0x3e)
+        super().__init__(Mnemonics.SRL,
+                         R1=0x38,
+                         PHLP=0x3e,
+                         CBPIXDP=0x3e,
+                         CBPIYDP=0x3e)
 
 
-SimpleInstructionDef(Mnemonics.CCF, 0x3f).update_decode_map()
-SimpleEDInstructionDef(Mnemonics.CPD, 0xa9).update_decode_map()
-SimpleEDInstructionDef(Mnemonics.CPDR, 0xb9).update_decode_map()
-SimpleEDInstructionDef(Mnemonics.CPI, 0xa1).update_decode_map()
-SimpleEDInstructionDef(Mnemonics.CPIR, 0xb1).update_decode_map()
-SimpleInstructionDef(Mnemonics.CPL, 0x2f).update_decode_map()
-SimpleInstructionDef(Mnemonics.DAA, 0x27).update_decode_map()
-SimpleInstructionDef(Mnemonics.DI, 0xf3).update_decode_map()
-SimpleInstructionDef(Mnemonics.EI, 0xfb).update_decode_map()
-SimpleInstructionDef(Mnemonics.EXX, 0xd9).update_decode_map()
-SimpleEDInstructionDef(Mnemonics.IND, 0xaa).update_decode_map()
-SimpleEDInstructionDef(Mnemonics.INDR, 0xba).update_decode_map()
-SimpleEDInstructionDef(Mnemonics.INI, 0xa2).update_decode_map()
-SimpleEDInstructionDef(Mnemonics.INIR, 0xb2).update_decode_map()
-SimpleEDInstructionDef(Mnemonics.LDD, 0xa8).update_decode_map()
-SimpleEDInstructionDef(Mnemonics.LDDR, 0xb8).update_decode_map()
-SimpleEDInstructionDef(Mnemonics.LDI, 0xa0).update_decode_map()
-SimpleEDInstructionDef(Mnemonics.LDIR, 0xb0).update_decode_map()
-SimpleEDInstructionDef(Mnemonics.NEG, 0x44).update_decode_map()
-SimpleEDInstructionDef(Mnemonics.OTDR, 0xbb).update_decode_map()
-SimpleEDInstructionDef(Mnemonics.OUTD, 0xab).update_decode_map()
-SimpleEDInstructionDef(Mnemonics.OUTI, 0xa3).update_decode_map()
-SimpleEDInstructionDef(Mnemonics.RETI, 0x4d).update_decode_map()
-SimpleEDInstructionDef(Mnemonics.RETN, 0x45).update_decode_map()
-SimpleInstructionDef(Mnemonics.RLA, 0x17).update_decode_map()
-SimpleInstructionDef(Mnemonics.RLCA, 0x07).update_decode_map()
-SimpleEDInstructionDef(Mnemonics.RLD, 0x6f).update_decode_map()
-SimpleInstructionDef(Mnemonics.RRA, 0x1f).update_decode_map()
-SimpleInstructionDef(Mnemonics.RRCA, 0x0f).update_decode_map()
-SimpleEDInstructionDef(Mnemonics.RRD, 0x67).update_decode_map()
-SimpleInstructionDef(Mnemonics.SCF, 0x37).update_decode_map()
+InstructionDef(Mnemonics.CCF, SIMPLE=0x3f).update_decode_map()
+InstructionDef(Mnemonics.CPL, SIMPLE=0x2f).update_decode_map()
+InstructionDef(Mnemonics.DAA, SIMPLE=0x27).update_decode_map()
+InstructionDef(Mnemonics.DI, SIMPLE=0xf3).update_decode_map()
+InstructionDef(Mnemonics.EI, SIMPLE=0xfb).update_decode_map()
+InstructionDef(Mnemonics.EXX, SIMPLE=0xd9).update_decode_map()
+InstructionDef(Mnemonics.RLA, SIMPLE=0x17).update_decode_map()
+InstructionDef(Mnemonics.RLCA, SIMPLE=0x07).update_decode_map()
+InstructionDef(Mnemonics.RRA, SIMPLE=0x1f).update_decode_map()
+InstructionDef(Mnemonics.RRCA, SIMPLE=0x0f).update_decode_map()
+InstructionDef(Mnemonics.SCF, SIMPLE=0x37).update_decode_map()
+
+InstructionDef(Mnemonics.CPD, SIMPLE_ED=0xa9).update_decode_map()
+InstructionDef(Mnemonics.CPDR, SIMPLE_ED=0xb9).update_decode_map()
+InstructionDef(Mnemonics.CPI, SIMPLE_ED=0xa1).update_decode_map()
+InstructionDef(Mnemonics.CPIR, SIMPLE_ED=0xb1).update_decode_map()
+InstructionDef(Mnemonics.IND, SIMPLE_ED=0xaa).update_decode_map()
+InstructionDef(Mnemonics.INDR, SIMPLE_ED=0xba).update_decode_map()
+InstructionDef(Mnemonics.INI, SIMPLE_ED=0xa2).update_decode_map()
+InstructionDef(Mnemonics.INIR, SIMPLE_ED=0xb2).update_decode_map()
+InstructionDef(Mnemonics.LDD, SIMPLE_ED=0xa8).update_decode_map()
+InstructionDef(Mnemonics.LDDR, SIMPLE_ED=0xb8).update_decode_map()
+InstructionDef(Mnemonics.LDI, SIMPLE_ED=0xa0).update_decode_map()
+InstructionDef(Mnemonics.LDIR, SIMPLE_ED=0xb0).update_decode_map()
+InstructionDef(Mnemonics.NEG, SIMPLE_ED=0x44).update_decode_map()
+InstructionDef(Mnemonics.OTDR, SIMPLE_ED=0xbb).update_decode_map()
+InstructionDef(Mnemonics.OUTD, SIMPLE_ED=0xab).update_decode_map()
+InstructionDef(Mnemonics.OUTI, SIMPLE_ED=0xa3).update_decode_map()
+InstructionDef(Mnemonics.RETI, SIMPLE_ED=0x4d).update_decode_map()
+InstructionDef(Mnemonics.RETN, SIMPLE_ED=0x45).update_decode_map()
+InstructionDef(Mnemonics.RLD, SIMPLE_ED=0x6f).update_decode_map()
+InstructionDef(Mnemonics.RRD, SIMPLE_ED=0x67).update_decode_map()
 
 
-class HALT(SimpleInstructionDef):
+class HALT(InstructionDef):
     def __init__(self) -> None:
-        super().__init__(Mnemonics.HALT, 0x76)
+        super().__init__(Mnemonics.HALT, SIMPLE=0x76)
 
 
-class NOP(SimpleInstructionDef):
+class NOP(InstructionDef):
     def __init__(self) -> None:
-        super().__init__(Mnemonics.NOP, 0x00)
+        super().__init__(Mnemonics.NOP, SIMPLE=0x00)
 
 
 class JP(InstructionDef):
     def __init__(self):
-        super().__init__(Mnemonics.JP)
-
-    def update_decode_map(self) -> None:
-        DECODE_MAP[0xc3] = self
-        DECODE_MAP[0xe9] = self
-        DECODE_MAP_IXY[0xe9] = self
-        for cc in range(8):
-            DECODE_MAP[0xc2 + cc * 8] = self
-
-    def decode(self, address: int, instr: int, next_byte: NEXT_BYTE_CALLBACK, ixy: Optional[IXY] = None, **params) -> Instruction:
-        if ixy:
-            return Instruction(address, self, AddrMode.PIXP if ixy == IXY.IX else AddrMode.PIYP, **params)
-        elif instr == 0xe9:
-            return Instruction(address, self, AddrMode.PHLP, **params)
-        elif instr == 0xc3:
-            return Instruction(address, self, AddrMode.NN, nn=next_byte() + 256 * next_byte(), **params)
-        elif instr & 0xc7 == 0xc2:
-            return Instruction(address, self, AddrMode.CCNN, cc=(instr & 0x38) // 8, nn=next_byte() + 256 * next_byte(), **params)
-        else:
-            raise ValueError(f"Cannot decode; {instr}, ixy={ixy}")
+        super().__init__(Mnemonics.JP,
+                         NN=0xc3,
+                         CCNN=0xc2,
+                         PHLP=0xe9,
+                         PIXP=0xe9,
+                         PIYP=0xe9)
 
 
 class JR(InstructionDef):
     def __init__(self):
-        super().__init__(Mnemonics.JR)
-
-    def update_decode_map(self) -> None:
-        DECODE_MAP[0x18] = self
-        DECODE_MAP[0x38] = self
-        DECODE_MAP[0x30] = self
-        DECODE_MAP[0x28] = self
-        DECODE_MAP[0x20] = self
-
-    def decode(self, address: int, instr: int, next_byte: NEXT_BYTE_CALLBACK, ixy: Optional[IXY] = None, **params) -> Instruction:
-        def calc_relative(e: int) -> int:
-            if e > 128:
-                return  + address + 2 - 256 + e
-            return address + 2 + e
-
-        if instr == 0x18:
-            return Instruction(address, self, AddrMode.E, e=calc_relative(next_byte()), **params)
-        elif instr == 0x38:
-            return Instruction(address, self, AddrMode.CE, e=calc_relative(next_byte()), **params)
-        elif instr == 0x30:
-            return Instruction(address, self, AddrMode.NCE, e=calc_relative(next_byte()), **params)
-        elif instr == 0x28:
-            return Instruction(address, self, AddrMode.ZE, e=calc_relative(next_byte()), **params)
-        elif instr == 0x20:
-            return Instruction(address, self, AddrMode.NZE, e=calc_relative(next_byte()), **params)
-        else:
-            raise ValueError(f"Cannot decode; {instr}, ixy={ixy}")
+        super().__init__(Mnemonics.JR,
+                         E=0x18,
+                         CE=0x38,
+                         NCE=0x30,
+                         ZE=0x28,
+                         NZE=0x20)
 
 
 class DJNZ(InstructionDef):
     def __init__(self):
-        super().__init__(Mnemonics.DJNZ)
-
-    def update_decode_map(self) -> None:
-        DECODE_MAP[0x10] = self
-
-    def decode(self, address: int, instr: int, next_byte: NEXT_BYTE_CALLBACK, ixy: Optional[IXY] = None, **params) -> Instruction:
-        def calc_relative(e: int) -> int:
-            if e > 128:
-                return  + address + 2 - 256 + e
-            return address + 2 + e
-
-        if instr == 0x10:
-            return Instruction(address, self, AddrMode.E, e=calc_relative(next_byte()), **params)
-        else:
-            raise ValueError(f"Cannot decode; {instr}, ixy={ixy}")
+        super().__init__(Mnemonics.DJNZ,
+                         E=0x10)
 
 
-class PushInstructionDef(PushPopInstructionDef):
+class PushInstructionDef(InstructionDef):
     def __init__(self) -> None:
-        super().__init__(Mnemonics.PUSH, 0xc5, 0xe5)
+        super().__init__(Mnemonics.PUSH,
+                         QQ=0xc5,
+                         IX=0xe5,
+                         IY=0xe5)
 
 
-class PopInstructionDef(PushPopInstructionDef):
+class PopInstructionDef(InstructionDef):
     def __init__(self) -> None:
-        super().__init__(Mnemonics.POP, 0xc1, 0xe1)
+        super().__init__(Mnemonics.POP,
+                         QQ=0xc1,
+                         IX=0xe1,
+                         IY=0xe1)
 
 
 class EX(InstructionDef):
     def __init__(self):
-        super().__init__(Mnemonics.EX)
-
-    def update_decode_map(self) -> None:
-        DECODE_MAP[0xeb] = self
-        DECODE_MAP[0x08] = self
-        DECODE_MAP[0xe3] = self
-        DECODE_MAP_IXY[0xe3] = self
-
-    def decode(self, address: int, instr: int, next_byte: NEXT_BYTE_CALLBACK, ixy: Optional[IXY] = None, **params) -> Instruction:
-        if ixy:
-            return Instruction(address, self, AddrMode.SPIX if ixy == ixy.IX else AddrMode.SPIY, **params)
-        elif instr == 0xeb:
-            return Instruction(address, self, AddrMode.DEHL, **params)
-        elif instr == 0x08:
-            return Instruction(address, self, AddrMode.AFAFp, **params)
-        elif instr == 0xe3:
-            return Instruction(address, self, AddrMode.SPHL, **params)
-        else:
-            raise ValueError(f"Cannot decode; {instr}, ixy={ixy}")
+        super().__init__(Mnemonics.EX,
+                         DEHL=0xeb,
+                         AFAFp=0x08,
+                         PSPPHL=0xe3,
+                         PSPPIX=0xe3,
+                         PSPPIY=0xe3)
 
 
 class RET(InstructionDef):
     def __init__(self):
-        super().__init__(Mnemonics.RET)
-
-    def update_decode_map(self) -> None:
-        DECODE_MAP[0xc9] = self
-        for cc in range(8):
-            DECODE_MAP[0xc0 + cc * 8] = self
-
-    def decode(self, address: int, instr: int, next_byte: NEXT_BYTE_CALLBACK, ixy: Optional[IXY] = None, **params) -> Instruction:
-        if instr == 0xc9:
-            return Instruction(address, self, AddrMode.SIMPLE, **params)
-        elif instr & 0xc7 == 0xc0:
-            return Instruction(address, self, AddrMode.CC, cc=(instr & 0x38) // 8, **params)
-        else:
-            raise ValueError(f"Cannot decode; {instr}, ixy={ixy}")
+        super().__init__(Mnemonics.RET,
+                         SIMPLE=0xc9,
+                         CC=0xc0)
 
 
 class LD(InstructionDef):
     def __init__(self):
-        super().__init__(Mnemonics.LD)
-
-    def update_decode_map(self) -> None:
-        for r1 in range(8):
-            if r1 != 6:
-                for r2 in range(8):
-                    if r2 != 6:
-                        DECODE_MAP[0x40 + r1 * 8 + r2] = self
-        for r in range(8):
-            if r != 6:
-                DECODE_MAP[0x06 + r * 8] = self
-                DECODE_MAP[0x46 + r * 8] = self
-                DECODE_MAP_IXY[0x46 + r * 8] = self
-                DECODE_MAP[0x70 + r] = self
-                DECODE_MAP_IXY[0x70 + r] = self
-
-    def decode(self, address: int, instr: int, next_byte: NEXT_BYTE_CALLBACK, ixy: Optional[IXY] = None, **params) -> Instruction:
-        if ixy:
-            if instr & 0xC7 == 0x46:
-                return Instruction(address, self, AddrMode.RPIXDP if ixy == IXY.IX else AddrMode.RPIYDP, r=(instr & 0x38) // 8, d=next_byte(), **params)
-            elif instr & 0xf8 == 0x70:
-                return Instruction(address, self, AddrMode.PIXDPR if ixy == IXY.IX else AddrMode.PIYDPR, r=instr & 0x7, d=next_byte(), **params)
-            else:
-                raise ValueError(f"Cannot decode; {instr}, ixy={ixy}")
-        elif instr & 0xf8 == 0x70:
-            return Instruction(address, self, AddrMode.PHLPR, r=instr & 0x7, **params)
-        elif instr & 0xC7 == 0x46:
-            return Instruction(address, self, AddrMode.RPHLP, r=(instr & 0x38) // 8, **params)
-        elif instr & 0xC7 == 0x06:
-            return Instruction(address, self, AddrMode.RN, r=(instr & 0x38) // 8, n=next_byte(), **params)
-        elif instr & 0xC0 == 0x40:
-            return Instruction(address, self, AddrMode.RR, r=(instr & 0x38) // 8, r1=instr & 7, **params)
-        else:
-            raise ValueError(f"Cannot decode; {instr}, ixy={ixy}")
+        super().__init__(Mnemonics.LD,
+                         RR=0x40,
+                         RN=0x06,
+                         RPHLP=0x46,
+                         RPIXDP=0x46,
+                         RPIYDP=0x46,
+                         PHLPR=0x70,
+                         PIXDPR=0x70,
+                         PIYDPR=0x70)
 
 
 this_module = sys.modules[__name__]
@@ -300,5 +277,5 @@ this_module = sys.modules[__name__]
 
 for _, obj in inspect.getmembers(this_module, lambda member: hasattr(member, "__module__") and member.__module__ == __name__ and inspect.isclass):
     instruction = obj()
-    MNEMONICS_TO_INSTRUCTION[instruction.mnemonic] = instruction
+    # MNEMONICS_TO_INSTRUCTION[instruction.mnemonic] = instruction
     instruction.update_decode_map()

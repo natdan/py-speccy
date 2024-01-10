@@ -1,4 +1,4 @@
-from tests.assembler.memory import assert_decode
+from assembler.assert_util import assert_decode
 
 
 class TestDecodeSOP:
