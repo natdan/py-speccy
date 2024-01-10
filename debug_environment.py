@@ -157,7 +157,7 @@ class DebugEnvironment:
 
         self.screen = pygame.display.set_mode(
             size=self.scaled_spectrum_screen_size() + (410, 130),
-            flags=pygame.HWSURFACE | pygame.DOUBLEBUF,
+            flags=pygame.HWSURFACE | pygame.DOUBLEBUF | pygame.RESIZABLE,
             depth=8)
         self.pre_screen = pygame.surface.Surface(
             size=self.scaled_spectrum_screen_size(),
@@ -313,6 +313,13 @@ class DebugEnvironment:
                     self.keyboard.do_key(False, event.key, self._current_key_mods)
             elif event.type == pygame.QUIT:
                 raise KeyboardInterrupt()
+            elif event.type == pygame.VIDEORESIZE:
+                old_surface = self.screen
+                self.screen = pygame.display.set_mode((event.w, event.h), pygame.RESIZABLE)
+                # On the next line, if only part of the window
+                # needs to be copied, there's some other options.
+                self.screen.blit(old_surface, (0, 0))
+                del old_surface
             elif self.state != EmulatorState.RUNNING:
                 self.ui_adapter.process_event(event)
 
