@@ -7,35 +7,35 @@ class MemoryAccess(ABC):
         self.tstates = tstates
         self.delay = delay
 
-    def __repr__(self) -> str: return f"({self.tstates}{'+' + str(self.delay) if self.delay > 0 else ''})"
+    def __repr__(self) -> str: return f"{self.tstates}{'+' + str(self.delay) if self.delay > 0 else ''}"
 
 
 class NoMemoryAccess(MemoryAccess):
     def __init__(self, at_tstates: int, tstates: int, delay: int  = 0):
         super().__init__(at_tstates, tstates, delay)
 
-    def __repr__(self) -> str: return f"E{super().__repr__()}"
+    def __repr__(self) -> str: return f"e{super().__repr__()}"
 
 
 class FetchOpcode(MemoryAccess):
     def __init__(self, at_tstates: int, tstates: int, delay: int  = 0):
         super().__init__(at_tstates, tstates, delay)
 
-    def __repr__(self) -> str: return f"F{super().__repr__()}"
+    def __repr__(self) -> str: return f"f{super().__repr__()}"
 
 
 class PeekB(MemoryAccess):
     def __init__(self, at_tstates: int, tstates: int, delay: int  = 0):
         super().__init__(at_tstates, tstates, delay)
 
-    def __repr__(self) -> str: return f"RB{super().__repr__()}"
+    def __repr__(self) -> str: return f"rb{super().__repr__()}"
 
 
 class PokeB(MemoryAccess):
     def __init__(self, at_tstates: int, tstates: int, delay: int  = 0):
         super().__init__(at_tstates, tstates, delay)
 
-    def __repr__(self) -> str: return f"WB{super().__repr__()}"
+    def __repr__(self) -> str: return f"wb{super().__repr__()}"
 
 
 class PeekW(MemoryAccess):
@@ -45,7 +45,7 @@ class PeekW(MemoryAccess):
         self.delay2 = delay2
 
     def __repr__(self) -> str:
-        return f"RW({self.tstates}{'+' + str(self.delay) if self.delay > 0 else ''} {self.tstates2}{'+' + str(self.delay2) if self.delay2 > 0 else ''})"
+        return f"rw{self.tstates}{'+' + str(self.delay) if self.delay > 0 else ''},{self.tstates2}{'+' + str(self.delay2) if self.delay2 > 0 else ''}"
 
 
 class PokeW(MemoryAccess):
@@ -55,7 +55,7 @@ class PokeW(MemoryAccess):
         self.delay2 = delay2
 
     def __repr__(self) -> str:
-        return f"WW({self.tstates}{'+' + str(self.delay) if self.delay > 0 else ''} {self.tstates2}{'+' + str(self.delay2) if self.delay2 > 0 else ''})"
+        return f"ww{self.tstates}{'+' + str(self.delay) if self.delay > 0 else ''},{self.tstates2}{'+' + str(self.delay2) if self.delay2 > 0 else ''}"
 
 
 class AddrOnBus(MemoryAccess):
@@ -64,7 +64,7 @@ class AddrOnBus(MemoryAccess):
         self.delays = delays
 
     def __repr__(self) -> str:
-        return f"A({self.tstates}{''.join(str(d) for d in self.delays)})"
+        return f"a{self.tstates}{''.join(str(d) for d in self.delays)}"
 
 
 class InPort(MemoryAccess):
@@ -73,7 +73,7 @@ class InPort(MemoryAccess):
         self.delays = delays
 
     def __repr__(self) -> str:
-        return f"I({self.tstates}{''.join(str(d) for d in self.delays)})"
+        return f"i{self.tstates}{''.join(str(d) for d in self.delays)}"
 
 
 class OutPort(MemoryAccess):
@@ -82,4 +82,4 @@ class OutPort(MemoryAccess):
         self.delays = delays
 
     def __repr__(self) -> str:
-        return f"O({self.tstates}{''.join(str(d) for d in self.delays)})"
+        return f"o{self.tstates}{''.join(str(d) for d in self.delays)}"

@@ -115,7 +115,8 @@ class Spectrum:
             if l < 19:
                 s += " " * (19 - l)
 
-            print(f"0x{instruction.address:04x} ({instruction.tstates:05d}): {s} {' '.join(str(p) for p in instruction.profile)}")
+            has_delay = any(p for p in instruction.profile if p.delay > 0)
+            print(f"0x{instruction.address:04x} ({instruction.tstates:05d}): {s} {'*' if has_delay else ''}{' '.join(str(p) for p in instruction.profile)}")
 
     def load_sna(self, filename: str) -> None:
         self.loader.load_sna(filename)

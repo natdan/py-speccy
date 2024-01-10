@@ -1,7 +1,7 @@
 from typing import Callable
 
 from spectrum.spectrum_bus_access import ZXSpectrum48ClockAndBusAccess
-from z80.instructions.profile import FetchOpcode, PeekB, PokeB, PeekW, PokeW, AddrOnBus, InPort, OutPort
+from z80.instructions.profile import FetchOpcode, PeekB, PokeB, PeekW, PokeW, AddrOnBus, InPort, OutPort, MemoryAccess
 from z80.memory import Memory
 from z80.ports import Ports
 
@@ -9,15 +9,13 @@ from z80.ports import Ports
 INTERRUPT_LENGTH = 24
 
 
-# This implementation heavily inspired by one from JSpeccy
-# https://github.com/jsanchezv/JSpeccy/blob/master/src/main/java/machine/Spectrum.java
 class ProfilingZXSpectrum48ClockAndBusAccess(ZXSpectrum48ClockAndBusAccess):
     def __init__(self,
                  memory: Memory,
                  ports: Ports,
                  update_next_screen_byte: Callable) -> None:
         super().__init__(memory, ports, update_next_screen_byte)
-        self.profile = []
+        self.profile: list[MemoryAccess] = []
 
     def fetch_opcode(self, address: int) -> int:
         if 16384 <= address < 32768:
