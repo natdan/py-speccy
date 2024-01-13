@@ -10,6 +10,6 @@ def assert_decode(expected: str, *values: int, address=16384) -> None:
     instr_byte = next_byte()
     decoder = DECODE_MAP[instr_byte]
 
-    instruction = decoder.decode(address, instr_byte, next_byte)
+    instruction = decoder.decode(address, instr_byte, next_byte, False, None)
 
     assert_that(instruction.to_str(0).strip(), is_(expected))

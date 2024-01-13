@@ -99,6 +99,12 @@ class TestDecodeSOP:
         assert_decode("inc (ix-4)",   0xdd, 0x34, 252)
         assert_decode("inc (iy+123)", 0xfd, 0x34, 123)
         assert_decode("inc (iy-123)", 0xfd, 0x34, 133)
+        assert_decode("inc bc", 0x03)
+        assert_decode("inc de", 0x13)
+        assert_decode("inc hl", 0x23)
+        assert_decode("inc sp", 0x33)
+        assert_decode("inc ix", 0xdd, 0x23)
+        assert_decode("inc iy", 0xfd, 0x23)
 
     def test_dec(self) -> None:
         assert_decode("dec b", 0x05)
@@ -113,3 +119,9 @@ class TestDecodeSOP:
         assert_decode("dec (ix-4)",   0xdd, 0x35, 252)
         assert_decode("dec (iy+123)", 0xfd, 0x35, 123)
         assert_decode("dec (iy-123)", 0xfd, 0x35, 133)
+        assert_decode("dec bc", 0x0b)
+        assert_decode("dec de", 0x1b)
+        assert_decode("dec hl", 0x2b)
+        assert_decode("dec sp", 0x3b)
+        assert_decode("dec ix", 0xdd, 0x2b)
+        assert_decode("dec iy", 0xfd, 0x2b)

@@ -1,10 +1,7 @@
-from typing import Optional
-
 import sys
 import inspect
 
-from z80.instructions import AddrMode
-from z80.instructions.instruction_def import Mnemonics, InstructionDef, DECODE_MAP, DECODE_MAP_IXY, NEXT_BYTE_CALLBACK, Instruction, IXY, CBInstructionDef
+from z80.instructions.instruction_def import Mnemonics, InstructionDef, CBInstructionDef
 
 
 class AND(InstructionDef):
@@ -90,7 +87,10 @@ class INC(InstructionDef):
                          R2=0x04,
                          PHLP=0x34,
                          PIXDP=0x34,
-                         PIYDP=0x34)
+                         PIYDP=0x34,
+                         SS=0x03,
+                         IX=0x23,
+                         IY=0x23)
 
 
 class DEC(InstructionDef):
@@ -99,7 +99,10 @@ class DEC(InstructionDef):
                          R2=0x05,
                          PHLP=0x35,
                          PIXDP=0x35,
-                         PIYDP=0x35)
+                         PIYDP=0x35,
+                         SS=0x0b,
+                         IX=0x2b,
+                         IY=0x2b)
 
 
 class RL(CBInstructionDef):
@@ -269,7 +272,95 @@ class LD(InstructionDef):
                          RPIYDP=0x46,
                          PHLPR=0x70,
                          PIXDPR=0x70,
-                         PIYDPR=0x70)
+                         PIYDPR=0x70,
+                         PHLPN=0x36,
+                         PIXDPN=0x36,
+                         PIYDPN=0x36,
+                         APBCP=0x0a,
+                         APDEP=0x1a,
+                         APNNP=0x3a,
+                         PBCPA=0x02,
+                         PDEPA=0x12,
+                         PNNPA=0x32,
+                         AI=0x57,
+                         AR=0x5f,
+                         IA=0x47,
+                         RA=0x4f,
+                         DDNN=0x01,
+                         IXNN=0x21,
+                         IYNN=0x21,
+                         HLPNNP=0x2a,
+                         DDPNNP=0x4b,
+                         IXPNNP=0x2a,
+                         IYPNNP=0x2a,
+                         PNNPHL=0x22,
+                         PNNPDD=0x43,
+                         PNNPIX=0x22,
+                         PNNPIY=0x22,
+                         SPHL=0xf9,
+                         SPIX=0xf9,
+                         SPIY=0xf9)
+
+
+class ADD(InstructionDef):
+    def __init__(self):
+        super().__init__(Mnemonics.ADD,
+                         AR1=0x80,
+                         AN=0xc6,
+                         APHLP=0x86,
+                         APIXDP=0x86,
+                         APIYDP=0x86,
+                         HLSS=0x09,
+                         IXPP=0x09,
+                         IYRR=0x09)
+
+
+class SBC(InstructionDef):
+    def __init__(self):
+        super().__init__(Mnemonics.SBC,
+                         AR1=0x98,
+                         AN=0xde,
+                         APHLP=0x9e,
+                         APIXDP=0x9e,
+                         APIYDP=0x9e)
+
+
+class ADC(InstructionDef):
+    def __init__(self):
+        super().__init__(Mnemonics.ADC,
+                         AR1=0x88,
+                         AN=0xce,
+                         APHLP=0x8e,
+                         APIXDP=0x8e,
+                         APIYDP=0x8e)
+
+
+class IM(InstructionDef):
+    def __init__(self):
+        super().__init__(Mnemonics.IM,
+                         IM0=0x46,
+                         IM1=0x56,
+                         IM2=0x5e)
+
+
+class RST(InstructionDef):
+    def __init__(self):
+        super().__init__(Mnemonics.RST,
+                         RST=0xc7)
+
+
+class IN(InstructionDef):
+    def __init__(self):
+        super().__init__(Mnemonics.IN,
+                         APNP=0xdb,
+                         RPCP=0x40)
+
+
+class OUT(InstructionDef):
+    def __init__(self):
+        super().__init__(Mnemonics.OUT,
+                         PNPA=0xd3,
+                         PCPR=0x41)
 
 
 this_module = sys.modules[__name__]

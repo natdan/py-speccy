@@ -1,7 +1,7 @@
 from assembler.assert_util import assert_decode
 
 
-class TestDecodeLd:
+class TestDecodeLD:
     def test_ld_rr(self) -> None:
         assert_decode("ld b, b", 0x40)
         assert_decode("ld b, c", 0x41)
@@ -121,3 +121,87 @@ class TestDecodeLd:
         assert_decode("ld (iy+5), h", 0xfd, 0x74, 5)
         assert_decode("ld (iy+6), l", 0xfd, 0x75, 6)
         assert_decode("ld (iy+7), a", 0xfd, 0x77, 7)
+
+    def test_ld_phlpn(self) -> None:
+        assert_decode("ld (hl), 123", 0x36, 123)
+
+    def test_ld_pixdpn(self) -> None:
+        assert_decode("ld (ix+15), 123", 0xdd, 0x36, 15, 123)
+
+    def test_ld_piydpn(self) -> None:
+        assert_decode("ld (iy-2), 123", 0xfd, 0x36, 0xfe, 123)
+
+    def test_ld_apbcp(self) -> None:
+        assert_decode("ld a, (bc)", 0x0a)
+
+    def test_ld_apdep(self) -> None:
+        assert_decode("ld a, (de)", 0x1a)
+
+    def test_ld_apnnp(self) -> None:
+        assert_decode("ld a, (0x1234)", 0x3a, 0x34, 0x12)
+
+    def test_ld_pbcpa(self) -> None:
+        assert_decode("ld (bc), a", 0x02)
+
+    def test_ld_pdepa(self) -> None:
+        assert_decode("ld (de), a", 0x12)
+
+    def test_ld_pnnpa(self) -> None:
+        assert_decode("ld (0x1234), a", 0x32, 0x34, 0x12)
+
+    def test_ld_air(self) -> None:
+        assert_decode("ld a, i", 0xed, 0x57)
+        assert_decode("ld a, r", 0xed, 0x5f)
+        assert_decode("ld i, a", 0xed, 0x47)
+        assert_decode("ld r, a", 0xed, 0x4f)
+
+    def test_ld_ddnn(self) -> None:
+        assert_decode("ld bc, 0x1234", 0x01, 0x34, 0x12)
+        assert_decode("ld de, 0x1234", 0x11, 0x34, 0x12)
+        assert_decode("ld hl, 0x1234", 0x21, 0x34, 0x12)
+        assert_decode("ld sp, 0x1234", 0x31, 0x34, 0x12)
+
+    def test_ld_ixnn(self) -> None:
+        assert_decode("ld ix, 0x1234", 0xdd, 0x21, 0x34, 0x12)
+
+    def test_ld_iynn(self) -> None:
+        assert_decode("ld iy, 0x1234", 0xfd, 0x21, 0x34, 0x12)
+
+    def test_ld_hlpnnp(self) -> None:
+        assert_decode("ld hl, (0x1234)", 0x2a, 0x34, 0x12)
+
+    def test_ld_ddpnnp(self) -> None:
+        assert_decode("ld bc, (0x1234)", 0xed, 0x4b, 0x34, 0x12)
+        assert_decode("ld de, (0x1234)", 0xed, 0x5b, 0x34, 0x12)
+        assert_decode("ld hl, (0x1234)", 0xed, 0x6b, 0x34, 0x12)
+        assert_decode("ld sp, (0x1234)", 0xed, 0x7b, 0x34, 0x12)
+
+    def test_ld_ixpnnp(self) -> None:
+        assert_decode("ld ix, (0x1234)", 0xdd, 0x2a, 0x34, 0x12)
+
+    def test_ld_iypnnp(self) -> None:
+        assert_decode("ld iy, (0x1234)", 0xfd, 0x2a, 0x34, 0x12)
+
+    def test_ld_pnnphl(self) -> None:
+        assert_decode("ld (0x1234), hl", 0x22, 0x34, 0x12)
+
+    def test_ld_pnnpdd(self) -> None:
+        assert_decode("ld (0x1234), bc", 0xed, 0x43, 0x34, 0x12)
+        assert_decode("ld (0x1234), de", 0xed, 0x53, 0x34, 0x12)
+        assert_decode("ld (0x1234), hl", 0xed, 0x63, 0x34, 0x12)
+        assert_decode("ld (0x1234), sp", 0xed, 0x73, 0x34, 0x12)
+
+    def test_ld_pnnpix(self) -> None:
+        assert_decode("ld (0x1234), ix", 0xdd, 0x22, 0x34, 0x12)
+
+    def test_ld_pnnpiy(self) -> None:
+        assert_decode("ld (0x1234), iy", 0xfd, 0x22, 0x34, 0x12)
+
+    def test_ld_sphl(self) -> None:
+        assert_decode("ld sp, hl", 0xf9)
+
+    def test_ld_spix(self) -> None:
+        assert_decode("ld sp, ix", 0xdd, 0xf9)
+
+    def test_ld_spiy(self) -> None:
+        assert_decode("ld sp, iy", 0xfd, 0xf9)

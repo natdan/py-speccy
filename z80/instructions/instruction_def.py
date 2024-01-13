@@ -16,10 +16,10 @@ class InstructionDef(InstructionDecoder):
             code = self.addr_mode_code[addr_mode]
             addr_mode.update_decode_maps(self, code)
 
-    def decode(self, address: int, instr: int, next_byte: NEXT_BYTE_CALLBACK, ixy: Optional[IXY] = None, **params) -> 'Instruction':
+    def decode(self, address: int, instr: int, next_byte: NEXT_BYTE_CALLBACK, ed: bool, ixy: Optional[IXY], **params) -> 'Instruction':
         params = params if params is not None else {}
         for addr_mode, code in self.addr_mode_code.items():
-            if addr_mode.ixy() == ixy and addr_mode.can_decode(code, instr):
+            if addr_mode.can_decode(code, instr, ed, ixy):
                 params.update(addr_mode.decode(address, code, instr, next_byte))
                 if params is not None:
                     return Instruction(address, self, addr_mode, **params)
@@ -59,7 +59,7 @@ class UnknownInstructionDef(InstructionDef):
     def update_decode_map(self) -> None:
         pass
 
-    def decode(self, address: int, instr: int, next_byte: NEXT_BYTE_CALLBACK, ixy: Optional[IXY] = None, **params) -> 'Instruction':
+    def decode(self, address: int, instr: int, next_byte: NEXT_BYTE_CALLBACK, ed: bool, ixy: Optional[IXY], **params) -> 'Instruction':
         return Instruction(address, self, AddrMode.SIMPLE, **params)
 
     def to_str(self) -> str:
@@ -83,8 +83,7 @@ def decode_instruction(address: int, next_byte: NEXT_BYTE_CALLBACK) -> Instructi
     instr_byte = next_byte()
     if instr_byte in DECODE_MAP:
         decoder = DECODE_MAP[instr_byte]
-    else:
-        return Instruction(address, UnknownInstructionDef(instr_byte), AddrMode.SIMPLE)
+        return decoder.decode(address, instr_byte, next_byte, False, None)
 
-    instruction = decoder.decode(address, instr_byte, next_byte)
-    return instruction
+    return Instruction(address, UnknownInstructionDef(instr_byte), AddrMode.SIMPLE)
+

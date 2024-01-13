@@ -101,7 +101,7 @@ class InstructionDecoder(ABC):
         pass
 
     @abstractmethod
-    def decode(self, address: int, instr: int, next_byte: NEXT_BYTE_CALLBACK, ixy: Optional[IXY] = None, **params) -> 'Instruction':
+    def decode(self, address: int, instr: int, next_byte: NEXT_BYTE_CALLBACK, ed: bool, ixy: Optional[IXY], **params) -> 'Instruction':
         pass
 
 
