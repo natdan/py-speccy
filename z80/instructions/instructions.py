@@ -132,6 +132,15 @@ class RRC(CBInstructionDef):
                          CBPIYDP=0x0e)
 
 
+class RLC(CBInstructionDef):
+    def __init__(self) -> None:
+        super().__init__(Mnemonics.RLC,
+                         R1=0x00,
+                         PHLP=0x06,
+                         CBPIXDP=0x06,
+                         CBPIYDP=0x06)
+
+
 class SLA(CBInstructionDef):
     def __init__(self) -> None:
         super().__init__(Mnemonics.SLA,
@@ -221,6 +230,13 @@ class JR(InstructionDef):
                          NCE=0x30,
                          ZE=0x28,
                          NZE=0x20)
+
+
+class CALL(InstructionDef):
+    def __init__(self):
+        super().__init__(Mnemonics.CALL,
+                         NN=0xcd,
+                         CCNN=0xc4)
 
 
 class DJNZ(InstructionDef):
@@ -322,7 +338,8 @@ class SBC(InstructionDef):
                          AN=0xde,
                          APHLP=0x9e,
                          APIXDP=0x9e,
-                         APIYDP=0x9e)
+                         APIYDP=0x9e,
+                         ED_HLSS=0x42)
 
 
 class ADC(InstructionDef):
@@ -332,7 +349,8 @@ class ADC(InstructionDef):
                          AN=0xce,
                          APHLP=0x8e,
                          APIXDP=0x8e,
-                         APIYDP=0x8e)
+                         APIYDP=0x8e,
+                         ED_HLSS=0x4a)
 
 
 class IM(InstructionDef):

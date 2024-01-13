@@ -694,6 +694,7 @@ class AddrMode(Enum):
     RPCP = [_R2, _COMMA, _PCP], _ED_R2
     PNPA = [_PNP, _COMMA, _A], None
     PCPR = [_PCP, _COMMA, _R2], _ED_R2
+    ED_HLSS = [_HL, _COMMA, _SS], _ED_DD
 
     def __new__(cls, *args, **kwargs):
         value = len(cls.__members__) + 1

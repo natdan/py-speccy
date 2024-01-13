@@ -44,6 +44,20 @@ class TestDecodeSOP:
         assert_decode("rrc (iy+123)", 0xfd, 0xcb, 123, 0x0e)
         assert_decode("rrc (iy-123)", 0xfd, 0xcb, 133, 0x0e)
 
+    def test_rlc(self) -> None:
+        assert_decode("rlc b", 0xcb, 0x00)
+        assert_decode("rlc c", 0xcb, 0x01)
+        assert_decode("rlc d", 0xcb, 0x02)
+        assert_decode("rlc e", 0xcb, 0x03)
+        assert_decode("rlc h", 0xcb, 0x04)
+        assert_decode("rlc l", 0xcb, 0x05)
+        assert_decode("rlc a", 0xcb, 0x07)
+        assert_decode("rlc (hl)", 0xcb, 0x06)
+        assert_decode("rlc (ix+123)", 0xdd, 0xcb, 123, 0x06)
+        assert_decode("rlc (ix-4)", 0xdd, 0xcb, 252, 0x06)
+        assert_decode("rlc (iy+123)", 0xfd, 0xcb, 123, 0x06)
+        assert_decode("rlc (iy-123)", 0xfd, 0xcb, 133, 0x06)
+
     def test_sla(self) -> None:
         assert_decode("sla b", 0xcb, 0x20)
         assert_decode("sla c", 0xcb, 0x21)

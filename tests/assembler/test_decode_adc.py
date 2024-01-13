@@ -2,7 +2,7 @@ from assembler.assert_util import assert_decode
 
 
 class TestDecodeADC:
-    def test_and(self) -> None:
+    def test_adc(self) -> None:
         assert_decode("adc a, b", 0x88)
         assert_decode("adc a, c", 0x89)
         assert_decode("adc a, d", 0x8a)
@@ -16,3 +16,7 @@ class TestDecodeADC:
         assert_decode("adc a, (ix-4)", 0xdd, 0x8e, 252)
         assert_decode("adc a, (iy+123)", 0xfd, 0x8e, 123)
         assert_decode("adc a, (iy-123)", 0xfd, 0x8e, 133)
+        assert_decode("adc hl, bc", 0xed, 0x4a)
+        assert_decode("adc hl, de", 0xed, 0x5a)
+        assert_decode("adc hl, hl", 0xed, 0x6a)
+        assert_decode("adc hl, sp", 0xed, 0x7a)

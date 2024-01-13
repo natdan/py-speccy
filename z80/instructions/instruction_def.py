@@ -5,6 +5,17 @@ from z80.instructions import AddrMode
 from z80.instructions.base import InstructionDecoder, Mnemonics, NEXT_BYTE_CALLBACK, IXY, DECODE_MAP, DECODE_MAP_ED, DECODE_MAP_IXY, DECODE_MAP_CB, DECODE_MAP_IDCB
 
 
+def read_bytes(instr: int, next_byte: NEXT_BYTE_CALLBACK) -> list[int]:
+    b = [instr]
+    while True:
+        try:
+            b.append(next_byte())
+            if len(b) == 4:
+                return b
+        except Exception:
+            return b
+
+
 class InstructionDef(InstructionDecoder):
     def __init__(self, mnemonic: Mnemonics, **addr_mode_code) -> None:
         super().__init__()
@@ -85,5 +96,4 @@ def decode_instruction(address: int, next_byte: NEXT_BYTE_CALLBACK) -> Instructi
         decoder = DECODE_MAP[instr_byte]
         return decoder.decode(address, instr_byte, next_byte, False, None)
 
-    return Instruction(address, UnknownInstructionDef(instr_byte), AddrMode.SIMPLE)
-
+    return Instruction(address, UnknownInstructionDef(*read_bytes(instr_byte, next_byte)), AddrMode.SIMPLE)

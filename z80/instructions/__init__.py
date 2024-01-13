@@ -7,7 +7,7 @@ from z80.instructions.base import InstructionDecoder
 from z80.instructions.base import DECODE_MAP, DECODE_MAP_CB, DECODE_MAP_ED, DECODE_MAP_IXY, DECODE_MAP_IDCB
 
 import z80.instructions.instructions
-from z80.instructions.instruction_def import Instruction, UnknownInstructionDef
+from z80.instructions.instruction_def import Instruction, UnknownInstructionDef, read_bytes
 
 
 class IXYInstructionDecoder(InstructionDecoder):
@@ -20,7 +20,7 @@ class IXYInstructionDecoder(InstructionDecoder):
         if instr in DECODE_MAP_IXY:
             return DECODE_MAP_IXY[instr].decode(address, instr, next_byte, ed, self.ixy)
 
-        return Instruction(address, UnknownInstructionDef(prefix, instr), AddrMode.SIMPLE)
+        return Instruction(address, UnknownInstructionDef(prefix, *read_bytes(instr, next_byte)), AddrMode.SIMPLE)
 
 
 class CBInstructionDecoder(InstructionDecoder):
@@ -32,7 +32,7 @@ class CBInstructionDecoder(InstructionDecoder):
         if instr in DECODE_MAP_CB:
             return DECODE_MAP_CB[instr].decode(address, instr, next_byte, False, ixy)
 
-        return Instruction(address, UnknownInstructionDef(prefix, instr), AddrMode.SIMPLE)
+        return Instruction(address, UnknownInstructionDef(prefix, *read_bytes(instr, next_byte)), AddrMode.SIMPLE)
 
 
 class EDInstructionDecoder(InstructionDecoder):
@@ -44,7 +44,7 @@ class EDInstructionDecoder(InstructionDecoder):
         if instr in DECODE_MAP_ED:
             return DECODE_MAP_ED[instr].decode(address, instr, next_byte, True, ixy)
 
-        return Instruction(address, UnknownInstructionDef(prefix, instr), AddrMode.SIMPLE)
+        return Instruction(address, UnknownInstructionDef(prefix, *read_bytes(instr, next_byte)), AddrMode.SIMPLE)
 
 
 class IXYCBInstructionDecoder(InstructionDecoder):
@@ -57,7 +57,7 @@ class IXYCBInstructionDecoder(InstructionDecoder):
         if instr in DECODE_MAP_IDCB:
             return DECODE_MAP_IDCB[instr].decode(address, instr, next_byte, False, ixy, d=displacement)
 
-        return Instruction(address, UnknownInstructionDef(prefix, instr), AddrMode.SIMPLE)
+        return Instruction(address, UnknownInstructionDef(prefix, *read_bytes(instr, next_byte)), AddrMode.SIMPLE)
 
 
 DECODE_MAP[IX_CODE] = IXYInstructionDecoder(IXY.IX)

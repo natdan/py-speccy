@@ -16,3 +16,7 @@ class TestDecodeSBC:
         assert_decode("sbc a, (ix-4)", 0xdd, 0x9e, 252)
         assert_decode("sbc a, (iy+123)", 0xfd, 0x9e, 123)
         assert_decode("sbc a, (iy-123)", 0xfd, 0x9e, 133)
+        assert_decode("sbc hl, bc", 0xed, 0x42)
+        assert_decode("sbc hl, de", 0xed, 0x52)
+        assert_decode("sbc hl, hl", 0xed, 0x62)
+        assert_decode("sbc hl, sp", 0xed, 0x72)
