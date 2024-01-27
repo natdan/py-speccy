@@ -22,10 +22,11 @@ class InstructionDef(InstructionDecoder):
         self.mnemonic = mnemonic
         self.addr_mode_code: dict[AddrMode, int] = {AddrMode.from_name(k): v for k, v in addr_mode_code.items()}
 
-    def update_decode_map(self) -> None:
+    def update_decode_map(self) -> 'InstructionDef':
         for addr_mode in self.addr_mode_code:
             code = self.addr_mode_code[addr_mode]
             addr_mode.update_decode_maps(self, code)
+        return self
 
     def decode(self, address: int, instr: int, next_byte: NEXT_BYTE_CALLBACK, ed: bool, ixy: Optional[IXY], **params) -> 'Instruction':
         params = params if params is not None else {}

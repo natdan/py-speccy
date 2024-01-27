@@ -31,6 +31,7 @@ class TestDecodeSimple:
         assert_decode(f"neg", 0xed, 0x44)
         assert_decode(f"outd", 0xed, 0xab)
         assert_decode(f"otdr", 0xed, 0xbb)
+        assert_decode(f"otir", 0xed, 0xb3)
         assert_decode(f"reti", 0xed, 0x4d)
         assert_decode(f"retn", 0xed, 0x45)
         assert_decode(f"rrd", 0xed, 0x67)

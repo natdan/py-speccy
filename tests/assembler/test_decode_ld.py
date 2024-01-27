@@ -96,7 +96,7 @@ class TestDecodeLD:
         assert_decode("ld a, (iy+7)", 0xfd, 0x7e, 7)
 
     def test_ld_phlpr(self) -> None:
-        # assert_decode("ld (hl), b", 0x70)
+        assert_decode("ld (hl), b", 0x70)
         assert_decode("ld (hl), c", 0x71)
         assert_decode("ld (hl), d", 0x72)
         assert_decode("ld (hl), e", 0x73)
@@ -173,7 +173,8 @@ class TestDecodeLD:
     def test_ld_ddpnnp(self) -> None:
         assert_decode("ld bc, (0x1234)", 0xed, 0x4b, 0x34, 0x12)
         assert_decode("ld de, (0x1234)", 0xed, 0x5b, 0x34, 0x12)
-        assert_decode("ld hl, (0x1234)", 0xed, 0x6b, 0x34, 0x12)
+        # This is same as above instruction (!)
+        assert_decode("ld hl, (0x1234)", 0xed, 0x6b, 0x34, 0x12, assert_asm=False)
         assert_decode("ld sp, (0x1234)", 0xed, 0x7b, 0x34, 0x12)
 
     def test_ld_ixpnnp(self) -> None:

@@ -2,7 +2,7 @@ from assembler.assert_util import assert_decode
 
 
 class TestDecodeSBC:
-    def test_and(self) -> None:
+    def test_sbc(self) -> None:
         assert_decode("sbc a, b", 0x98)
         assert_decode("sbc a, c", 0x99)
         assert_decode("sbc a, d", 0x9a)

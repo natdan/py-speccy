@@ -1,5 +1,5 @@
 
-from z80 import Z80AssemblerParser
+from z80_assembler import Z80AssemblerParser
 
 parser = Z80AssemblerParser()
 scanner = Z80AssemblerParser.SCANNER_CLASS()

@@ -168,38 +168,39 @@ class SRL(CBInstructionDef):
                          CBPIYDP=0x3e)
 
 
-InstructionDef(Mnemonics.CCF, SIMPLE=0x3f).update_decode_map()
-InstructionDef(Mnemonics.CPL, SIMPLE=0x2f).update_decode_map()
-InstructionDef(Mnemonics.DAA, SIMPLE=0x27).update_decode_map()
-InstructionDef(Mnemonics.DI, SIMPLE=0xf3).update_decode_map()
-InstructionDef(Mnemonics.EI, SIMPLE=0xfb).update_decode_map()
-InstructionDef(Mnemonics.EXX, SIMPLE=0xd9).update_decode_map()
-InstructionDef(Mnemonics.RLA, SIMPLE=0x17).update_decode_map()
-InstructionDef(Mnemonics.RLCA, SIMPLE=0x07).update_decode_map()
-InstructionDef(Mnemonics.RRA, SIMPLE=0x1f).update_decode_map()
-InstructionDef(Mnemonics.RRCA, SIMPLE=0x0f).update_decode_map()
-InstructionDef(Mnemonics.SCF, SIMPLE=0x37).update_decode_map()
+CCF = InstructionDef(Mnemonics.CCF, SIMPLE=0x3f).update_decode_map()
+CPL = InstructionDef(Mnemonics.CPL, SIMPLE=0x2f).update_decode_map()
+DAA = InstructionDef(Mnemonics.DAA, SIMPLE=0x27).update_decode_map()
+DI = InstructionDef(Mnemonics.DI, SIMPLE=0xf3).update_decode_map()
+EI = InstructionDef(Mnemonics.EI, SIMPLE=0xfb).update_decode_map()
+EXX = InstructionDef(Mnemonics.EXX, SIMPLE=0xd9).update_decode_map()
+RLA = InstructionDef(Mnemonics.RLA, SIMPLE=0x17).update_decode_map()
+RLCA = InstructionDef(Mnemonics.RLCA, SIMPLE=0x07).update_decode_map()
+RRA = InstructionDef(Mnemonics.RRA, SIMPLE=0x1f).update_decode_map()
+RRCA = InstructionDef(Mnemonics.RRCA, SIMPLE=0x0f).update_decode_map()
+SCF = InstructionDef(Mnemonics.SCF, SIMPLE=0x37).update_decode_map()
 
-InstructionDef(Mnemonics.CPD, SIMPLE_ED=0xa9).update_decode_map()
-InstructionDef(Mnemonics.CPDR, SIMPLE_ED=0xb9).update_decode_map()
-InstructionDef(Mnemonics.CPI, SIMPLE_ED=0xa1).update_decode_map()
-InstructionDef(Mnemonics.CPIR, SIMPLE_ED=0xb1).update_decode_map()
-InstructionDef(Mnemonics.IND, SIMPLE_ED=0xaa).update_decode_map()
-InstructionDef(Mnemonics.INDR, SIMPLE_ED=0xba).update_decode_map()
-InstructionDef(Mnemonics.INI, SIMPLE_ED=0xa2).update_decode_map()
-InstructionDef(Mnemonics.INIR, SIMPLE_ED=0xb2).update_decode_map()
-InstructionDef(Mnemonics.LDD, SIMPLE_ED=0xa8).update_decode_map()
-InstructionDef(Mnemonics.LDDR, SIMPLE_ED=0xb8).update_decode_map()
-InstructionDef(Mnemonics.LDI, SIMPLE_ED=0xa0).update_decode_map()
-InstructionDef(Mnemonics.LDIR, SIMPLE_ED=0xb0).update_decode_map()
-InstructionDef(Mnemonics.NEG, SIMPLE_ED=0x44).update_decode_map()
-InstructionDef(Mnemonics.OTDR, SIMPLE_ED=0xbb).update_decode_map()
-InstructionDef(Mnemonics.OUTD, SIMPLE_ED=0xab).update_decode_map()
-InstructionDef(Mnemonics.OUTI, SIMPLE_ED=0xa3).update_decode_map()
-InstructionDef(Mnemonics.RETI, SIMPLE_ED=0x4d).update_decode_map()
-InstructionDef(Mnemonics.RETN, SIMPLE_ED=0x45).update_decode_map()
-InstructionDef(Mnemonics.RLD, SIMPLE_ED=0x6f).update_decode_map()
-InstructionDef(Mnemonics.RRD, SIMPLE_ED=0x67).update_decode_map()
+CPD = InstructionDef(Mnemonics.CPD, SIMPLE_ED=0xa9).update_decode_map()
+CPDR = InstructionDef(Mnemonics.CPDR, SIMPLE_ED=0xb9).update_decode_map()
+CPI = InstructionDef(Mnemonics.CPI, SIMPLE_ED=0xa1).update_decode_map()
+CPIR = InstructionDef(Mnemonics.CPIR, SIMPLE_ED=0xb1).update_decode_map()
+IND = InstructionDef(Mnemonics.IND, SIMPLE_ED=0xaa).update_decode_map()
+INDR = InstructionDef(Mnemonics.INDR, SIMPLE_ED=0xba).update_decode_map()
+INI = InstructionDef(Mnemonics.INI, SIMPLE_ED=0xa2).update_decode_map()
+INIR = InstructionDef(Mnemonics.INIR, SIMPLE_ED=0xb2).update_decode_map()
+LDD = InstructionDef(Mnemonics.LDD, SIMPLE_ED=0xa8).update_decode_map()
+LDDR = InstructionDef(Mnemonics.LDDR, SIMPLE_ED=0xb8).update_decode_map()
+LDI = InstructionDef(Mnemonics.LDI, SIMPLE_ED=0xa0).update_decode_map()
+LDIR = InstructionDef(Mnemonics.LDIR, SIMPLE_ED=0xb0).update_decode_map()
+NEG = InstructionDef(Mnemonics.NEG, SIMPLE_ED=0x44).update_decode_map()
+OTDR = InstructionDef(Mnemonics.OTDR, SIMPLE_ED=0xbb).update_decode_map()
+OTIR = InstructionDef(Mnemonics.OTIR, SIMPLE_ED=0xb3).update_decode_map()
+OUTD = InstructionDef(Mnemonics.OUTD, SIMPLE_ED=0xab).update_decode_map()
+OUTI = InstructionDef(Mnemonics.OUTI, SIMPLE_ED=0xa3).update_decode_map()
+RETI = InstructionDef(Mnemonics.RETI, SIMPLE_ED=0x4d).update_decode_map()
+RETN = InstructionDef(Mnemonics.RETN, SIMPLE_ED=0x45).update_decode_map()
+RLD = InstructionDef(Mnemonics.RLD, SIMPLE_ED=0x6f).update_decode_map()
+RRD = InstructionDef(Mnemonics.RRD, SIMPLE_ED=0x67).update_decode_map()
 
 
 class HALT(InstructionDef):
@@ -245,7 +246,7 @@ class DJNZ(InstructionDef):
                          E=0x10)
 
 
-class PushInstructionDef(InstructionDef):
+class PUSH(InstructionDef):
     def __init__(self) -> None:
         super().__init__(Mnemonics.PUSH,
                          QQ=0xc5,
@@ -253,7 +254,7 @@ class PushInstructionDef(InstructionDef):
                          IY=0xe5)
 
 
-class PopInstructionDef(InstructionDef):
+class POP(InstructionDef):
     def __init__(self) -> None:
         super().__init__(Mnemonics.POP,
                          QQ=0xc1,

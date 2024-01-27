@@ -1,11 +1,11 @@
-grammar z80;
+grammar z80_assembler;
 
 scanner Z80AssemblerScanner {
 
     "="; ";"; ","; "."; "("; ")"; "+"; "-";
 
     "adc"; "add"; "and";
-    "bit"; "call"; "ccf"; "cp"; "cpd"; "cpdr"; "cpi"; "cpir";
+    "bit"; "call"; "ccf"; "cp"; "cpd"; "cpdr"; "cpi"; "cpir"; "cpl";
     "daa"; "dec"; "di"; "djnz";
     "ei"; "ex"; "exx"; "halt"; "im"; "in"; "inc"; "ind"; "indr"; "ini"; "inir";
     "jp"; "jr";
@@ -21,12 +21,13 @@ scanner Z80AssemblerScanner {
     "xor";
     "a"; "b"; "c"; "d"; "e"; "h"; "l"; "i"; "r";
     "bc"; "de"; "hl"; "ix"; "iy"; "af"; "af'"; "sp";
-    "nz"; "z"; "nc"; "c"; "po"; "pe"; "p"; "m";
+    "nz"; "z"; "nc"; "po"; "pe"; "p"; "m";
 
     eol     = CHR(10);
 
-    private digit   = '0' .. '9';
-    private letter  = 'A' .. 'Z' | 'a' .. 'z';
+    private digit     = '0' .. '9';
+    private hex_digit = '0' .. '9' | 'a' .. 'z';
+    private letter    = 'A' .. 'Z' | 'a' .. 'z';
 
     literal
         = "'" (('\\' CHR(32)..CHR(127)) | (CHR(32) .. CHR(91) | CHR(93) .. CHR(127) ) ) "'"
@@ -70,7 +71,9 @@ scanner Z80AssemblerScanner {
 
     ident = ( '.' | '_' | letter) { letter | digit | '_' | '.' };
 
-    unsigned_number = digit { digit } ["h" | "H"];
+    unsigned_number = "0" "x" hex_digit { hex_digit }
+                    | digit { digit } ["h" | "H"]
+                    ;
 
     private allbuteol = CHR(1) .. CHR(9) | CHR(11) .. CHR(127);
 
@@ -82,9 +85,17 @@ scanner Z80AssemblerScanner {
 
 parser Z80AssemblerParser using scanner Z80AssemblerScanner {
 
+from "typing" import "Union";
+from "assembler_utils" import "to_int";
+from "z80.instructions.instruction_def" import "Instruction, InstructionDef";
+from "z80.instructions.instructions" import "*";
+from "z80.instructions.address_modes" import "AddrMode";
 
 <%
-
+        self.instructions: list[Instruction] = []
+        self.value: Optional[Union[int, str]] = None
+        self.reg = 0
+        self._cc = 0
 %>
 
     z80 = {
@@ -94,204 +105,347 @@ parser Z80AssemblerParser using scanner Z80AssemblerScanner {
     instruction = (
           "adc" adc_op
         | "add" add_op
-        | "and" s_op<"and">
-        | "bit" bit_op<"bit">
+        | "and" s_op<AND()>
+        | "bit" bit_op<BIT()>
         | "call" call_op
-        | "ccf"
-        | "cp" s_op<"cp">
-        | "cpd"
-        | "cpdr"
-        | "cpi"
-        | "cpir"
-        | "cpl"
-        | "daa"
-        | "dec" m_op<"dec">
-        | "di"
-        | "djnz" relative
-        | "ei"
+        | "ccf" <% self.instructions.append(Instruction(0, CCF, AddrMode.SIMPLE)) %>
+        | "cp" s_op<CP()>
+        | "cpd" <% self.instructions.append(Instruction(0, CPD, AddrMode.SIMPLE)) %>
+        | "cpdr" <% self.instructions.append(Instruction(0, CPDR, AddrMode.SIMPLE)) %>
+        | "cpi" <% self.instructions.append(Instruction(0, CPI, AddrMode.SIMPLE)) %>
+        | "cpir" <% self.instructions.append(Instruction(0, CPIR, AddrMode.SIMPLE)) %>
+        | "cpl" <% self.instructions.append(Instruction(0, CPL, AddrMode.SIMPLE)) %>
+        | "daa" <% self.instructions.append(Instruction(0, DAA, AddrMode.SIMPLE)) %>
+        | "dec" incdec<DEC()>
+        | "di" <% self.instructions.append(Instruction(0, DI, AddrMode.SIMPLE)) %>
+        | "djnz" relative <% self.instructions.append(Instruction(0, DJNZ(), AddrMode.E, e=self.value)) %>
+        | "ei" <% self.instructions.append(Instruction(0, EI, AddrMode.SIMPLE)) %>
         | "ex" ex_op
-        | "exx"
-        | "halt"
+        | "exx" <% self.instructions.append(Instruction(0, EXX, AddrMode.SIMPLE)) %>
+        | "halt" <% self.instructions.append(Instruction(0, HALT, AddrMode.SIMPLE)) %>
         | "im" im_op
         | "in" in_op
-        | "inc" m_op<"inc">
-        | "ind"
-        | "indr"
-        | "ini"
-        | "inir"
+        | "inc" incdec<INC()>
+        | "ind" <% self.instructions.append(Instruction(0, IND, AddrMode.SIMPLE)) %>
+        | "indr" <% self.instructions.append(Instruction(0, INDR, AddrMode.SIMPLE)) %>
+        | "ini" <% self.instructions.append(Instruction(0, INI, AddrMode.SIMPLE)) %>
+        | "inir" <% self.instructions.append(Instruction(0, INIR, AddrMode.SIMPLE)) %>
         | "jp" jp_op
         | "jr" jr_op
         | "ld" ld_op
-        | "ldd"
-        | "lddr"
-        | "ldi"
-        | "ldir"
-        | "neg"
-        | "nop"
-        | "or" s_op<"or">
-        | "otdr"
-        | "otir"
+        | "ldd" <% self.instructions.append(Instruction(0, LDD, AddrMode.SIMPLE)) %>
+        | "lddr" <% self.instructions.append(Instruction(0, LDDR, AddrMode.SIMPLE)) %>
+        | "ldi" <% self.instructions.append(Instruction(0, LDI, AddrMode.SIMPLE)) %>
+        | "ldir" <% self.instructions.append(Instruction(0, LDIR, AddrMode.SIMPLE)) %>
+        | "neg" <% self.instructions.append(Instruction(0, NEG, AddrMode.SIMPLE)) %>
+        | "nop" <% self.instructions.append(Instruction(0, NOP, AddrMode.SIMPLE)) %>
+        | "or" s_op<OR()>
+        | "otdr" <% self.instructions.append(Instruction(0, OTDR, AddrMode.SIMPLE)) %>
+        | "otir" <% self.instructions.append(Instruction(0, OTIR, AddrMode.SIMPLE)) %>
         | "out" out_op
-        | "outd"
-        | "outi"
-        | "pop" pop_op<"pop">
-        | "push" pop_op<"push">
-        | "res" bit_op<"res">
+        | "outd" <% self.instructions.append(Instruction(0, OUTD, AddrMode.SIMPLE)) %>
+        | "outi" <% self.instructions.append(Instruction(0, OUTI, AddrMode.SIMPLE)) %>
+        | "pop" pop_op<POP()>
+        | "push" pop_op<PUSH()>
+        | "res" bit_op<RES()>
         | "ret" ret_op
-        | "reti"
-        | "retn"
-        | "rl" m_op<"rl">
-        | "rla"
-        | "rlc" m_op<"rlc">  // Wrong. Only reg here!
-        | "rlca"
-        | "rld"
-        | "rr"  m_op<"rr">
-        | "rra"
-        | "rrc" m_op<"rrc">
-        | "rrca"
-        | "rrd"
+        | "reti" <% self.instructions.append(Instruction(0, RETI, AddrMode.SIMPLE)) %>
+        | "retn" <% self.instructions.append(Instruction(0, RETN, AddrMode.SIMPLE)) %>
+        | "rl" m_op<RL()>
+        | "rla" <% self.instructions.append(Instruction(0, RLA, AddrMode.SIMPLE)) %>
+        | "rlc" m_op<RLC()>  // Wrong. Only reg here!
+        | "rlca" <% self.instructions.append(Instruction(0, RLCA, AddrMode.SIMPLE)) %>
+        | "rld" <% self.instructions.append(Instruction(0, RLD, AddrMode.SIMPLE)) %>
+        | "rr"  m_op<RR()>
+        | "rra" <% self.instructions.append(Instruction(0, RRA, AddrMode.SIMPLE)) %>
+        | "rrc" m_op<RRC()>
+        | "rrca" <% self.instructions.append(Instruction(0, RRCA, AddrMode.SIMPLE)) %>
+        | "rrd" <% self.instructions.append(Instruction(0, RRD, AddrMode.SIMPLE)) %>
         | "rst" immediate
+            <%
+                if self.value in [0x00, 0x08, 0x10, 0x18, 0x20, 0x28, 0x30, 0x38]:
+                    self.instructions.append(Instruction(0, RST(), AddrMode.RST, t=self.value // 8))
+                else:
+                    ParserError(t=self.t, nt=self.nt, expected="\"00h\", \"08h\", \"10h\", \"18h\", \"20h\", \"28h\", \"30h\", \"38h\"")
+            %>
         | "sbc" sbc_op
-        | "scf"
-        | "set" bit_op<"set">
-        | "sla" m_op<"sla">
-        | "sra" m_op<"sra">
-        | "srl" m_op<"srl">
-        | "sub" s_op<"sub">
-        | "xor" s_op<"xor">
+        | "scf" <% self.instructions.append(Instruction(0, SCF, AddrMode.SIMPLE)) %>
+        | "set" bit_op<SET()>
+        | "sla" m_op<SLA()>
+        | "sra" m_op<SRA()>
+        | "srl" m_op<SRL()>
+        | "sub" s_op<SUB()>
+        | "xor" s_op<XOR()>
         );
 
     ld_op =
           ( "("
-              ( "hl" ")" "," ("a" | register | immediate )
-              | ("ix" | "iy") ("+" | "-") unsigned_number ")" "," ("a" | register | immediate)
-              | "bc" ")" "," "a"
-              | "de" ")" "," "a"
-              | addr16 ")" "," ("a" | "hl" | "ix" | "iy" | dd)
+              ( "hl" ")" ","
+                  ( register <% self.instructions.append(Instruction(0, LD(), AddrMode.PHLPR, r1=self.reg)) %>
+                  | immediate <% self.instructions.append(Instruction(0, LD(), AddrMode.PHLPN, n=self.value)) %>
+                  )
+              | "ix" number_with_sign ")" "," <% d = self.value %>
+                    ( register <% self.instructions.append(Instruction(0, LD(), AddrMode.PIXDPR, r1=self.reg, d=d)) %>
+                    | immediate <% self.instructions.append(Instruction(0, LD(), AddrMode.PIXDPN, n=self.value, d=d)) %>
+                    )
+              | "iy" number_with_sign ")" "," <% d = self.value %>
+                    ( register <% self.instructions.append(Instruction(0, LD(), AddrMode.PIYDPR, r1=self.reg, d=d)) %>
+                    | immediate <% self.instructions.append(Instruction(0, LD(), AddrMode.PIYDPN, n=self.value, d=d)) %>
+                    )
+              | "bc" ")" "," "a" <% self.instructions.append(Instruction(0, LD(), AddrMode.PBCPA)) %>
+              | "de" ")" "," "a" <% self.instructions.append(Instruction(0, LD(), AddrMode.PDEPA)) %>
+              | addr16 ")" ","
+                  ( "a" <% self.instructions.append(Instruction(0, LD(), AddrMode.PNNPA, nn=self.value)) %>
+                  | "hl" <% self.instructions.append(Instruction(0, LD(), AddrMode.PNNPHL, nn=self.value)) %>
+                  | "ix" <% self.instructions.append(Instruction(0, LD(), AddrMode.PNNPIX, nn=self.value)) %>
+                  | "iy" <% self.instructions.append(Instruction(0, LD(), AddrMode.PNNPIY, nn=self.value)) %>
+                  | dd <% self.instructions.append(Instruction(0, LD(), AddrMode.PNNPDD, dd=self.reg, nn=self.value)) %>
+                  )
               )
-          | "sp" "," ("hl" | "ix" | "iy" | "(" addr16 ")" | immediate )
-          | dd "," ("(" addr16 ")" | immediate )
-          | "ix" "," ("(" addr16 ")" | immediate )
-          | "iy" "," ("(" addr16 ")" | immediate )
-          | "i" "," "a"
-          | "r" "," "a"
+          | "sp" ","
+              ( "hl" <% self.instructions.append(Instruction(0, LD(), AddrMode.SPHL)) %>
+              | "ix" <% self.instructions.append(Instruction(0, LD(), AddrMode.SPIX)) %>
+              | "iy" <% self.instructions.append(Instruction(0, LD(), AddrMode.SPIY)) %>
+              | "(" addr16 ")" <% self.instructions.append(Instruction(0, LD(), AddrMode.DDPNNP, dd=3, nn=self.value))  # sp=3 %>
+              | immediate <% self.instructions.append(Instruction(0, LD(), AddrMode.DDNN, dd=3, nn=self.value))  # sp=3 %>
+              )
+          | dd ","
+              ("(" addr16 ")"
+                  <%
+                      if self.reg == 2:
+                         self.instructions.append(Instruction(0, LD(), AddrMode.HLPNNP, nn=self.value))
+                      else:
+                         self.instructions.append(Instruction(0, LD(), AddrMode.DDPNNP, dd=self.reg, nn=self.value))
+                  %>
+              | immediate <% self.instructions.append(Instruction(0, LD(), AddrMode.DDNN, dd=self.reg, nn=self.value)) %>
+              )
+          | "ix" ","
+              ("(" addr16 ")" <% self.instructions.append(Instruction(0, LD(), AddrMode.IXPNNP, nn=self.value)) %>
+              | immediate <% self.instructions.append(Instruction(0, LD(), AddrMode.IXNN, nn=self.value))  # sp=3 %>
+              )
+          | "iy" ","
+              ("(" addr16 ")" <% self.instructions.append(Instruction(0, LD(), AddrMode.IYPNNP, nn=self.value)) %>
+              | immediate <% self.instructions.append(Instruction(0, LD(), AddrMode.IYNN, nn=self.value))  # sp=3 %>
+              )
+          | "i" "," "a" <% self.instructions.append(Instruction(0, LD(), AddrMode.IA)) %>
+          | "r" "," "a" <% self.instructions.append(Instruction(0, LD(), AddrMode.RA)) %>
           | "a" ","
-              ("i"
-              | "r"
+              ("i" <% self.instructions.append(Instruction(0, LD(), AddrMode.AI)) %>
+              | "r" <% self.instructions.append(Instruction(0, LD(), AddrMode.AR)) %>
               | "("
-                  ( "bc"
-                  | "de"
-                  | addr16
+                  ( "bc" <% self.instructions.append(Instruction(0, LD(), AddrMode.APBCP)) %>
+                  | "de" <% self.instructions.append(Instruction(0, LD(), AddrMode.APDEP)) %>
+                  | "hl" <% self.instructions.append(Instruction(0, LD(), AddrMode.RPHLP, r2=7))  # a=7 %>
+                  | "ix" number_with_sign <% self.instructions.append(Instruction(0, LD(), AddrMode.RPIXDP, r2=7, d=self.value))  # a=7 %>
+                  | "iy" number_with_sign <% self.instructions.append(Instruction(0, LD(), AddrMode.RPIYDP, r2=7, d=self.value))  # a=7 %>
+                  | addr16 <% self.instructions.append(Instruction(0, LD(), AddrMode.APNNP, nn=self.value)) %>
                   )
                  ")"
+              | register <% self.instructions.append(Instruction(0, LD(), AddrMode.RR, r1=self.reg, r2=7))   # a = 7%>
+              | immediate <% self.instructions.append(Instruction(0, LD(), AddrMode.RN, n=self.value, r2=7))   # a = 7%>
               )
-          | register ","
-              ( register
-              | immediate
+          | register "," <% reg = self.reg %>
+              ( register <% self.instructions.append(Instruction(0, LD(), AddrMode.RR, r1=self.reg, r2=reg)) %>
+              | immediate <% self.instructions.append(Instruction(0, LD(), AddrMode.RN, n=self.value, r2=reg)) %>
               | "("
-                  ( "hl"
-                  | ("ix" | "iy") ("+" | "-") unsigned_number
+                  ( "hl" <% self.instructions.append(Instruction(0, LD(), AddrMode.RPHLP, r2=reg)) %>
+                  | "ix" number_with_sign <% self.instructions.append(Instruction(0, LD(), AddrMode.RPIXDP, r2=reg, d=self.value)) %>
+                  | "iy" number_with_sign <% self.instructions.append(Instruction(0, LD(), AddrMode.RPIYDP, r2=reg, d=self.value)) %>
                   )
                 ")"
               )
           );
 
     add_op =
-           ( "hl" "," ss
-           | "ix" "," pp
-           | "iy" "," rr
-           | a_op<"add">
+           ( "hl" "," ss <% self.instructions.append(Instruction(0, ADD(), AddrMode.ED_HLSS, dd=self.reg)) %>
+           | "ix" "," pp <% self.instructions.append(Instruction(0, ADD(), AddrMode.IXPP, pp=self.reg)) %>
+           | "iy" "," rr <% self.instructions.append(Instruction(0, ADD(), AddrMode.IYRR, rr=self.reg)) %>
+           | a_op<ADD()>
            );
 
     adc_op =
            ( "hl" "," ss
-           | a_op<"adc">
+               <% self.instructions.append(Instruction(0, ADC(), AddrMode.ED_HLSS, dd=self.reg)) %>
+           | a_op<ADC()>
            );
 
     sbc_op =
-           ( "hl" "," ss
-           | a_op<"sbc">
+           ( "hl" "," ss <% self.instructions.append(Instruction(0, SBC(), AddrMode.ED_HLSS, dd=self.reg)) %>
+           | a_op<SBC()>
            );
 
-    call_op = (cc "," addr16) | addr16 ;
+    call_op = (cc "," addr16) <% self.instructions.append(Instruction(0, CALL(), AddrMode.CCNN, cc=self._cc, nn=self.value)) %>
+            | addr16 <% self.instructions.append(Instruction(0, CALL(), AddrMode.NN, nn=self.value)) %>
+            ;
 
     jp_op =
-          ( "(" ("hl" | "ix" | "iy") ")"
-          | (cc "," addr16)
-          | addr16
+          ( "(" ( "hl" <% self.instructions.append(Instruction(0, JP(), AddrMode.PHLP)) %>
+                | "ix" <% self.instructions.append(Instruction(0, JP(), AddrMode.PIXP)) %>
+                | "iy" <% self.instructions.append(Instruction(0, JP(), AddrMode.PIYP)) %>
+                )
+             ")"
+          | cc "," addr16 <% self.instructions.append(Instruction(0, JP(), AddrMode.CCNN, cc=self._cc, nn=self.value)) %>
+          | addr16 <% self.instructions.append(Instruction(0, JP(), AddrMode.NN, nn=self.value)) %>
           );
 
     jr_op =
-          ( "nz" "," relative
-          | "z" "," relative
-          | "nc" "," relative
-          | "c" "," relative
-          | relative
+          ( "nz" "," relative <% self.instructions.append(Instruction(0, JR(), AddrMode.NZE, e=self.value)) %>
+          | "z" "," relative <% self.instructions.append(Instruction(0, JR(), AddrMode.ZE, e=self.value)) %>
+          | "nc" "," relative <% self.instructions.append(Instruction(0, JR(), AddrMode.NCE, e=self.value)) %>
+          | "c" "," relative <% self.instructions.append(Instruction(0, JR(), AddrMode.CE, e=self.value)) %>
+          | relative <% self.instructions.append(Instruction(0, JR(), AddrMode.E, e=self.value)) %>
           );
 
     out_op = "("
-            ( "c" ")" "," register
-            | immediate ")" "," "a"
+            ( "c" ")" "," register <% self.instructions.append(Instruction(0, OUT(), AddrMode.PCPR, n=self.value, r2=self.reg)) %>
+            | immediate ")" "," "a" <% self.instructions.append(Instruction(0, OUT(), AddrMode.PNPA, n=self.value)) %>
             );
 
-    in_op = ( "a" "," "(" immediate ")"
+    in_op = ( "a" ","
+               "("
+               ("c"
+                   <% self.instructions.append(Instruction(0, IN(), AddrMode.RPCP, r2=7))  # a = 7 %>
+               | immediate
+                   <% self.instructions.append(Instruction(0, IN(), AddrMode.APNP, n=self.value)) %>
+               )
+               ")"
             | register "," "(" "c" ")"
+               <% self.instructions.append(Instruction(0, IN(), AddrMode.RPCP, r2=self.reg)) %>
             );
 
-    ex_op = ( "de" "," "hl"
-            | "af" "," "af'"
+    ex_op = ( "de" "," "hl" <% self.instructions.append(Instruction(0, EX(), AddrMode.DEHL)) %>
+            | "af" "," "af'" <% self.instructions.append(Instruction(0, EX(), AddrMode.AFAFp)) %>
             | "(" "sp" ")" ","
-                ( "hl" | "ix" | "iy" )
+                ( "hl" <% self.instructions.append(Instruction(0, EX(), AddrMode.PSPPHL)) %>
+                | "ix" <% self.instructions.append(Instruction(0, EX(), AddrMode.PSPPIX)) %>
+                | "iy"  <% self.instructions.append(Instruction(0, EX(), AddrMode.PSPPIY)) %>
+                )
             );
 
-    pop_op<op: str> = qq | "ix" | "iy";
+    pop_op<op: InstructionDef> = qq <% self.instructions.append(Instruction(0, op, AddrMode.QQ, qq=self.reg)) %>
+                    | "ix" <% self.instructions.append(Instruction(0, op, AddrMode.IX)) %>
+                    | "iy" <% self.instructions.append(Instruction(0, op, AddrMode.IY)) %>
+                    ;
 
-    ret_op = [cc];
+    ret_op = <% has_cc = False %> [ cc <% has_cc = True %> ]
+             <%
+                 if has_cc:
+                     self.instructions.append(Instruction(0, RET(), AddrMode.CC, cc=self._cc))
+                 else:
+                     self.instructions.append(Instruction(0, RET(), AddrMode.SIMPLE))
+             %>
+           ;
 
-    im_op = unsigned_number;
+    im_op = unsigned_number
+            <%
+                if self.t.s == "0":
+                    self.instructions.append(Instruction(0, IM(), AddrMode.IM0))
+                elif self.t.s == "1":
+                    self.instructions.append(Instruction(0, IM(), AddrMode.IM1))
+                elif self.t.s == "2":
+                    self.instructions.append(Instruction(0, IM(), AddrMode.IM2))
+                else:
+                    raise ParserError(t=self.t, nt=self.nt, expected="0, 1 or 2")
+            %>
+          ;
 
-    a_op<op: str> = "a" ","
+    a_op<op: InstructionDef> = "a" ","
         ( register
+            <% self.instructions.append(Instruction(0, op, AddrMode.AR1, r1=self.reg)) %>
         | immediate
+            <% self.instructions.append(Instruction(0, op, AddrMode.AN, n=self.value)) %>
         | "(" ("hl"
-              | ("ix" | "iy") ("+" | "-") unsigned_number
+                  <% self.instructions.append(Instruction(0, op, AddrMode.APHLP)) %>
+              | ("ix" <% addr_mode = AddrMode.APIXDP %>
+                | "iy" <% addr_mode = AddrMode.APIYDP %>
+                )
+                number_with_sign
+                <% self.instructions.append(Instruction(0, op, addr_mode, d=self.value)) %>
               )
           ")"
         );
 
-    s_op<op: str> =
-        ( register
-        | immediate
-        | "(" ("hl"
-              | ("ix" | "iy") ("+" | "-") unsigned_number
+    s_op<op: InstructionDef> =
+        ( register <% self.instructions.append(Instruction(0, op, AddrMode.R1, r1=self.reg)) %>
+        | immediate <% self.instructions.append(Instruction(0, op, AddrMode.N, n=self.value)) %>
+        | "(" ( "hl" <% self.instructions.append(Instruction(0, op, AddrMode.PHLP)) %>
+              | "ix" number_with_sign <% self.instructions.append(Instruction(0, op, AddrMode.PIXDP, d=self.value)) %>
+              | "iy" number_with_sign <% self.instructions.append(Instruction(0, op, AddrMode.PIYDP, d=self.value)) %>
               )
           ")"
         );
 
-    m_op<op: str> =
-        ( register
-        | "(" ("hl"
-              | ("ix" | "iy") ("+" | "-") unsigned_number
+    m_op<op: InstructionDef> =
+        ( register <% self.instructions.append(Instruction(0, op, AddrMode.R1, r1=self.reg)) %>
+        | "(" ("hl" <% self.instructions.append(Instruction(0, op, AddrMode.PHLP)) %>
+              | "ix" number_with_sign <% self.instructions.append(Instruction(0, op, AddrMode.PIXDP, d=self.value)) %>
+              | "iy" number_with_sign <% self.instructions.append(Instruction(0, op, AddrMode.PIYDP, d=self.value)) %>
               )
           ")"
         );
 
-    bit_op<op: str> = unsigned_number ","
-        ( register
-        | "(" ("hl"
-              | ("ix" | "iy") ("+" | "-") unsigned_number
+    incdec<op: InstructionDef> =
+        ( register <% self.instructions.append(Instruction(0, op, AddrMode.R1, r1=self.reg)) %>
+        | "(" ("hl" <% self.instructions.append(Instruction(0, op, AddrMode.PHLP)) %>
+              | "ix" number_with_sign <% self.instructions.append(Instruction(0, op, AddrMode.PIXDP, d=self.value)) %>
+              | "iy" number_with_sign <% self.instructions.append(Instruction(0, op, AddrMode.PIYDP, d=self.value)) %>
+              )
+          ")"
+        | ss <% self.instructions.append(Instruction(0, op, AddrMode.SS, dd=self.reg)) %>
+        | "ix" <% self.instructions.append(Instruction(0, op, AddrMode.IX)) %>
+        | "iy" <% self.instructions.append(Instruction(0, op, AddrMode.IY)) %>
+        );
+
+    bit_op<op: InstructionDef> = unsigned_number <% bit = int(self.t.s) %> ","
+        ( register <% self.instructions.append(Instruction(0, op, AddrMode.BR, b=bit, r1=self.reg)) %>
+        | "(" ("hl" <% self.instructions.append(Instruction(0, op, AddrMode.BPHLP, b=bit, r1=self.reg)) %>
+              | ("ix" <% addr_mode = AddrMode.BPIXDP %>
+                | "iy" <% addr_mode = AddrMode.BPIYDP %>
+                )
+                number_with_sign
+                <% self.instructions.append(Instruction(0, op, addr_mode, b=bit, d=self.value)) %>
               )
           ")"
         );
 
-    addr16 = unsigned_number | ident;
-    relative = (["+"|"-"] unsigned_number) | ident;
-    immediate = (["+"|"-"] unsigned_number) | ident;
-    register = "a" | "b" | "c" | "d" | "e" | "h" | "l";
-    cc = "nz" | "z" | "nc" | "c" | "po" | "pe" | "p" | "m";
-    qq = "bc" | "de" | "hl" | "af";
-    ss = "bc" | "de" | "hl" | "sp";
-    pp = "bc" | "de" | "ix" | "sp";
-    rr = "bc" | "de" | "iy" | "sp";
-    dd = "bc" | "de" | "hl" | "sp";
+    addr16 = unsigned_number <% self.value = to_int(self.t.s, False) %>
+           | ident
+           ;
+    relative = signed_number | ident;
+    immediate = signed_number
+              | ident
+              ;
+    register = "a" <% self.reg = 7 %>
+             | "b" <% self.reg = 0 %>
+             | "c" <% self.reg = 1 %>
+             | "d" <% self.reg = 2 %>
+             | "e" <% self.reg = 3 %>
+             | "h" <% self.reg = 4 %>
+             | "l" <% self.reg = 5 %>;
+    cc = "nz" <% self._cc = 0 %>
+       | "z" <% self._cc = 1 %>
+       | "nc" <% self._cc = 2 %>
+       | "c" <% self._cc = 3 %>
+       | "po" <% self._cc = 4 %>
+       | "pe" <% self._cc = 5 %>
+       | "p" <% self._cc = 6 %>
+       | "m" <% self._cc = 7 %>
+       ;
+    qq = "bc" <% self.reg = 0 %> | "de" <% self.reg = 1 %> | "hl" <% self.reg = 2 %> | "af" <% self.reg = 3 %>;
+    ss = "bc" <% self.reg = 0 %> | "de" <% self.reg = 1 %> | "hl" <% self.reg = 2 %> | "sp" <% self.reg = 3 %>;
+    pp = "bc" <% self.reg = 0 %> | "de" <% self.reg = 1 %> | "ix" <% self.reg = 2 %> | "sp" <% self.reg = 3 %>;
+    rr = "bc" <% self.reg = 0 %> | "de" <% self.reg = 1 %> | "iy" <% self.reg = 2 %> | "sp" <% self.reg = 3 %>;
+    dd = "bc" <% self.reg = 0 %> | "de" <% self.reg = 1 %> | "hl" <% self.reg = 2 %> | "sp" <% self.reg = 3 %>;
+
+    number_with_sign =
+                     ( "+" <% negative = False %>
+                     | "-" <% negative = True %>
+                     ) unsigned_number <% self.value = to_int(self.t.s, negative) %>
+                     ;
+
+    signed_number = <% negative = False %>
+                  [ "+"
+                  | "-" <% negative = True %>
+                  ] unsigned_number <% self.value = to_int(self.t.s, negative) %>
+                  ;
 }
