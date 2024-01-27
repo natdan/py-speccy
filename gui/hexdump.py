@@ -5,19 +5,20 @@ from typing import Optional
 
 from pygame import Rect, Surface
 
-from gui.components import BaseUIFactory, Collection, LeftRightLayout, TopDownLayout, ALIGNMENT, UiHint, BorderDecoration, Component
+from gui.components import BaseUIFactory, Collection, LeftRightLayout, TopDownLayout, ALIGNMENT, UiHint, BorderDecoration
 from z80.z80_cpu import Z80CPU
 
 SEPARATOR_HEIGHT = 3
 
 
 class HexDumpComponent(Collection):
-    def __init__(self, rect: Rect, ui_factory: BaseUIFactory, z80: Z80CPU, registers: list[str]) -> None:
+    def __init__(self, rect: Rect, ui_factory: BaseUIFactory, z80: Z80CPU, registers: list[str], narrow: bool = False) -> None:
         super().__init__(rect)
         self._ui_factory = ui_factory
         self.z80 = z80
         self.last_memory_address = -1
         self.selected_register_name = registers[0]
+        self._narrow = narrow
         self._surface: Optional[Surface] = None
         self.top_line_height = self._ui_factory.small_font.get_linesize()
         self.line_height = self._ui_factory.small_font.get_linesize()
@@ -97,15 +98,15 @@ class HexDumpComponent(Collection):
         for a in range(addr, addr + len(self.lines.components) * 8, 8):
             if 0 <= a < 65536 - 8:
                 text = f"0x{a:04x}: " + \
-                    ",".join([f"{self.z80.bus_access.memory.peekb(a + i):02x}" for i in range(8)]) + \
-                    " |" + "".join([byte_to_char(self.z80.bus_access.memory.peekb(a + i)) for i in range(8)]) + "|"
+                    ",".join([f"{self.z80.bus_access.memory.peekb(a + i):02x}" for i in range(4 if self._narrow else 8)]) + \
+                    " |" + "".join([byte_to_char(self.z80.bus_access.memory.peekb(a + i)) for i in range(4 if self._narrow else 8)]) + "|"
                 self.lines.components[line].text = text
             else:
                 self.lines.components[line].text = ""
             line += 1
 
         pygame.draw.rect(self._surface, (64, 64, 64),
-                         (0, middle_mine_rect.y, middle_mine_rect.width, middle_mine_rect.height))
+                         (middle_mine_rect.x, middle_mine_rect.y, middle_mine_rect.width, middle_mine_rect.height))
 
         # self.header.draw(self._surface)
         self.lines.draw(self._surface)

@@ -136,6 +136,11 @@ class Playback:
             state.update_from(self.spectrum)
             self.top += 1
 
+    def restore_first(self) -> None:
+        self.top = 0
+
+        self.backlog[self.top].restore_to(self.spectrum)
+
     def restore_previous(self, skip_count: int = 1) -> None:
         self.top -= skip_count
         if self.top < 0: self.top = 0

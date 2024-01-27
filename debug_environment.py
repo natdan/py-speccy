@@ -12,6 +12,7 @@ from gui.help_modal import HelpModal
 from gui.hexdump import HexDumpComponent
 from gui.internal_debug_component import InternalDebugComponent
 from gui.modal import Modal
+from gui.profile_component import ProfileComponent
 from gui.registers_component import RegistersComponent
 from gui.spectrum_screen import SpectrumScreen
 from gui.ui_size import UISize
@@ -53,7 +54,7 @@ class DebugEnvironment:
         self.spectrum_screen_border_width = 3
         self.spectrum_screen_border_color = (64, 192, 64)
 
-        self.screen_size = self.scaled_spectrum_screen_size() + (410, 130)
+        self.screen_size = self.scaled_spectrum_screen_size() + (710, 130)
 
         pygame.init()
         self.font = pygame.font.SysFont("Monaco", 20)
@@ -94,32 +95,47 @@ class DebugEnvironment:
         )
         self.top_component.add_component(self.internal_debug_component)
 
+        self._narrow = True
+        self.central_column_width = 240 if self._narrow else 380
+
         self.memory_dump = HexDumpComponent(Rect(
-                tuple(self.spectrum_screen_offset + (spectrum_screen_size[0] + 10, 0)) + (380, 200)
+                tuple(self.spectrum_screen_offset + (spectrum_screen_size[0] + 10, 0)) + (self.central_column_width, 200)
             ),
             self.ui_factory,
             self.spectrum.z80,
-            ["PC"]
+            ["PC"],
+            narrow=self._narrow
         )
         self.top_component.add_component(self.memory_dump)
 
         self.stack_pointer_dump = HexDumpComponent(Rect(
-                tuple(self.spectrum_screen_offset + (spectrum_screen_size[0] + 10, 205)) + (380, 200)
+                tuple(self.spectrum_screen_offset + (spectrum_screen_size[0] + 10, 205)) + (self.central_column_width, 200)
             ),
             self.ui_factory,
             self.spectrum.z80,
-            ["SP"]
+            ["SP"],
+            narrow=self._narrow
         )
         self.top_component.add_component(self.stack_pointer_dump)
 
         self.stack_pointer_dump = HexDumpComponent(Rect(
-                tuple(self.spectrum_screen_offset + (spectrum_screen_size[0] + 10, 410)) + (380, 190)
+                tuple(self.spectrum_screen_offset + (spectrum_screen_size[0] + 10, 410)) + (self.central_column_width, 190)
             ),
             self.ui_factory,
             self.spectrum.z80,
-            ["HL", "IX", "IY"]
+            ["HL", "IX", "IY"],
+            narrow=self._narrow
         )
         self.top_component.add_component(self.stack_pointer_dump)
+
+        self.profile_component = ProfileComponent(Rect(
+                self.memory_dump.rect.right + 10, self.memory_dump.rect.top,
+                self.screen_size[0] - self.memory_dump.rect.right - 15, self.screen_size[1] - self.memory_dump.rect.top - 5
+            ),
+            self.ui_factory,
+            self.spectrum.instructions
+        )
+        self.top_component.add_component(self.profile_component)
 
         def close_modal(*_) -> None: self.top_component.hide_modal()
 
@@ -156,7 +172,7 @@ class DebugEnvironment:
         icon = pygame.image.load('icon.png')
 
         self.screen = pygame.display.set_mode(
-            size=self.scaled_spectrum_screen_size() + (410, 130),
+            size=self.screen_size,
             flags=pygame.HWSURFACE | pygame.DOUBLEBUF | pygame.RESIZABLE,
             depth=8)
         self.pre_screen = pygame.surface.Surface(
@@ -282,8 +298,13 @@ class DebugEnvironment:
 
     def key_pause(self, _: int, _key_mods: int) -> bool:
         self.state = EmulatorState.RUNNING if self.state == EmulatorState.PAUSED else EmulatorState.PAUSED
-        if self.state == EmulatorState.RUNNING:
+        if self.state == EmulatorState.PAUSED:
             self.playback.reset()
+            self.playback.record()
+            self.spectrum.profile(TSTATES_PER_INTERRUPT)
+            self.playback.restore_first()
+            self.profile_component.set_tstates(self.spectrum.bus_access.tstates)
+            self.profile_component.redraw()
         return False
 
     def process_keyboard(self) -> None:
@@ -352,6 +373,7 @@ class DebugEnvironment:
                     self.playback.record()
                 elif self.state == EmulatorState.PAUSED:
                     while self.state == EmulatorState.PAUSED:
+                        self.profile_component.set_tstates(self.spectrum.bus_access.tstates)
                         self.update_ui()
                         self.process_keyboard()
                 elif self.state == EmulatorState.ONE_FRAME:
@@ -359,11 +381,11 @@ class DebugEnvironment:
                     self.playback.reset()
                     self.process_interrupt()
                     self.state = EmulatorState.PAUSED
-                elif self.state == EmulatorState.PROFILE:
-                    self.spectrum.profile(TSTATES_PER_INTERRUPT)
-                    self.playback.reset()
-                    self.process_interrupt()
-                    self.state = EmulatorState.PAUSED
+                # elif self.state == EmulatorState.PROFILE:
+                #     self.spectrum.profile(TSTATES_PER_INTERRUPT)
+                #     self.playback.reset()
+                #     self.process_interrupt()
+                #     self.state = EmulatorState.PAUSED
                 elif self.state == EmulatorState.STEPPING:
                     while self._step != 0 and self.state == EmulatorState.STEPPING:
                         if self.spectrum.execute_one_instruction():
@@ -371,6 +393,7 @@ class DebugEnvironment:
                         if self._step > 0:
                             self._step -= 1
                         self.playback.record()
+                    self.profile_component.set_tstates(self.spectrum.bus_access.tstates)
                     self.spectrum.update_screen()
                     self.update(self.spectrum.bus_access.frames, self.spectrum.bus_access.tstates)
                     self.state = EmulatorState.PAUSED

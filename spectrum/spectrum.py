@@ -80,7 +80,7 @@ class Spectrum:
     def execute(self, tstate_limit: int) -> None:
         self.z80.execute(tstate_limit)
 
-    def profile(self, tstate_limit: int) -> None:
+    def profile(self, tstate_limit: int = TSTATES_PER_INTERRUPT) -> None:
         ptr = [0]
 
         def next_byte() -> int:
@@ -91,7 +91,7 @@ class Spectrum:
         self._profiling_bus_access.copy_from_bus_access(self._normal_bus_access)
         self._bus_access = self._profiling_bus_access
         self.z80.bus_access = self._profiling_bus_access
-        self.instructions = []
+        del self.instructions[:]
         while self.bus_access.tstates < tstate_limit:
             self._profiling_bus_access.profile = []
             address = self.z80.regPC
@@ -108,15 +108,7 @@ class Spectrum:
             self.instructions.append(instruction)
         self._normal_bus_access.copy_from_bus_access(self._profiling_bus_access)
         self._bus_access = self._normal_bus_access
-
-        for instruction in self.instructions:
-            s = instruction.to_str(2)
-            l = len(s)
-            if l < 19:
-                s += " " * (19 - l)
-
-            has_delay = any(p for p in instruction.profile if p.delay > 0)
-            print(f"0x{instruction.address:04x} ({instruction.tstates:05d}): {s} {'*' if has_delay else ''}{' '.join(str(p) for p in instruction.profile)}")
+        self.z80.bus_access = self._bus_access
 
     def load_sna(self, filename: str) -> None:
         self.loader.load_sna(filename)
