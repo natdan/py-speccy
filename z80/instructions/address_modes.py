@@ -22,9 +22,7 @@ class AddrModeElement(ABC):
 
     def ed(self) -> bool: return False
 
-
-class _COMMA(AddrModeElement):
-    def to_str(self, **params) -> str: return ", "
+    def size(self) -> int: return 0
 
 
 class _R2(AddrModeElement):
@@ -93,6 +91,8 @@ class _N(AddrModeElement):
     def decode(self, address: int, code: int, instr: int, next_byte: NEXT_BYTE_CALLBACK) -> dict[str, Any]:
         return {"n": next_byte()}
 
+    def size(self) -> int: return 1
+
 
 class _PHLP(AddrModeElement):
     def to_str(self, **params) -> str: return "(hl)"
@@ -109,6 +109,8 @@ class _PIXDP(AddrModeElement):
     def decode(self, address: int, code: int, instr: int, next_byte: NEXT_BYTE_CALLBACK) -> dict[str, Any]:
         return {"d": next_byte()}
 
+    def size(self) -> int: return 2
+
 
 class _PIYDP(AddrModeElement):
     def to_str(self, **params) -> str:
@@ -121,13 +123,19 @@ class _PIYDP(AddrModeElement):
     def decode(self, address: int, code: int, instr: int, next_byte: NEXT_BYTE_CALLBACK) -> dict[str, Any]:
         return {"d": next_byte()}
 
+    def size(self) -> int: return 2
+
 
 class _CB_PIXDP(_PIXDP):
     def decode(self, address: int, code: int, instr: int, next_byte: NEXT_BYTE_CALLBACK) -> dict[str, Any]: return {}
 
+    def size(self) -> int: return 2
+
 
 class _CB_PIYDP(_PIYDP):
     def decode(self, address: int, code: int, instr: int, next_byte: NEXT_BYTE_CALLBACK) -> dict[str, Any]: return {}
+
+    def size(self) -> int: return 2
 
 
 class _IX(AddrModeElement):
@@ -135,11 +143,15 @@ class _IX(AddrModeElement):
 
     def ixy(self) -> Optional[IXY]: return IXY.IX
 
+    def size(self) -> int: return 1
+
 
 class _IY(AddrModeElement):
     def to_str(self, **params) -> str: return "iy"
 
     def ixy(self) -> Optional[IXY]: return IXY.IY
+
+    def size(self) -> int: return 1
 
 
 class _PIXP(AddrModeElement):
@@ -147,11 +159,15 @@ class _PIXP(AddrModeElement):
 
     def ixy(self) -> Optional[IXY]: return IXY.IX
 
+    def size(self) -> int: return 1
+
 
 class _PIYP(AddrModeElement):
     def to_str(self, **params) -> str: return "(iy)"
 
     def ixy(self) -> Optional[IXY]: return IXY.IY
+
+    def size(self) -> int: return 1
 
 
 class _BIT(AddrModeElement):
@@ -184,6 +200,9 @@ class _CD_IXYBIT(AddrModeElement):
     def decode(self, address: int, code: int, instr: int, next_byte: NEXT_BYTE_CALLBACK) -> dict[str, Any]:
         return {"b": (instr & 0x38) // 8}
 
+    # Both instances already have IX or IY in address modes
+    # def size(self) -> int: return 2
+
 
 class _CD_IXY(AddrModeElement):
     def to_str(self, **params) -> str: return str(params["b"])
@@ -194,12 +213,17 @@ class _CD_IXY(AddrModeElement):
     def can_decode(self, code: int, instr: int) -> bool:
         return instr == code
 
+    # Both instances already have IX or IY in address modes
+    # def size(self) -> int: return 2
+
 
 class _NN(AddrModeElement):
     def to_str(self, **params) -> str: return f"0x{params['nn']:04x}"
 
     def decode(self, address: int, code: int, instr: int, next_byte: NEXT_BYTE_CALLBACK) -> dict[str, Any]:
         return {"nn": next_byte() + 256 * next_byte()}
+
+    def size(self) -> int: return 2
 
 
 class _CC(AddrModeElement):
@@ -235,6 +259,8 @@ class _E(AddrModeElement):
                 return address + 2 - 256 + e
             return address + 2 + e
         return {"e": calc_relative(next_byte())}
+
+    def size(self) -> int: return 1
 
 
 class _C(AddrModeElement):
@@ -357,6 +383,8 @@ class _ED_DD(AddrModeElement):
 
     def ed(self) -> bool: return True
 
+    def size(self) -> int: return 1
+
 
 class _PDDP(AddrModeElement):
     DD = {
@@ -420,12 +448,16 @@ class _PNNP(AddrModeElement):
     def decode(self, address: int, code: int, instr: int, next_byte: NEXT_BYTE_CALLBACK) -> dict[str, Any]:
         return {"nn": next_byte() + 256 * next_byte()}
 
+    def size(self) -> int: return 2
+
 
 class _PNP(AddrModeElement):
     def to_str(self, **params) -> str: return f"({params['n']})"
 
     def decode(self, address: int, code: int, instr: int, next_byte: NEXT_BYTE_CALLBACK) -> dict[str, Any]:
         return {"n": next_byte()}
+
+    def size(self) -> int: return 1
 
 
 class _PSPP(AddrModeElement):
@@ -529,6 +561,8 @@ class _ED_R2(AddrModeElement):
 
     def ed(self) -> bool: return True
 
+    def size(self) -> int: return 1
+
 
 class _ED_SIMPLE(AddrModeElement):
     def to_str(self, **params) -> str: return ""
@@ -540,6 +574,8 @@ class _ED_SIMPLE(AddrModeElement):
         DECODE_MAP_ED[code] = decoder
 
     def ed(self) -> bool: return True
+
+    def size(self) -> int: return 1
 
 
 class _IM0(_ED_SIMPLE):
@@ -554,17 +590,16 @@ class _IM2(_ED_SIMPLE):
     def to_str(self, **params) -> str: return "2"
 
 
-_COMMA = _COMMA()
 _R1 = _R1()
 _R2 = _R2()
 _N = _N()
 _PHLP = _PHLP()
 _PIXDP = _PIXDP()
+_PIYDP = _PIYDP()
 _IX = _IX()
 _IY = _IY()
 _PIXP = _PIXP()
 _PIYP = _PIYP()
-_PIYDP = _PIYDP()
 _BIT = _BIT()
 _NN = _NN()
 _CC = _CC()
@@ -614,9 +649,9 @@ class AddrMode(Enum):
     SIMPLE_ED = [], _ED_SIMPLE
     R2 = [_R2], _R2
     R1 = [_R1], _R1
-    RR = [_R2, _COMMA, _R1], _R1R2
+    RR = [_R2, _R1], _R1R2
     N = [_N], None
-    RN = [_R2, _COMMA, _N], _R2
+    RN = [_R2, _N], _R2
     IX = [_IX], None
     IY = [_IY], None
     PHLP = [_PHLP], None
@@ -626,75 +661,75 @@ class AddrMode(Enum):
     PIYDP = [_PIYDP], None
     CBPIXDP = [_CB_PIXDP], _CD_IXY
     CBPIYDP = [_CB_PIYDP], _CD_IXY
-    BR = [_BIT, _COMMA, _R1], _BITR1
-    BPHLP = [_BIT, _COMMA, _PHLP], _BIT
-    BPIXDP = [_BIT, _COMMA, _CB_PIXDP], _CD_IXYBIT
-    BPIYDP = [_BIT, _COMMA, _CB_PIYDP], _CD_IXYBIT
+    BR = [_BIT, _R1], _BITR1
+    BPHLP = [_BIT, _PHLP], _BIT
+    BPIXDP = [_BIT, _CB_PIXDP], _CD_IXYBIT
+    BPIYDP = [_BIT, _CB_PIYDP], _CD_IXYBIT
     NN = [_NN], None
     CC = [_CC], _CC
-    CCNN = [_CC, _COMMA, _NN], _CC
+    CCNN = [_CC, _NN], _CC
     E = [_E], None  # Relative
-    CE = [_C, _COMMA, _E], None
-    NCE = [_NC, _COMMA, _E], None
-    ZE = [_Z, _COMMA, _E], None
-    NZE = [_NZ, _COMMA, _E], None
+    CE = [_C, _E], None
+    NCE = [_NC, _E], None
+    ZE = [_Z, _E], None
+    NZE = [_NZ, _E], None
     QQ = [_QQ], _QQ
-    DEHL = [_DE, _COMMA, _HL], None
-    AFAFp = [_AF, _COMMA, _AFp], None
-    PSPPHL = [_PSPP, _COMMA, _HL], None
-    PSPPIX = [_PSPP, _COMMA, _IX], None
-    PSPPIY = [_PSPP, _COMMA, _IY], None
-    RPHLP = [_R2, _COMMA, _PHLP], _R2
-    RPIXDP = [_R2, _COMMA, _PIXDP], _R2
-    RPIYDP = [_R2, _COMMA, _PIYDP], _R2
-    PHLPR = [_PHLP, _COMMA, _R1], _R1
-    PIXDPR = [_PIXDP, _COMMA, _R1], _R1
-    PIYDPR = [_PIYDP, _COMMA, _R1], _R1
-    PHLPN = [_PHLP, _COMMA, _N], None
-    PIXDPN = [_PIXDP, _COMMA, _N], None
-    PIYDPN = [_PIYDP, _COMMA, _N], None
-    APBCP = [_A, _COMMA, _PBCP], None
-    APDEP = [_A, _COMMA, _PDEP], None
-    APNNP = [_A, _COMMA, _PNNP], None
-    PBCPA = [_PBCP, _COMMA, _A], None
-    PDEPA = [_PDEP, _COMMA, _A], None
-    PNNPA = [_PNNP, _COMMA, _A], None
-    AI = [_A, _COMMA, _I], _ED_SIMPLE
-    AR = [_A, _COMMA, _R], _ED_SIMPLE
-    IA = [_I, _COMMA, _A], _ED_SIMPLE
-    RA = [_R, _COMMA, _A], _ED_SIMPLE
-    DDNN = [_DD, _COMMA, _NN], _DD
-    IXNN = [_IX, _COMMA, _NN], None
-    IYNN = [_IY, _COMMA, _NN], None
-    HLPNNP = [_HL, _COMMA, _PNNP], None
-    DDPNNP = [_DD, _COMMA, _PNNP], _ED_DD
-    IXPNNP = [_IX, _COMMA, _PNNP], None
-    IYPNNP = [_IY, _COMMA, _PNNP], None
-    PNNPHL = [_PNNP, _COMMA, _HL], None
-    PNNPDD = [_PNNP, _COMMA, _DD], _ED_DD
-    PNNPIX = [_PNNP, _COMMA, _IX], None
-    PNNPIY = [_PNNP, _COMMA, _IY], None
-    SPHL = [_SP, _COMMA, _HL], None
-    SPIX = [_SP, _COMMA, _IX], None
-    SPIY = [_SP, _COMMA, _IY], None
-    AR1 = [_A, _COMMA, _R1], _R1
-    AN = [_A, _COMMA, _N], None
-    APHLP = [_A, _COMMA, _PHLP], None
-    APIXDP = [_A, _COMMA, _PIXDP], None
-    APIYDP = [_A, _COMMA, _PIYDP], None
-    HLSS = [_HL, _COMMA, _SS], _SS
-    IXPP = [_IX, _COMMA, _PP], _PP
-    IYRR = [_IY, _COMMA, _RR], _RR
+    DEHL = [_DE, _HL], None
+    AFAFp = [_AF, _AFp], None
+    PSPPHL = [_PSPP, _HL], None
+    PSPPIX = [_PSPP, _IX], None
+    PSPPIY = [_PSPP, _IY], None
+    RPHLP = [_R2, _PHLP], _R2
+    RPIXDP = [_R2, _PIXDP], _R2
+    RPIYDP = [_R2, _PIYDP], _R2
+    PHLPR = [_PHLP, _R1], _R1
+    PIXDPR = [_PIXDP, _R1], _R1
+    PIYDPR = [_PIYDP, _R1], _R1
+    PHLPN = [_PHLP, _N], None
+    PIXDPN = [_PIXDP, _N], None
+    PIYDPN = [_PIYDP, _N], None
+    APBCP = [_A, _PBCP], None
+    APDEP = [_A, _PDEP], None
+    APNNP = [_A, _PNNP], None
+    PBCPA = [_PBCP, _A], None
+    PDEPA = [_PDEP, _A], None
+    PNNPA = [_PNNP, _A], None
+    AI = [_A, _I], _ED_SIMPLE
+    AR = [_A, _R], _ED_SIMPLE
+    IA = [_I, _A], _ED_SIMPLE
+    RA = [_R, _A], _ED_SIMPLE
+    DDNN = [_DD, _NN], _DD
+    IXNN = [_IX, _NN], None
+    IYNN = [_IY, _NN], None
+    HLPNNP = [_HL, _PNNP], None
+    DDPNNP = [_DD, _PNNP], _ED_DD
+    IXPNNP = [_IX, _PNNP], None
+    IYPNNP = [_IY, _PNNP], None
+    PNNPHL = [_PNNP, _HL], None
+    PNNPDD = [_PNNP, _DD], _ED_DD
+    PNNPIX = [_PNNP, _IX], None
+    PNNPIY = [_PNNP, _IY], None
+    SPHL = [_SP, _HL], None
+    SPIX = [_SP, _IX], None
+    SPIY = [_SP, _IY], None
+    AR1 = [_A, _R1], _R1
+    AN = [_A, _N], None
+    APHLP = [_A, _PHLP], None
+    APIXDP = [_A, _PIXDP], None
+    APIYDP = [_A, _PIYDP], None
+    HLSS = [_HL, _SS], _SS
+    IXPP = [_IX, _PP], _PP
+    IYRR = [_IY, _RR], _RR
     SS = [_SS], _SS
     IM0 = [_IM0], _IM0
     IM1 = [_IM1], _IM1
     IM2 = [_IM2], _IM2
     RST = [_RST], _RST
-    APNP = [_A, _COMMA, _PNP], None
-    RPCP = [_R2, _COMMA, _PCP], _ED_R2
-    PNPA = [_PNP, _COMMA, _A], None
-    PCPR = [_PCP, _COMMA, _R2], _ED_R2
-    ED_HLSS = [_HL, _COMMA, _SS], _ED_DD
+    APNP = [_A, _PNP], None
+    RPCP = [_R2, _PCP], _ED_R2
+    PNPA = [_PNP, _A], None
+    PCPR = [_PCP, _R2], _ED_R2
+    ED_HLSS = [_HL, _SS], _ED_DD
 
     def __new__(cls, *args, **kwargs):
         value = len(cls.__members__) + 1
@@ -738,6 +773,10 @@ class AddrMode(Enum):
                     res.update(r)
 
         return res
+
+    def size(self) -> int:
+        extra = self.instr_decoder.size() if self.instr_decoder is not None and self.instr_decoder not in self.addr_mode_elements else 0
+        return sum(map(lambda e: e.size(), self.addr_mode_elements)) + extra
 
     @classmethod
     def from_name(cls, name: str) -> 'AddrMode':

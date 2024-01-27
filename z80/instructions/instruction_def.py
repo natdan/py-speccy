@@ -38,6 +38,8 @@ class InstructionDef(InstructionDecoder):
 
         raise ValueError(f"Cannot decode; {instr}, ixy={ixy}")
 
+    def size(self) -> int: return 1
+
     def to_str(self) -> str:
         return self.mnemonic.value
 
@@ -55,12 +57,14 @@ class Instruction:
         self.profile = []
         self.tstates = 0
 
+    def size(self) -> int: return self.instruction_def.size() + self.addr_mode.size()
+
     def to_str(self, tab: int = 0) -> str:
         mnemonic = self.instruction_def.to_str() + " "
         l = len(mnemonic)
         if l < tab * 4:
             mnemonic += " " * (tab * 4 - l)
-        return f"{mnemonic}{''.join(a.to_str(**self.params) for a in self.addr_mode.addr_mode_elements)}"
+        return f"{mnemonic}{', '.join(a.to_str(**self.params) for a in self.addr_mode.addr_mode_elements)}"
 
 
 class UnknownInstructionDef(InstructionDef):
@@ -89,6 +93,8 @@ class CBInstructionDef(InstructionDef):
         for addr_mode in self.addr_mode_code:
             code = self.addr_mode_code[addr_mode]
             addr_mode.update_decode_maps(self, code, cb=True)
+
+    def size(self) -> int: return 2
 
 
 def decode_instruction(address: int, next_byte: NEXT_BYTE_CALLBACK) -> Instruction:

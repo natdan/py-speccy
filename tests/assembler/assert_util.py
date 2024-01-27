@@ -17,6 +17,8 @@ def assert_decode(expected: str, *values: int, address=16384, assert_asm=True) -
 
     assert_that(instruction.to_str(0).strip(), is_(expected))
 
+    assert_that(instruction.size(), is_(len(values)))
+
     if assert_asm:
         parser = Z80AssemblerParser()
         scanner = Z80AssemblerParser.SCANNER_CLASS()
