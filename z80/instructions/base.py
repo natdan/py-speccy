@@ -74,6 +74,7 @@ class Mnemonics(Enum):
     SCF = "scf"
     SET = "set"
     SLA = "sla"
+    SLL = "sll"
     SRA = "sra"
     SRL = "srl"
     SUB = "sub"

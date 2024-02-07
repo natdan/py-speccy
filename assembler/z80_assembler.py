@@ -1979,9 +1979,14 @@ class Z80AssemblerParser:
         self.nt = self.scanner.get_next_token()
         self.id_ = self.nt.id_
 
-    # z80<> = {[instruction] (.k=1.) comments|eol} eof
+    # z80<> = {[ident] [instruction] (.k=1.) comments|eol} eof
     def z80(self):
-        while (10 <= self.id_ <= 76) or (self.id_ == Z80AssemblerScanner.TOKEN_eol) or (self.id_ == Z80AssemblerScanner.TOKEN_comments):
+        while (10 <= self.id_ <= 76) or (self.id_ == Z80AssemblerScanner.TOKEN_eol) or (self.id_ == Z80AssemblerScanner.TOKEN_ident) or (self.id_ == Z80AssemblerScanner.TOKEN_comments):
+            if self.id_ == Z80AssemblerScanner.TOKEN_ident:
+                if self.id_ == Z80AssemblerScanner.TOKEN_ident:
+                    self.next()
+                else:
+                    raise ParserError(t=self.t, nt=self.nt, expected="ident")
             if 10 <= self.id_ <= 76:
                 self.instruction()
             if self.id_ == Z80AssemblerScanner.TOKEN_comments:
@@ -3487,7 +3492,7 @@ class Z80AssemblerParser:
         else:
             raise ParserError(t=self.t, expected="'(','a','b','c','d','e','h','l'")
 
-    # addr16<> = (.k=1.) unsigned_number CODE|ident
+    # addr16<> = (.k=1.) unsigned_number CODE|ident CODE
     def addr16(self):
         if self.id_ == Z80AssemblerScanner.TOKEN_unsigned_number:
             if self.id_ == Z80AssemblerScanner.TOKEN_unsigned_number:
@@ -3500,10 +3505,11 @@ class Z80AssemblerParser:
                 self.next()
             else:
                 raise ParserError(t=self.t, nt=self.nt, expected="ident")
+            self.value = self.t.s 
         else:
             raise ParserError(t=self.t, expected="ident,unsigned_number")
 
-    # relative<> = (.k=1.) signed_number|ident
+    # relative<> = (.k=1.) signed_number|ident CODE
     def relative(self):
         if (8 <= self.id_ <= 9) or (self.id_ == Z80AssemblerScanner.TOKEN_unsigned_number):
             self.signed_number()
@@ -3512,10 +3518,11 @@ class Z80AssemblerParser:
                 self.next()
             else:
                 raise ParserError(t=self.t, nt=self.nt, expected="ident")
+            self.value = self.t.s 
         else:
             raise ParserError(t=self.t, expected="'+','-',ident,unsigned_number")
 
-    # immediate<> = (.k=1.) signed_number|ident
+    # immediate<> = (.k=1.) signed_number|ident CODE
     def immediate(self):
         if (8 <= self.id_ <= 9) or (self.id_ == Z80AssemblerScanner.TOKEN_unsigned_number):
             self.signed_number()
@@ -3524,6 +3531,7 @@ class Z80AssemblerParser:
                 self.next()
             else:
                 raise ParserError(t=self.t, nt=self.nt, expected="ident")
+            self.value = self.t.s 
         else:
             raise ParserError(t=self.t, expected="'+','-',ident,unsigned_number")
 

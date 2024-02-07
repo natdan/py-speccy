@@ -14,6 +14,8 @@ class TestDecodeSimple:
         assert_decode(f"rlca", 0x07)
         assert_decode(f"rra", 0x1f)
         assert_decode(f"rrca", 0x0f)
+        assert_decode(f"nop", 0x00)
+        assert_decode(f"halt", 0x76)
 
     def test_simple_ed(self) -> None:
         assert_decode(f"cpd", 0xed, 0xa9)

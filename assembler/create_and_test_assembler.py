@@ -23,10 +23,12 @@ with open("test-asm.asm", "r") as f:
     scanner.set_reader(f)
     parser.parse(scanner)
 
+pc = 0
 print("------------------------------------------------------")
 for instruction in parser.instructions:
-    print(instruction)
+    instruction.address = pc
+    pc += instruction.size()
 
 print("------------------------------------------------------")
 for instruction in parser.instructions:
-    print(instruction.to_str(0).strip())
+    print(f"0x{instruction.address:04x}    {instruction.to_str(0).strip()}")

@@ -1,4 +1,6 @@
 
+        org     8000h
+
         adc     a, b
         add     a, 3
 
@@ -63,7 +65,7 @@
         lddr
 ;       ld
         neg
-        nop
+        nop                 ; nop instruction
         or      (hl)
         or      c
         or      128

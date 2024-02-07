@@ -99,7 +99,9 @@ from "z80.instructions.address_modes" import "AddrMode";
 %>
 
     z80 = {
-            [instruction] (comments | eol)
+            [ident]
+            [instruction]
+            (comments | eol)
           } eof ;
 
     instruction = (
@@ -409,11 +411,13 @@ from "z80.instructions.address_modes" import "AddrMode";
         );
 
     addr16 = unsigned_number <% self.value = to_int(self.t.s, False) %>
-           | ident
+           | ident <% self.value = self.t.s %>
            ;
-    relative = signed_number | ident;
+    relative = signed_number
+             | ident <% self.value = self.t.s %>
+             ;
     immediate = signed_number
-              | ident
+              | ident <% self.value = self.t.s %>
               ;
     register = "a" <% self.reg = 7 %>
              | "b" <% self.reg = 0 %>

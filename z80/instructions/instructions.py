@@ -150,6 +150,15 @@ class SLA(CBInstructionDef):
                          CBPIYDP=0x26)
 
 
+class SLL(CBInstructionDef):
+    def __init__(self) -> None:
+        super().__init__(Mnemonics.SLL,
+                         R1=0x30,
+                         PHLP=0x36,
+                         CBPIXDP=0x36,
+                         CBPIYDP=0x36)
+
+
 class SRA(CBInstructionDef):
     def __init__(self) -> None:
         super().__init__(Mnemonics.SRA,
@@ -202,15 +211,8 @@ RETN = InstructionDef(Mnemonics.RETN, SIMPLE_ED=0x45).update_decode_map()
 RLD = InstructionDef(Mnemonics.RLD, SIMPLE_ED=0x6f).update_decode_map()
 RRD = InstructionDef(Mnemonics.RRD, SIMPLE_ED=0x67).update_decode_map()
 
-
-class HALT(InstructionDef):
-    def __init__(self) -> None:
-        super().__init__(Mnemonics.HALT, SIMPLE=0x76)
-
-
-class NOP(InstructionDef):
-    def __init__(self) -> None:
-        super().__init__(Mnemonics.NOP, SIMPLE=0x00)
+HALT = InstructionDef(Mnemonics.HALT, SIMPLE=0x76).update_decode_map()
+NOP = InstructionDef(Mnemonics.NOP, SIMPLE=0x00).update_decode_map()
 
 
 class JP(InstructionDef):
