@@ -6,7 +6,10 @@ def to_int(s: str, negative: bool = False) -> int:
     elif s.startswith("0x"):
         value = int(s[2:], 16)
     else:
-        value = int(s)
+        try:
+            value = int(s)
+        except ValueError:
+            raise ValueError(f"Cannot convert to it '{s}'")
 
     if negative:
         value = - value

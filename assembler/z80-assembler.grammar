@@ -2,6 +2,8 @@ grammar z80_assembler;
 
 scanner Z80AssemblerScanner {
 
+    emit EOL BOL;
+
     "="; ";"; ","; "."; "("; ")"; "+"; "-";
 
     "adc"; "add"; "and";
@@ -23,7 +25,11 @@ scanner Z80AssemblerScanner {
     "bc"; "de"; "hl"; "ix"; "iy"; "af"; "af'"; "sp";
     "nz"; "z"; "nc"; "po"; "pe"; "p"; "m";
 
-    eol     = CHR(10);
+    "+"; "-"; "*"; "/"; "<<"; ">>"; "~"; "!"; "&"; "|"; "&&"; "||"; "?"; "="; "!="; ">"; "<"; "<="; ">=";
+    "mod"; "%"; "shl"; "shr"; "eq"; "ne"; "lt"; "le"; "gt"; "ge";
+    "$"; "nul"; "^";
+
+    "org"; "end";
 
     private digit     = '0' .. '9';
     private hex_digit = '0' .. '9' | 'a' .. 'z';
@@ -48,7 +54,7 @@ scanner Z80AssemblerScanner {
         %>
         ;
 
-    private char    = ' ' | CHR(33) | '\\' CHR(34) | CHR(35) .. CHR(127) ;
+    private char = ' ' | CHR(33) | '\\' CHR(34) | CHR(35) .. CHR(127) ;
 
     string
         = '"' { char } '"'
@@ -71,14 +77,20 @@ scanner Z80AssemblerScanner {
 
     ident = ( '.' | '_' | letter) { letter | digit | '_' | '.' };
 
+    label = BOL ident;
+
     unsigned_number = "0" "x" hex_digit { hex_digit }
                     | digit { digit } ["h" | "H"]
                     ;
 
     private allbuteol = CHR(1) .. CHR(9) | CHR(11) .. CHR(127);
 
-    comments    = ";" { allbuteol } eol ;
+    comments    = ";" { allbuteol } EOL ;
     private whitespace  = ( " " | CHR(1) .. CHR(9) | CHR(11) .. CHR(31) ) ;
+
+    eol = EOL;
+    eof = EOF;
+    bol = BOL;
 
 }
 
@@ -87,22 +99,23 @@ parser Z80AssemblerParser using scanner Z80AssemblerScanner {
 
 from "typing" import "Union";
 from "assembler_utils" import "to_int";
-from "z80.instructions.instruction_def" import "Instruction, InstructionDef";
+from "directives" import "*";
+from "z80.instructions.instruction_def" import "Instruction";
 from "z80.instructions.instructions" import "*";
 from "z80.instructions.address_modes" import "AddrMode";
 
 <%
-        self.instructions: list[Instruction] = []
+        self.instructions: list[Union[Instruction, Directive]] = []
         self.value: Optional[Union[int, str]] = None
         self.reg = 0
         self._cc = 0
 %>
 
     z80 = {
-            [ident]
-            [instruction]
-            (comments | eol)
-          } eof ;
+            (label <% self.instructions.append(Label(self.t.s)) %> | bol)
+            [instruction | directive]
+            (comments | eol | eof)
+          } eof;
 
     instruction = (
           "adc" adc_op
@@ -180,6 +193,10 @@ from "z80.instructions.address_modes" import "AddrMode";
         | "xor" s_op<XOR()>
         );
 
+    directive = "org" unsigned_number <% self.instructions.append(Org(to_int(self.t.s))) %>
+              | "end"
+              ;
+
     ld_op =
           ( "("
               ( "hl" ")" ","
@@ -215,9 +232,9 @@ from "z80.instructions.address_modes" import "AddrMode";
               ("(" addr16 ")"
                   <%
                       if self.reg == 2:
-                         self.instructions.append(Instruction(0, LD(), AddrMode.HLPNNP, nn=self.value))
+                          self.instructions.append(Instruction(0, LD(), AddrMode.HLPNNP, nn=self.value))
                       else:
-                         self.instructions.append(Instruction(0, LD(), AddrMode.DDPNNP, dd=self.reg, nn=self.value))
+                          self.instructions.append(Instruction(0, LD(), AddrMode.DDPNNP, dd=self.reg, nn=self.value))
                   %>
               | immediate <% self.instructions.append(Instruction(0, LD(), AddrMode.DDNN, dd=self.reg, nn=self.value)) %>
               )
@@ -452,4 +469,90 @@ from "z80.instructions.address_modes" import "AddrMode";
                   | "-" <% negative = True %>
                   ] unsigned_number <% self.value = to_int(self.t.s, negative) %>
                   ;
+
+
+    expr = and_test
+            { "||" and_test
+            }
+            ;
+
+    and_test = not_test
+             { "&&" not_test
+             }
+             ;
+
+    not_test = "!" not_test
+             | comparison
+             ;
+
+    comparison = or_expr
+               { comp_op or_expr
+               }
+               ;
+
+    comp_op =
+              ("lt" | "<")
+            | ("gt" | ">")
+            | ("eq" | "=")
+            | ("ge" | ">=")
+            | ("le" | "<=")
+            | ("ne" | "!=")
+            ;
+
+    or_expr = xor_expr
+         { ("or" | "|") xor_expr
+         }
+         ;
+
+    xor_expr = and_expr
+             { "^" and_expr
+             }
+             ;
+
+    and_expr = shift_expr
+             { ("and" | "&") shift_expr
+             }
+             ;
+
+    shift_expr = arith_expr
+               {
+                   ( "<<"
+                   | ">>"
+                   )
+                   arith_expr
+               };
+
+    arith_expr = term
+               {
+                   ( "+"
+                   | "-"
+                   )
+                   term
+               };
+
+    term = factor
+         {
+             ( "*"
+             | "/"
+             )
+             factor
+         };
+
+   factor =
+          {
+              ( "+"
+              | "-"
+              | "~"
+              )
+              factor
+          }
+          atom;
+
+    atom = ( "("
+             expr
+             ")"
+           | ident
+           | unsigned_number
+           );
+
 }

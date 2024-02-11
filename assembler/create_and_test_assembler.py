@@ -1,6 +1,8 @@
 
 from buLL.bull_parser import BullParser
 from buLL.parser.toolkit import Toolkit
+from directives import Org, Label
+from z80.instructions import Instruction
 
 args = "-vv --one-file z80-assembler.grammar"
 
@@ -26,9 +28,17 @@ with open("test-asm.asm", "r") as f:
 pc = 0
 print("------------------------------------------------------")
 for instruction in parser.instructions:
-    instruction.address = pc
-    pc += instruction.size()
+    if isinstance(instruction, Instruction):
+        instruction.address = pc
+        pc += instruction.size()
+    elif isinstance(instruction, Org):
+        pc = instruction.address
+    elif isinstance(instruction, Label):
+        instruction.address = pc
 
 print("------------------------------------------------------")
 for instruction in parser.instructions:
-    print(f"0x{instruction.address:04x}    {instruction.to_str(0).strip()}")
+    if isinstance(instruction, Instruction):
+        print(f"0x{instruction.address:04x}            {instruction.to_str(2).strip()}")
+    else:
+        print(f"          {instruction.to_str(2)}")
