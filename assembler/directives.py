@@ -30,3 +30,12 @@ class Label(Directive):
 
     def to_str(self, tabs: int = 0) -> str:
         return f"{self.label} ; (0x{self.address:04x})"
+
+
+class MacroInvocation(Directive):
+    def __init__(self, name: str) -> None:
+        super().__init__(0)
+        self.name = name
+
+    def to_str(self, tabs: int = 0) -> str:
+        return f"invoke macro '{self.name}'"

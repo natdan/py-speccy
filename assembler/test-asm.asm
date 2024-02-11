@@ -1,12 +1,12 @@
 ;       first comment
 
-l1
+l1:
         org     8000h
 
         adc     a, b
         add     a, 3
 
-label1
+label1:
         and     c
         and     5
         and     (hl)
@@ -18,7 +18,7 @@ label1
         sub     (iy-1)
         bit     3, a
 
-method1
+method1:
         call    123
         call    nz, 124
         ccf
@@ -207,3 +207,5 @@ method1
         ld      sp, hl
         ld      sp, ix
         ld      sp, iy
+
+        my_macro

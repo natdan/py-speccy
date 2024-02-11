@@ -77,7 +77,7 @@ scanner Z80AssemblerScanner {
 
     ident = ( '.' | '_' | letter) { letter | digit | '_' | '.' };
 
-    label = BOL ident;
+    label = BOL ident ":";
 
     unsigned_number = "0" "x" hex_digit { hex_digit }
                     | digit { digit } ["h" | "H"]
@@ -113,7 +113,10 @@ from "z80.instructions.address_modes" import "AddrMode";
 
     z80 = {
             (label <% self.instructions.append(Label(self.t.s)) %> | bol)
-            [instruction | directive]
+            [instruction
+            | directive
+            | macro_invocation
+            ]
             (comments | eol | eof)
           } eof;
 
@@ -196,6 +199,8 @@ from "z80.instructions.address_modes" import "AddrMode";
     directive = "org" unsigned_number <% self.instructions.append(Org(to_int(self.t.s))) %>
               | "end"
               ;
+
+    macro_invocation = ident <% self.instructions.append(MacroInvocation(self.t.s)) %> ;
 
     ld_op =
           ( "("

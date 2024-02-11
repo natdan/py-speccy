@@ -304,7 +304,7 @@ class Z80AssemblerScanner:
         while self.ok:
             self.ch = self.get_next_char()
             # print(f"{self.state}: {self.ch} {chr(self.ch)}
-# total nodes: 194
+# total nodes: 195
             if self.state == 1:
                 if self.ch == -3:
                     self.id_ = self.TOKEN_bol
@@ -313,7 +313,7 @@ class Z80AssemblerScanner:
                 elif self.ch == -2:
                     self.id_ = self.TOKEN_eof
                     self.mark()
-                    self.state = 4
+                    self.state = 5
                 elif (1 <= self.ch <= 9) or (11 <= self.ch <= 32):
                     self.start_line = self.line
                     self.start_pos = self.pos
@@ -323,179 +323,179 @@ class Z80AssemblerScanner:
                 elif self.ch == 10:
                     self.id_ = self.TOKEN_eol
                     self.mark()
-                    self.state = 6
+                    self.state = 7
                 elif self.ch == 33:
                     self.id_ = 110
                     self.mark()
-                    self.state = 7
+                    self.state = 8
                 elif self.ch == 34:
-                    self.state = 9
+                    self.state = 10
                 elif self.ch == 36:
                     self.id_ = 132
                     self.mark()
-                    self.state = 13
+                    self.state = 14
                 elif self.ch == 37:
                     self.id_ = 123
                     self.mark()
-                    self.state = 14
+                    self.state = 15
                 elif self.ch == 38:
                     self.id_ = 111
                     self.mark()
-                    self.state = 15
+                    self.state = 16
                 elif self.ch == 39:
-                    self.state = 17
+                    self.state = 18
                 elif self.ch == 40:
                     self.id_ = 8
                     self.mark()
-                    self.state = 21
+                    self.state = 22
                 elif self.ch == 41:
                     self.id_ = 9
                     self.mark()
-                    self.state = 22
+                    self.state = 23
                 elif self.ch == 42:
                     self.id_ = 105
                     self.mark()
-                    self.state = 23
+                    self.state = 24
                 elif self.ch == 43:
                     self.id_ = 10
                     self.mark()
-                    self.state = 24
+                    self.state = 25
                 elif self.ch == 44:
                     self.id_ = 6
                     self.mark()
-                    self.state = 25
+                    self.state = 26
                 elif self.ch == 45:
                     self.id_ = 11
                     self.mark()
-                    self.state = 26
+                    self.state = 27
                 elif self.ch == 46:
                     self.id_ = 7
                     self.mark()
-                    self.state = 27
+                    self.state = 28
                 elif self.ch == 47:
                     self.id_ = 106
                     self.mark()
-                    self.state = 29
+                    self.state = 30
                 elif self.ch == 48:
                     self.id_ = self.TOKEN_unsigned_number
                     self.mark()
-                    self.state = 30
+                    self.state = 31
                 elif 49 <= self.ch <= 57:
                     self.id_ = self.TOKEN_unsigned_number
                     self.mark()
-                    self.state = 31
+                    self.state = 32
                 elif self.ch == 59:
                     self.id_ = 5
                     self.mark()
-                    self.state = 35
+                    self.state = 36
                 elif self.ch == 60:
                     self.id_ = 119
                     self.mark()
-                    self.state = 38
+                    self.state = 39
                 elif self.ch == 61:
                     self.id_ = 4
                     self.mark()
-                    self.state = 41
+                    self.state = 42
                 elif self.ch == 62:
                     self.id_ = 118
                     self.mark()
-                    self.state = 42
+                    self.state = 43
                 elif self.ch == 63:
                     self.id_ = 115
                     self.mark()
-                    self.state = 45
+                    self.state = 46
                 elif (65 <= self.ch <= 66) or (68 <= self.ch <= 90) or (self.ch == 95) or (self.ch == 102) or (self.ch == 107) or (self.ch == 113) or (116 <= self.ch <= 119) or (self.ch == 121):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
                 elif self.ch == 67:
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 46
+                    self.state = 47
                 elif self.ch == 94:
                     self.id_ = 134
                     self.mark()
-                    self.state = 51
+                    self.state = 52
                 elif self.ch == 97:
                     self.id_ = 79
                     self.mark()
-                    self.state = 52
+                    self.state = 53
                 elif self.ch == 98:
                     self.id_ = 80
                     self.mark()
-                    self.state = 60
+                    self.state = 61
                 elif self.ch == 99:
                     self.id_ = 81
                     self.mark()
-                    self.state = 64
+                    self.state = 65
                 elif self.ch == 100:
                     self.id_ = 82
                     self.mark()
-                    self.state = 76
+                    self.state = 77
                 elif self.ch == 101:
                     self.id_ = 83
                     self.mark()
-                    self.state = 85
+                    self.state = 86
                 elif self.ch == 103:
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 92
+                    self.state = 93
                 elif self.ch == 104:
                     self.id_ = 84
                     self.mark()
-                    self.state = 95
+                    self.state = 96
                 elif self.ch == 105:
                     self.id_ = 86
                     self.mark()
-                    self.state = 100
+                    self.state = 101
                 elif self.ch == 106:
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 110
+                    self.state = 111
                 elif self.ch == 108:
                     self.id_ = 85
                     self.mark()
-                    self.state = 113
+                    self.state = 114
                 elif self.ch == 109:
                     self.id_ = 102
                     self.mark()
-                    self.state = 121
+                    self.state = 122
                 elif self.ch == 110:
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 124
+                    self.state = 125
                 elif self.ch == 111:
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 133
+                    self.state = 134
                 elif self.ch == 112:
                     self.id_ = 101
                     self.mark()
-                    self.state = 145
+                    self.state = 146
                 elif self.ch == 114:
                     self.id_ = 87
                     self.mark()
-                    self.state = 152
+                    self.state = 153
                 elif self.ch == 115:
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 170
+                    self.state = 171
                 elif self.ch == 120:
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 188
+                    self.state = 189
                 elif self.ch == 122:
                     self.id_ = 97
                     self.mark()
-                    self.state = 191
+                    self.state = 192
                 elif self.ch == 124:
                     self.id_ = 112
                     self.mark()
-                    self.state = 192
+                    self.state = 193
                 elif self.ch == 126:
                     self.id_ = 109
                     self.mark()
-                    self.state = 194
+                    self.state = 195
                 elif self.ch == self.EOF_CHAR:
                     return self.Token("<eof>", self.TOKEN_EOF, self.start_line, self.start_pos)
                 else:
@@ -503,122 +503,122 @@ class Z80AssemblerScanner:
                 
             elif self.state == 2:
                 if (self.ch == 46) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
-                    self.id_ = self.TOKEN_label
-                    self.mark()
                     self.state = 3
                 else:
                     self.ok = False
                 
             elif self.state == 3:
                 if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
+                    self.state = 3
+                elif self.ch == 58:
                     self.id_ = self.TOKEN_label
                     self.mark()
-                    self.state = 3
+                    self.state = 4
                 else:
                     self.ok = False
                 
             elif self.state == 4:
                 self.ok = False
             elif self.state == 5:
+                self.ok = False
+            elif self.state == 6:
                 if self.ch == 10:
                     self.id_ = self.TOKEN_eol
                     self.mark()
-                    self.state = 6
+                    self.state = 7
                 else:
                     self.ok = False
                 
-            elif self.state == 6:
-                self.ok = False
             elif self.state == 7:
+                self.ok = False
+            elif self.state == 8:
                 if self.ch == 61:
                     self.id_ = 117
                     self.mark()
-                    self.state = 8
+                    self.state = 9
                 else:
                     self.ok = False
                 
-            elif self.state == 8:
-                self.ok = False
             elif self.state == 9:
-                if (32 <= self.ch <= 33) or (35 <= self.ch <= 91) or (93 <= self.ch <= 127):
-                    self.id_ = self.TOKEN_string
-                    self.mark()
-                    self.state = 10
-                elif self.ch == 34:
-                    self.id_ = self.TOKEN_string
-                    self.mark()
-                    self.state = 11
-                elif self.ch == 92:
-                    self.state = 12
-                else:
-                    self.ok = False
-                
+                self.ok = False
             elif self.state == 10:
                 if (32 <= self.ch <= 33) or (35 <= self.ch <= 91) or (93 <= self.ch <= 127):
                     self.id_ = self.TOKEN_string
                     self.mark()
-                    self.state = 10
+                    self.state = 11
                 elif self.ch == 34:
                     self.id_ = self.TOKEN_string
                     self.mark()
-                    self.state = 11
-                elif self.ch == 92:
                     self.state = 12
+                elif self.ch == 92:
+                    self.state = 13
                 else:
                     self.ok = False
                 
             elif self.state == 11:
-                self.ok = False
+                if (32 <= self.ch <= 33) or (35 <= self.ch <= 91) or (93 <= self.ch <= 127):
+                    self.id_ = self.TOKEN_string
+                    self.mark()
+                    self.state = 11
+                elif self.ch == 34:
+                    self.id_ = self.TOKEN_string
+                    self.mark()
+                    self.state = 12
+                elif self.ch == 92:
+                    self.state = 13
+                else:
+                    self.ok = False
+                
             elif self.state == 12:
+                self.ok = False
+            elif self.state == 13:
                 if (32 <= self.ch <= 91) or (93 <= self.ch <= 127):
                     self.id_ = self.TOKEN_string
                     self.mark()
-                    self.state = 10
+                    self.state = 11
                 elif self.ch == 92:
-                    self.state = 12
+                    self.state = 13
                 else:
                     self.ok = False
                 
-            elif self.state == 13:
-                self.ok = False
             elif self.state == 14:
                 self.ok = False
             elif self.state == 15:
+                self.ok = False
+            elif self.state == 16:
                 if self.ch == 38:
                     self.id_ = 113
                     self.mark()
-                    self.state = 16
+                    self.state = 17
                 else:
                     self.ok = False
                 
-            elif self.state == 16:
-                self.ok = False
             elif self.state == 17:
-                if (32 <= self.ch <= 91) or (93 <= self.ch <= 127):
-                    self.state = 18
-                elif self.ch == 92:
-                    self.state = 20
-                else:
-                    self.ok = False
-                
+                self.ok = False
             elif self.state == 18:
-                if self.ch == 39:
-                    self.id_ = self.TOKEN_literal
-                    self.mark()
+                if (32 <= self.ch <= 91) or (93 <= self.ch <= 127):
                     self.state = 19
+                elif self.ch == 92:
+                    self.state = 21
                 else:
                     self.ok = False
                 
             elif self.state == 19:
-                self.ok = False
-            elif self.state == 20:
-                if 32 <= self.ch <= 127:
-                    self.state = 18
+                if self.ch == 39:
+                    self.id_ = self.TOKEN_literal
+                    self.mark()
+                    self.state = 20
                 else:
                     self.ok = False
                 
-            elif self.state == 21:
+            elif self.state == 20:
                 self.ok = False
+            elif self.state == 21:
+                if 32 <= self.ch <= 127:
+                    self.state = 19
+                else:
+                    self.ok = False
+                
             elif self.state == 22:
                 self.ok = False
             elif self.state == 23:
@@ -630,143 +630,133 @@ class Z80AssemblerScanner:
             elif self.state == 26:
                 self.ok = False
             elif self.state == 27:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
-                    self.id_ = self.TOKEN_ident
-                    self.mark()
-                    self.state = 28
-                else:
-                    self.ok = False
-                
+                self.ok = False
             elif self.state == 28:
                 if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 29:
-                self.ok = False
-            elif self.state == 30:
-                if 48 <= self.ch <= 57:
-                    self.id_ = self.TOKEN_unsigned_number
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
+                    self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 31
-                elif (self.ch == 72) or (self.ch == 104):
-                    self.id_ = self.TOKEN_unsigned_number
-                    self.mark()
-                    self.state = 32
-                elif self.ch == 120:
-                    self.state = 33
+                    self.state = 29
                 else:
                     self.ok = False
                 
+            elif self.state == 30:
+                self.ok = False
             elif self.state == 31:
                 if 48 <= self.ch <= 57:
                     self.id_ = self.TOKEN_unsigned_number
                     self.mark()
-                    self.state = 31
+                    self.state = 32
                 elif (self.ch == 72) or (self.ch == 104):
                     self.id_ = self.TOKEN_unsigned_number
                     self.mark()
-                    self.state = 32
+                    self.state = 33
+                elif self.ch == 120:
+                    self.state = 34
                 else:
                     self.ok = False
                 
             elif self.state == 32:
-                self.ok = False
-            elif self.state == 33:
-                if (48 <= self.ch <= 57) or (97 <= self.ch <= 122):
+                if 48 <= self.ch <= 57:
                     self.id_ = self.TOKEN_unsigned_number
                     self.mark()
-                    self.state = 34
+                    self.state = 32
+                elif (self.ch == 72) or (self.ch == 104):
+                    self.id_ = self.TOKEN_unsigned_number
+                    self.mark()
+                    self.state = 33
                 else:
                     self.ok = False
                 
+            elif self.state == 33:
+                self.ok = False
             elif self.state == 34:
                 if (48 <= self.ch <= 57) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_unsigned_number
                     self.mark()
-                    self.state = 34
+                    self.state = 35
                 else:
                     self.ok = False
                 
             elif self.state == 35:
-                if (1 <= self.ch <= 9) or (11 <= self.ch <= 127):
-                    self.state = 36
-                elif self.ch == 10:
-                    self.id_ = self.TOKEN_comments
+                if (48 <= self.ch <= 57) or (97 <= self.ch <= 122):
+                    self.id_ = self.TOKEN_unsigned_number
                     self.mark()
-                    self.state = 37
+                    self.state = 35
                 else:
                     self.ok = False
                 
             elif self.state == 36:
                 if (1 <= self.ch <= 9) or (11 <= self.ch <= 127):
-                    self.state = 36
+                    self.state = 37
                 elif self.ch == 10:
                     self.id_ = self.TOKEN_comments
                     self.mark()
-                    self.state = 37
+                    self.state = 38
                 else:
                     self.ok = False
                 
             elif self.state == 37:
-                self.ok = False
-            elif self.state == 38:
-                if self.ch == 60:
-                    self.id_ = 107
+                if (1 <= self.ch <= 9) or (11 <= self.ch <= 127):
+                    self.state = 37
+                elif self.ch == 10:
+                    self.id_ = self.TOKEN_comments
                     self.mark()
-                    self.state = 39
-                elif self.ch == 61:
-                    self.id_ = 120
-                    self.mark()
-                    self.state = 40
+                    self.state = 38
                 else:
                     self.ok = False
                 
-            elif self.state == 39:
+            elif self.state == 38:
                 self.ok = False
+            elif self.state == 39:
+                if self.ch == 60:
+                    self.id_ = 107
+                    self.mark()
+                    self.state = 40
+                elif self.ch == 61:
+                    self.id_ = 120
+                    self.mark()
+                    self.state = 41
+                else:
+                    self.ok = False
+                
             elif self.state == 40:
                 self.ok = False
             elif self.state == 41:
                 self.ok = False
             elif self.state == 42:
+                self.ok = False
+            elif self.state == 43:
                 if self.ch == 61:
                     self.id_ = 121
                     self.mark()
-                    self.state = 43
+                    self.state = 44
                 elif self.ch == 62:
                     self.id_ = 108
                     self.mark()
-                    self.state = 44
+                    self.state = 45
                 else:
                     self.ok = False
                 
-            elif self.state == 43:
-                self.ok = False
             elif self.state == 44:
                 self.ok = False
             elif self.state == 45:
                 self.ok = False
             elif self.state == 46:
+                self.ok = False
+            elif self.state == 47:
                 if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 71) or (73 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
                 elif self.ch == 72:
-                    self.id_ = self.TOKEN_ident
-                    self.mark()
-                    self.state = 47
-                else:
-                    self.ok = False
-                
-            elif self.state == 47:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 81) or (83 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
-                    self.id_ = self.TOKEN_ident
-                    self.mark()
-                    self.state = 28
-                elif self.ch == 82:
                     self.id_ = self.TOKEN_ident
                     self.mark()
                     self.state = 48
@@ -774,74 +764,78 @@ class Z80AssemblerScanner:
                     self.ok = False
                 
             elif self.state == 48:
-                if self.ch == 40:
-                    self.state = 49
-                elif (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 81) or (83 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
+                elif self.ch == 82:
+                    self.id_ = self.TOKEN_ident
+                    self.mark()
+                    self.state = 49
                 else:
                     self.ok = False
                 
             elif self.state == 49:
-                if 48 <= self.ch <= 57:
+                if self.ch == 40:
                     self.state = 50
+                elif (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
+                    self.id_ = self.TOKEN_ident
+                    self.mark()
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 50:
-                if self.ch == 41:
-                    self.id_ = self.TOKEN_literal
-                    self.mark()
-                    self.state = 19
-                elif 48 <= self.ch <= 57:
-                    self.state = 50
+                if 48 <= self.ch <= 57:
+                    self.state = 51
                 else:
                     self.ok = False
                 
             elif self.state == 51:
-                self.ok = False
-            elif self.state == 52:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 99) or (self.ch == 101) or (103 <= self.ch <= 109) or (111 <= self.ch <= 122):
-                    self.id_ = self.TOKEN_ident
+                if self.ch == 41:
+                    self.id_ = self.TOKEN_literal
                     self.mark()
-                    self.state = 28
-                elif self.ch == 100:
-                    self.id_ = self.TOKEN_ident
-                    self.mark()
-                    self.state = 53
-                elif self.ch == 102:
-                    self.id_ = 93
-                    self.mark()
-                    self.state = 56
-                elif self.ch == 110:
-                    self.id_ = self.TOKEN_ident
-                    self.mark()
-                    self.state = 58
+                    self.state = 20
+                elif 48 <= self.ch <= 57:
+                    self.state = 51
                 else:
                     self.ok = False
                 
+            elif self.state == 52:
+                self.ok = False
             elif self.state == 53:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 98) or (101 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 99) or (self.ch == 101) or (103 <= self.ch <= 109) or (111 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
-                elif self.ch == 99:
-                    self.id_ = 12
+                    self.state = 29
+                elif self.ch == 100:
+                    self.id_ = self.TOKEN_ident
                     self.mark()
                     self.state = 54
-                elif self.ch == 100:
-                    self.id_ = 13
+                elif self.ch == 102:
+                    self.id_ = 93
                     self.mark()
-                    self.state = 55
+                    self.state = 57
+                elif self.ch == 110:
+                    self.id_ = self.TOKEN_ident
+                    self.mark()
+                    self.state = 59
                 else:
                     self.ok = False
                 
             elif self.state == 54:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 98) or (101 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
+                elif self.ch == 99:
+                    self.id_ = 12
+                    self.mark()
+                    self.state = 55
+                elif self.ch == 100:
+                    self.id_ = 13
+                    self.mark()
+                    self.state = 56
                 else:
                     self.ok = False
                 
@@ -849,117 +843,113 @@ class Z80AssemblerScanner:
                 if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 56:
-                if self.ch == 39:
-                    self.id_ = 94
-                    self.mark()
-                    self.state = 57
-                elif (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 57:
-                self.ok = False
-            elif self.state == 58:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 99) or (101 <= self.ch <= 122):
+                if self.ch == 39:
+                    self.id_ = 94
+                    self.mark()
+                    self.state = 58
+                elif (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
-                elif self.ch == 100:
-                    self.id_ = 14
-                    self.mark()
-                    self.state = 59
+                    self.state = 29
                 else:
                     self.ok = False
                 
+            elif self.state == 58:
+                self.ok = False
             elif self.state == 59:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 99) or (101 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
+                elif self.ch == 100:
+                    self.id_ = 14
+                    self.mark()
+                    self.state = 60
                 else:
                     self.ok = False
                 
             elif self.state == 60:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 98) or (100 <= self.ch <= 104) or (106 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
-                elif self.ch == 99:
-                    self.id_ = 88
-                    self.mark()
-                    self.state = 61
-                elif self.ch == 105:
-                    self.id_ = self.TOKEN_ident
-                    self.mark()
-                    self.state = 62
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 61:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 98) or (100 <= self.ch <= 104) or (106 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
-                else:
-                    self.ok = False
-                
-            elif self.state == 62:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 115) or (117 <= self.ch <= 122):
-                    self.id_ = self.TOKEN_ident
+                    self.state = 29
+                elif self.ch == 99:
+                    self.id_ = 88
                     self.mark()
-                    self.state = 28
-                elif self.ch == 116:
-                    self.id_ = 15
+                    self.state = 62
+                elif self.ch == 105:
+                    self.id_ = self.TOKEN_ident
                     self.mark()
                     self.state = 63
                 else:
                     self.ok = False
                 
-            elif self.state == 63:
+            elif self.state == 62:
                 if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
+                else:
+                    self.ok = False
+                
+            elif self.state == 63:
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 115) or (117 <= self.ch <= 122):
+                    self.id_ = self.TOKEN_ident
+                    self.mark()
+                    self.state = 29
+                elif self.ch == 116:
+                    self.id_ = 15
+                    self.mark()
+                    self.state = 64
                 else:
                     self.ok = False
                 
             elif self.state == 64:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (self.ch == 98) or (100 <= self.ch <= 111) or (113 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
-                elif self.ch == 97:
-                    self.id_ = self.TOKEN_ident
-                    self.mark()
-                    self.state = 65
-                elif self.ch == 99:
-                    self.id_ = self.TOKEN_ident
-                    self.mark()
-                    self.state = 68
-                elif self.ch == 112:
-                    self.id_ = 18
-                    self.mark()
-                    self.state = 70
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 65:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 107) or (109 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (self.ch == 98) or (100 <= self.ch <= 111) or (113 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
-                elif self.ch == 108:
+                    self.state = 29
+                elif self.ch == 97:
                     self.id_ = self.TOKEN_ident
                     self.mark()
                     self.state = 66
+                elif self.ch == 99:
+                    self.id_ = self.TOKEN_ident
+                    self.mark()
+                    self.state = 69
+                elif self.ch == 112:
+                    self.id_ = 18
+                    self.mark()
+                    self.state = 71
                 else:
                     self.ok = False
                 
@@ -967,99 +957,103 @@ class Z80AssemblerScanner:
                 if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 107) or (109 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
                 elif self.ch == 108:
-                    self.id_ = 16
+                    self.id_ = self.TOKEN_ident
                     self.mark()
                     self.state = 67
                 else:
                     self.ok = False
                 
             elif self.state == 67:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 107) or (109 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
+                elif self.ch == 108:
+                    self.id_ = 16
+                    self.mark()
+                    self.state = 68
                 else:
                     self.ok = False
                 
             elif self.state == 68:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 101) or (103 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
-                elif self.ch == 102:
-                    self.id_ = 17
-                    self.mark()
-                    self.state = 69
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 69:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 101) or (103 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
+                elif self.ch == 102:
+                    self.id_ = 17
+                    self.mark()
+                    self.state = 70
                 else:
                     self.ok = False
                 
             elif self.state == 70:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 99) or (101 <= self.ch <= 104) or (106 <= self.ch <= 107) or (109 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
-                elif self.ch == 100:
-                    self.id_ = 19
-                    self.mark()
-                    self.state = 71
-                elif self.ch == 105:
-                    self.id_ = 21
-                    self.mark()
-                    self.state = 73
-                elif self.ch == 108:
-                    self.id_ = 23
-                    self.mark()
-                    self.state = 75
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 71:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 113) or (115 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 99) or (101 <= self.ch <= 104) or (106 <= self.ch <= 107) or (109 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
-                elif self.ch == 114:
-                    self.id_ = 20
+                    self.state = 29
+                elif self.ch == 100:
+                    self.id_ = 19
                     self.mark()
                     self.state = 72
+                elif self.ch == 105:
+                    self.id_ = 21
+                    self.mark()
+                    self.state = 74
+                elif self.ch == 108:
+                    self.id_ = 23
+                    self.mark()
+                    self.state = 76
                 else:
                     self.ok = False
                 
             elif self.state == 72:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 113) or (115 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
+                elif self.ch == 114:
+                    self.id_ = 20
+                    self.mark()
+                    self.state = 73
                 else:
                     self.ok = False
                 
             elif self.state == 73:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 113) or (115 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
-                elif self.ch == 114:
-                    self.id_ = 22
-                    self.mark()
-                    self.state = 74
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 74:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 113) or (115 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
+                elif self.ch == 114:
+                    self.id_ = 22
+                    self.mark()
+                    self.state = 75
                 else:
                     self.ok = False
                 
@@ -1067,71 +1061,71 @@ class Z80AssemblerScanner:
                 if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 76:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (98 <= self.ch <= 100) or (102 <= self.ch <= 104) or (107 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
-                elif self.ch == 97:
-                    self.id_ = self.TOKEN_ident
-                    self.mark()
-                    self.state = 77
-                elif self.ch == 101:
-                    self.id_ = 89
-                    self.mark()
-                    self.state = 79
-                elif self.ch == 105:
-                    self.id_ = 26
-                    self.mark()
-                    self.state = 81
-                elif self.ch == 106:
-                    self.id_ = self.TOKEN_ident
-                    self.mark()
-                    self.state = 82
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 77:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (98 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (98 <= self.ch <= 100) or (102 <= self.ch <= 104) or (107 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
                 elif self.ch == 97:
-                    self.id_ = 24
+                    self.id_ = self.TOKEN_ident
                     self.mark()
                     self.state = 78
+                elif self.ch == 101:
+                    self.id_ = 89
+                    self.mark()
+                    self.state = 80
+                elif self.ch == 105:
+                    self.id_ = 26
+                    self.mark()
+                    self.state = 82
+                elif self.ch == 106:
+                    self.id_ = self.TOKEN_ident
+                    self.mark()
+                    self.state = 83
                 else:
                     self.ok = False
                 
             elif self.state == 78:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (98 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
+                elif self.ch == 97:
+                    self.id_ = 24
+                    self.mark()
+                    self.state = 79
                 else:
                     self.ok = False
                 
             elif self.state == 79:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 98) or (100 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
-                elif self.ch == 99:
-                    self.id_ = 25
-                    self.mark()
-                    self.state = 80
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 80:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 98) or (100 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
+                elif self.ch == 99:
+                    self.id_ = 25
+                    self.mark()
+                    self.state = 81
                 else:
                     self.ok = False
                 
@@ -1139,91 +1133,91 @@ class Z80AssemblerScanner:
                 if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 82:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 109) or (111 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
-                elif self.ch == 110:
-                    self.id_ = self.TOKEN_ident
-                    self.mark()
-                    self.state = 83
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 83:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 121):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 109) or (111 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
-                elif self.ch == 122:
-                    self.id_ = 27
+                    self.state = 29
+                elif self.ch == 110:
+                    self.id_ = self.TOKEN_ident
                     self.mark()
                     self.state = 84
                 else:
                     self.ok = False
                 
             elif self.state == 84:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 121):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
+                elif self.ch == 122:
+                    self.id_ = 27
+                    self.mark()
+                    self.state = 85
                 else:
                     self.ok = False
                 
             elif self.state == 85:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 104) or (106 <= self.ch <= 109) or (111 <= self.ch <= 112) or (114 <= self.ch <= 119) or (121 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
-                elif self.ch == 105:
-                    self.id_ = 28
-                    self.mark()
-                    self.state = 86
-                elif self.ch == 110:
-                    self.id_ = self.TOKEN_ident
-                    self.mark()
-                    self.state = 87
-                elif self.ch == 113:
-                    self.id_ = 126
-                    self.mark()
-                    self.state = 89
-                elif self.ch == 120:
-                    self.id_ = 29
-                    self.mark()
-                    self.state = 90
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 86:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 104) or (106 <= self.ch <= 109) or (111 <= self.ch <= 112) or (114 <= self.ch <= 119) or (121 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
+                elif self.ch == 105:
+                    self.id_ = 28
+                    self.mark()
+                    self.state = 87
+                elif self.ch == 110:
+                    self.id_ = self.TOKEN_ident
+                    self.mark()
+                    self.state = 88
+                elif self.ch == 113:
+                    self.id_ = 126
+                    self.mark()
+                    self.state = 90
+                elif self.ch == 120:
+                    self.id_ = 29
+                    self.mark()
+                    self.state = 91
                 else:
                     self.ok = False
                 
             elif self.state == 87:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 99) or (101 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
-                elif self.ch == 100:
-                    self.id_ = 136
-                    self.mark()
-                    self.state = 88
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 88:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 99) or (101 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
+                elif self.ch == 100:
+                    self.id_ = 136
+                    self.mark()
+                    self.state = 89
                 else:
                     self.ok = False
                 
@@ -1231,51 +1225,51 @@ class Z80AssemblerScanner:
                 if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 90:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 119) or (121 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
-                elif self.ch == 120:
-                    self.id_ = 30
-                    self.mark()
-                    self.state = 91
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 91:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 119) or (121 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
+                elif self.ch == 120:
+                    self.id_ = 30
+                    self.mark()
+                    self.state = 92
                 else:
                     self.ok = False
                 
             elif self.state == 92:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 100) or (102 <= self.ch <= 115) or (117 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
-                elif self.ch == 101:
-                    self.id_ = 131
-                    self.mark()
-                    self.state = 93
-                elif self.ch == 116:
-                    self.id_ = 130
-                    self.mark()
-                    self.state = 94
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 93:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 100) or (102 <= self.ch <= 115) or (117 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
+                elif self.ch == 101:
+                    self.id_ = 131
+                    self.mark()
+                    self.state = 94
+                elif self.ch == 116:
+                    self.id_ = 130
+                    self.mark()
+                    self.state = 95
                 else:
                     self.ok = False
                 
@@ -1283,55 +1277,55 @@ class Z80AssemblerScanner:
                 if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 95:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (98 <= self.ch <= 107) or (109 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
-                elif self.ch == 97:
-                    self.id_ = self.TOKEN_ident
-                    self.mark()
-                    self.state = 96
-                elif self.ch == 108:
-                    self.id_ = 90
-                    self.mark()
-                    self.state = 99
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 96:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 107) or (109 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (98 <= self.ch <= 107) or (109 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
-                elif self.ch == 108:
+                    self.state = 29
+                elif self.ch == 97:
                     self.id_ = self.TOKEN_ident
                     self.mark()
                     self.state = 97
+                elif self.ch == 108:
+                    self.id_ = 90
+                    self.mark()
+                    self.state = 100
                 else:
                     self.ok = False
                 
             elif self.state == 97:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 115) or (117 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 107) or (109 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
-                elif self.ch == 116:
-                    self.id_ = 31
+                    self.state = 29
+                elif self.ch == 108:
+                    self.id_ = self.TOKEN_ident
                     self.mark()
                     self.state = 98
                 else:
                     self.ok = False
                 
             elif self.state == 98:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 115) or (117 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
+                elif self.ch == 116:
+                    self.id_ = 31
+                    self.mark()
+                    self.state = 99
                 else:
                     self.ok = False
                 
@@ -1339,107 +1333,107 @@ class Z80AssemblerScanner:
                 if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 100:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 108) or (111 <= self.ch <= 119) or (self.ch == 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
-                elif self.ch == 109:
-                    self.id_ = 32
-                    self.mark()
-                    self.state = 101
-                elif self.ch == 110:
-                    self.id_ = 33
-                    self.mark()
-                    self.state = 102
-                elif self.ch == 120:
-                    self.id_ = 91
-                    self.mark()
-                    self.state = 108
-                elif self.ch == 121:
-                    self.id_ = 92
-                    self.mark()
-                    self.state = 109
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 101:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 108) or (111 <= self.ch <= 119) or (self.ch == 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
+                elif self.ch == 109:
+                    self.id_ = 32
+                    self.mark()
+                    self.state = 102
+                elif self.ch == 110:
+                    self.id_ = 33
+                    self.mark()
+                    self.state = 103
+                elif self.ch == 120:
+                    self.id_ = 91
+                    self.mark()
+                    self.state = 109
+                elif self.ch == 121:
+                    self.id_ = 92
+                    self.mark()
+                    self.state = 110
                 else:
                     self.ok = False
                 
             elif self.state == 102:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 98) or (101 <= self.ch <= 104) or (106 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
-                elif self.ch == 99:
-                    self.id_ = 34
-                    self.mark()
-                    self.state = 103
-                elif self.ch == 100:
-                    self.id_ = 35
-                    self.mark()
-                    self.state = 104
-                elif self.ch == 105:
-                    self.id_ = 37
-                    self.mark()
-                    self.state = 106
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 103:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 98) or (101 <= self.ch <= 104) or (106 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
-                else:
-                    self.ok = False
-                
-            elif self.state == 104:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 113) or (115 <= self.ch <= 122):
-                    self.id_ = self.TOKEN_ident
+                    self.state = 29
+                elif self.ch == 99:
+                    self.id_ = 34
                     self.mark()
-                    self.state = 28
-                elif self.ch == 114:
-                    self.id_ = 36
+                    self.state = 104
+                elif self.ch == 100:
+                    self.id_ = 35
                     self.mark()
                     self.state = 105
-                else:
-                    self.ok = False
-                
-            elif self.state == 105:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
-                    self.id_ = self.TOKEN_ident
-                    self.mark()
-                    self.state = 28
-                else:
-                    self.ok = False
-                
-            elif self.state == 106:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 113) or (115 <= self.ch <= 122):
-                    self.id_ = self.TOKEN_ident
-                    self.mark()
-                    self.state = 28
-                elif self.ch == 114:
-                    self.id_ = 38
+                elif self.ch == 105:
+                    self.id_ = 37
                     self.mark()
                     self.state = 107
                 else:
                     self.ok = False
                 
-            elif self.state == 107:
+            elif self.state == 104:
                 if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
+                else:
+                    self.ok = False
+                
+            elif self.state == 105:
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 113) or (115 <= self.ch <= 122):
+                    self.id_ = self.TOKEN_ident
+                    self.mark()
+                    self.state = 29
+                elif self.ch == 114:
+                    self.id_ = 36
+                    self.mark()
+                    self.state = 106
+                else:
+                    self.ok = False
+                
+            elif self.state == 106:
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
+                    self.id_ = self.TOKEN_ident
+                    self.mark()
+                    self.state = 29
+                else:
+                    self.ok = False
+                
+            elif self.state == 107:
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 113) or (115 <= self.ch <= 122):
+                    self.id_ = self.TOKEN_ident
+                    self.mark()
+                    self.state = 29
+                elif self.ch == 114:
+                    self.id_ = 38
+                    self.mark()
+                    self.state = 108
                 else:
                     self.ok = False
                 
@@ -1447,7 +1441,7 @@ class Z80AssemblerScanner:
                 if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
                 else:
                     self.ok = False
                 
@@ -1455,31 +1449,31 @@ class Z80AssemblerScanner:
                 if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 110:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 111) or (self.ch == 113) or (115 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
-                elif self.ch == 112:
-                    self.id_ = 39
-                    self.mark()
-                    self.state = 111
-                elif self.ch == 114:
-                    self.id_ = 40
-                    self.mark()
-                    self.state = 112
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 111:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 111) or (self.ch == 113) or (115 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
+                elif self.ch == 112:
+                    self.id_ = 39
+                    self.mark()
+                    self.state = 112
+                elif self.ch == 114:
+                    self.id_ = 40
+                    self.mark()
+                    self.state = 113
                 else:
                     self.ok = False
                 
@@ -1487,83 +1481,83 @@ class Z80AssemblerScanner:
                 if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 113:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 99) or (102 <= self.ch <= 115) or (117 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
-                elif self.ch == 100:
-                    self.id_ = 41
-                    self.mark()
-                    self.state = 114
-                elif self.ch == 101:
-                    self.id_ = 129
-                    self.mark()
-                    self.state = 119
-                elif self.ch == 116:
-                    self.id_ = 128
-                    self.mark()
-                    self.state = 120
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 114:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 99) or (101 <= self.ch <= 104) or (106 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 99) or (102 <= self.ch <= 115) or (117 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
                 elif self.ch == 100:
-                    self.id_ = 42
+                    self.id_ = 41
                     self.mark()
                     self.state = 115
-                elif self.ch == 105:
-                    self.id_ = 44
+                elif self.ch == 101:
+                    self.id_ = 129
                     self.mark()
-                    self.state = 117
+                    self.state = 120
+                elif self.ch == 116:
+                    self.id_ = 128
+                    self.mark()
+                    self.state = 121
                 else:
                     self.ok = False
                 
             elif self.state == 115:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 113) or (115 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 99) or (101 <= self.ch <= 104) or (106 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
-                elif self.ch == 114:
-                    self.id_ = 43
+                    self.state = 29
+                elif self.ch == 100:
+                    self.id_ = 42
                     self.mark()
                     self.state = 116
-                else:
-                    self.ok = False
-                
-            elif self.state == 116:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
-                    self.id_ = self.TOKEN_ident
-                    self.mark()
-                    self.state = 28
-                else:
-                    self.ok = False
-                
-            elif self.state == 117:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 113) or (115 <= self.ch <= 122):
-                    self.id_ = self.TOKEN_ident
-                    self.mark()
-                    self.state = 28
-                elif self.ch == 114:
-                    self.id_ = 45
+                elif self.ch == 105:
+                    self.id_ = 44
                     self.mark()
                     self.state = 118
                 else:
                     self.ok = False
                 
-            elif self.state == 118:
+            elif self.state == 116:
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 113) or (115 <= self.ch <= 122):
+                    self.id_ = self.TOKEN_ident
+                    self.mark()
+                    self.state = 29
+                elif self.ch == 114:
+                    self.id_ = 43
+                    self.mark()
+                    self.state = 117
+                else:
+                    self.ok = False
+                
+            elif self.state == 117:
                 if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
+                else:
+                    self.ok = False
+                
+            elif self.state == 118:
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 113) or (115 <= self.ch <= 122):
+                    self.id_ = self.TOKEN_ident
+                    self.mark()
+                    self.state = 29
+                elif self.ch == 114:
+                    self.id_ = 45
+                    self.mark()
+                    self.state = 119
                 else:
                     self.ok = False
                 
@@ -1571,7 +1565,7 @@ class Z80AssemblerScanner:
                 if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
                 else:
                     self.ok = False
                 
@@ -1579,135 +1573,135 @@ class Z80AssemblerScanner:
                 if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 121:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 110) or (112 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
-                elif self.ch == 111:
-                    self.id_ = self.TOKEN_ident
-                    self.mark()
-                    self.state = 122
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 122:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 99) or (101 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 110) or (112 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
-                elif self.ch == 100:
-                    self.id_ = 122
+                    self.state = 29
+                elif self.ch == 111:
+                    self.id_ = self.TOKEN_ident
                     self.mark()
                     self.state = 123
                 else:
                     self.ok = False
                 
             elif self.state == 123:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 99) or (101 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
+                elif self.ch == 100:
+                    self.id_ = 122
+                    self.mark()
+                    self.state = 124
                 else:
                     self.ok = False
                 
             elif self.state == 124:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 98) or (self.ch == 100) or (102 <= self.ch <= 110) or (112 <= self.ch <= 116) or (118 <= self.ch <= 121):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
-                elif self.ch == 99:
-                    self.id_ = 98
-                    self.mark()
-                    self.state = 125
-                elif self.ch == 101:
-                    self.id_ = 127
-                    self.mark()
-                    self.state = 126
-                elif self.ch == 111:
-                    self.id_ = self.TOKEN_ident
-                    self.mark()
-                    self.state = 128
-                elif self.ch == 117:
-                    self.id_ = self.TOKEN_ident
-                    self.mark()
-                    self.state = 130
-                elif self.ch == 122:
-                    self.id_ = 96
-                    self.mark()
-                    self.state = 132
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 125:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 98) or (self.ch == 100) or (102 <= self.ch <= 110) or (112 <= self.ch <= 116) or (118 <= self.ch <= 121):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
+                elif self.ch == 99:
+                    self.id_ = 98
+                    self.mark()
+                    self.state = 126
+                elif self.ch == 101:
+                    self.id_ = 127
+                    self.mark()
+                    self.state = 127
+                elif self.ch == 111:
+                    self.id_ = self.TOKEN_ident
+                    self.mark()
+                    self.state = 129
+                elif self.ch == 117:
+                    self.id_ = self.TOKEN_ident
+                    self.mark()
+                    self.state = 131
+                elif self.ch == 122:
+                    self.id_ = 96
+                    self.mark()
+                    self.state = 133
                 else:
                     self.ok = False
                 
             elif self.state == 126:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 102) or (104 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
-                elif self.ch == 103:
-                    self.id_ = 46
-                    self.mark()
-                    self.state = 127
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 127:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 102) or (104 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
+                elif self.ch == 103:
+                    self.id_ = 46
+                    self.mark()
+                    self.state = 128
                 else:
                     self.ok = False
                 
             elif self.state == 128:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 111) or (113 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
-                elif self.ch == 112:
-                    self.id_ = 47
-                    self.mark()
-                    self.state = 129
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 129:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 111) or (113 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
+                elif self.ch == 112:
+                    self.id_ = 47
+                    self.mark()
+                    self.state = 130
                 else:
                     self.ok = False
                 
             elif self.state == 130:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 107) or (109 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
-                elif self.ch == 108:
-                    self.id_ = 133
-                    self.mark()
-                    self.state = 131
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 131:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 107) or (109 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
+                elif self.ch == 108:
+                    self.id_ = 133
+                    self.mark()
+                    self.state = 132
                 else:
                     self.ok = False
                 
@@ -1715,139 +1709,139 @@ class Z80AssemblerScanner:
                 if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 133:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 113) or (self.ch == 115) or (118 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
-                elif self.ch == 114:
-                    self.id_ = 48
-                    self.mark()
-                    self.state = 134
-                elif self.ch == 116:
-                    self.id_ = self.TOKEN_ident
-                    self.mark()
-                    self.state = 136
-                elif self.ch == 117:
-                    self.id_ = self.TOKEN_ident
-                    self.mark()
-                    self.state = 141
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 134:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 102) or (104 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 113) or (self.ch == 115) or (118 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
-                elif self.ch == 103:
-                    self.id_ = 135
+                    self.state = 29
+                elif self.ch == 114:
+                    self.id_ = 48
                     self.mark()
                     self.state = 135
-                else:
-                    self.ok = False
-                
-            elif self.state == 135:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
-                    self.id_ = self.TOKEN_ident
-                    self.mark()
-                    self.state = 28
-                else:
-                    self.ok = False
-                
-            elif self.state == 136:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 99) or (101 <= self.ch <= 104) or (106 <= self.ch <= 122):
-                    self.id_ = self.TOKEN_ident
-                    self.mark()
-                    self.state = 28
-                elif self.ch == 100:
+                elif self.ch == 116:
                     self.id_ = self.TOKEN_ident
                     self.mark()
                     self.state = 137
-                elif self.ch == 105:
+                elif self.ch == 117:
                     self.id_ = self.TOKEN_ident
-                    self.mark()
-                    self.state = 139
-                else:
-                    self.ok = False
-                
-            elif self.state == 137:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 113) or (115 <= self.ch <= 122):
-                    self.id_ = self.TOKEN_ident
-                    self.mark()
-                    self.state = 28
-                elif self.ch == 114:
-                    self.id_ = 49
-                    self.mark()
-                    self.state = 138
-                else:
-                    self.ok = False
-                
-            elif self.state == 138:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
-                    self.id_ = self.TOKEN_ident
-                    self.mark()
-                    self.state = 28
-                else:
-                    self.ok = False
-                
-            elif self.state == 139:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 113) or (115 <= self.ch <= 122):
-                    self.id_ = self.TOKEN_ident
-                    self.mark()
-                    self.state = 28
-                elif self.ch == 114:
-                    self.id_ = 50
-                    self.mark()
-                    self.state = 140
-                else:
-                    self.ok = False
-                
-            elif self.state == 140:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
-                    self.id_ = self.TOKEN_ident
-                    self.mark()
-                    self.state = 28
-                else:
-                    self.ok = False
-                
-            elif self.state == 141:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 115) or (117 <= self.ch <= 122):
-                    self.id_ = self.TOKEN_ident
-                    self.mark()
-                    self.state = 28
-                elif self.ch == 116:
-                    self.id_ = 51
                     self.mark()
                     self.state = 142
                 else:
                     self.ok = False
                 
-            elif self.state == 142:
+            elif self.state == 135:
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 102) or (104 <= self.ch <= 122):
+                    self.id_ = self.TOKEN_ident
+                    self.mark()
+                    self.state = 29
+                elif self.ch == 103:
+                    self.id_ = 135
+                    self.mark()
+                    self.state = 136
+                else:
+                    self.ok = False
+                
+            elif self.state == 136:
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
+                    self.id_ = self.TOKEN_ident
+                    self.mark()
+                    self.state = 29
+                else:
+                    self.ok = False
+                
+            elif self.state == 137:
                 if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 99) or (101 <= self.ch <= 104) or (106 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
                 elif self.ch == 100:
-                    self.id_ = 52
+                    self.id_ = self.TOKEN_ident
+                    self.mark()
+                    self.state = 138
+                elif self.ch == 105:
+                    self.id_ = self.TOKEN_ident
+                    self.mark()
+                    self.state = 140
+                else:
+                    self.ok = False
+                
+            elif self.state == 138:
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 113) or (115 <= self.ch <= 122):
+                    self.id_ = self.TOKEN_ident
+                    self.mark()
+                    self.state = 29
+                elif self.ch == 114:
+                    self.id_ = 49
+                    self.mark()
+                    self.state = 139
+                else:
+                    self.ok = False
+                
+            elif self.state == 139:
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
+                    self.id_ = self.TOKEN_ident
+                    self.mark()
+                    self.state = 29
+                else:
+                    self.ok = False
+                
+            elif self.state == 140:
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 113) or (115 <= self.ch <= 122):
+                    self.id_ = self.TOKEN_ident
+                    self.mark()
+                    self.state = 29
+                elif self.ch == 114:
+                    self.id_ = 50
+                    self.mark()
+                    self.state = 141
+                else:
+                    self.ok = False
+                
+            elif self.state == 141:
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
+                    self.id_ = self.TOKEN_ident
+                    self.mark()
+                    self.state = 29
+                else:
+                    self.ok = False
+                
+            elif self.state == 142:
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 115) or (117 <= self.ch <= 122):
+                    self.id_ = self.TOKEN_ident
+                    self.mark()
+                    self.state = 29
+                elif self.ch == 116:
+                    self.id_ = 51
                     self.mark()
                     self.state = 143
-                elif self.ch == 105:
-                    self.id_ = 53
-                    self.mark()
-                    self.state = 144
                 else:
                     self.ok = False
                 
             elif self.state == 143:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 99) or (101 <= self.ch <= 104) or (106 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
+                elif self.ch == 100:
+                    self.id_ = 52
+                    self.mark()
+                    self.state = 144
+                elif self.ch == 105:
+                    self.id_ = 53
+                    self.mark()
+                    self.state = 145
                 else:
                     self.ok = False
                 
@@ -1855,159 +1849,159 @@ class Z80AssemblerScanner:
                 if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 145:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 100) or (102 <= self.ch <= 110) or (112 <= self.ch <= 116) or (118 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
-                elif self.ch == 101:
-                    self.id_ = 100
-                    self.mark()
-                    self.state = 146
-                elif self.ch == 111:
-                    self.id_ = 99
-                    self.mark()
-                    self.state = 147
-                elif self.ch == 117:
-                    self.id_ = self.TOKEN_ident
-                    self.mark()
-                    self.state = 149
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 146:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 100) or (102 <= self.ch <= 110) or (112 <= self.ch <= 116) or (118 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
-                else:
-                    self.ok = False
-                
-            elif self.state == 147:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 111) or (113 <= self.ch <= 122):
-                    self.id_ = self.TOKEN_ident
+                    self.state = 29
+                elif self.ch == 101:
+                    self.id_ = 100
                     self.mark()
-                    self.state = 28
-                elif self.ch == 112:
-                    self.id_ = 54
+                    self.state = 147
+                elif self.ch == 111:
+                    self.id_ = 99
                     self.mark()
                     self.state = 148
-                else:
-                    self.ok = False
-                
-            elif self.state == 148:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
-                    self.id_ = self.TOKEN_ident
-                    self.mark()
-                    self.state = 28
-                else:
-                    self.ok = False
-                
-            elif self.state == 149:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 114) or (116 <= self.ch <= 122):
-                    self.id_ = self.TOKEN_ident
-                    self.mark()
-                    self.state = 28
-                elif self.ch == 115:
+                elif self.ch == 117:
                     self.id_ = self.TOKEN_ident
                     self.mark()
                     self.state = 150
                 else:
                     self.ok = False
                 
-            elif self.state == 150:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 103) or (105 <= self.ch <= 122):
+            elif self.state == 147:
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
-                elif self.ch == 104:
-                    self.id_ = 55
+                    self.state = 29
+                else:
+                    self.ok = False
+                
+            elif self.state == 148:
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 111) or (113 <= self.ch <= 122):
+                    self.id_ = self.TOKEN_ident
+                    self.mark()
+                    self.state = 29
+                elif self.ch == 112:
+                    self.id_ = 54
+                    self.mark()
+                    self.state = 149
+                else:
+                    self.ok = False
+                
+            elif self.state == 149:
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
+                    self.id_ = self.TOKEN_ident
+                    self.mark()
+                    self.state = 29
+                else:
+                    self.ok = False
+                
+            elif self.state == 150:
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 114) or (116 <= self.ch <= 122):
+                    self.id_ = self.TOKEN_ident
+                    self.mark()
+                    self.state = 29
+                elif self.ch == 115:
+                    self.id_ = self.TOKEN_ident
                     self.mark()
                     self.state = 151
                 else:
                     self.ok = False
                 
             elif self.state == 151:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 103) or (105 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
+                elif self.ch == 104:
+                    self.id_ = 55
+                    self.mark()
+                    self.state = 152
                 else:
                     self.ok = False
                 
             elif self.state == 152:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 100) or (102 <= self.ch <= 107) or (109 <= self.ch <= 113) or (116 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
-                elif self.ch == 101:
-                    self.id_ = self.TOKEN_ident
-                    self.mark()
-                    self.state = 153
-                elif self.ch == 108:
-                    self.id_ = 60
-                    self.mark()
-                    self.state = 158
-                elif self.ch == 114:
-                    self.id_ = 65
-                    self.mark()
-                    self.state = 163
-                elif self.ch == 115:
-                    self.id_ = self.TOKEN_ident
-                    self.mark()
-                    self.state = 168
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 153:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 114) or (117 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 100) or (102 <= self.ch <= 107) or (109 <= self.ch <= 113) or (116 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
-                elif self.ch == 115:
-                    self.id_ = 56
+                    self.state = 29
+                elif self.ch == 101:
+                    self.id_ = self.TOKEN_ident
                     self.mark()
                     self.state = 154
-                elif self.ch == 116:
-                    self.id_ = 57
+                elif self.ch == 108:
+                    self.id_ = 60
                     self.mark()
-                    self.state = 155
+                    self.state = 159
+                elif self.ch == 114:
+                    self.id_ = 65
+                    self.mark()
+                    self.state = 164
+                elif self.ch == 115:
+                    self.id_ = self.TOKEN_ident
+                    self.mark()
+                    self.state = 169
                 else:
                     self.ok = False
                 
             elif self.state == 154:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 114) or (117 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
+                elif self.ch == 115:
+                    self.id_ = 56
+                    self.mark()
+                    self.state = 155
+                elif self.ch == 116:
+                    self.id_ = 57
+                    self.mark()
+                    self.state = 156
                 else:
                     self.ok = False
                 
             elif self.state == 155:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 104) or (106 <= self.ch <= 109) or (111 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
-                elif self.ch == 105:
-                    self.id_ = 58
-                    self.mark()
-                    self.state = 156
-                elif self.ch == 110:
-                    self.id_ = 59
-                    self.mark()
-                    self.state = 157
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 156:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 104) or (106 <= self.ch <= 109) or (111 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
+                elif self.ch == 105:
+                    self.id_ = 58
+                    self.mark()
+                    self.state = 157
+                elif self.ch == 110:
+                    self.id_ = 59
+                    self.mark()
+                    self.state = 158
                 else:
                     self.ok = False
                 
@@ -2015,55 +2009,55 @@ class Z80AssemblerScanner:
                 if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 158:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (self.ch == 98) or (101 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
-                elif self.ch == 97:
-                    self.id_ = 61
-                    self.mark()
-                    self.state = 159
-                elif self.ch == 99:
-                    self.id_ = 62
-                    self.mark()
-                    self.state = 160
-                elif self.ch == 100:
-                    self.id_ = 64
-                    self.mark()
-                    self.state = 162
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 159:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (self.ch == 98) or (101 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
+                elif self.ch == 97:
+                    self.id_ = 61
+                    self.mark()
+                    self.state = 160
+                elif self.ch == 99:
+                    self.id_ = 62
+                    self.mark()
+                    self.state = 161
+                elif self.ch == 100:
+                    self.id_ = 64
+                    self.mark()
+                    self.state = 163
                 else:
                     self.ok = False
                 
             elif self.state == 160:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (98 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
-                elif self.ch == 97:
-                    self.id_ = 63
-                    self.mark()
-                    self.state = 161
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 161:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (98 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
+                elif self.ch == 97:
+                    self.id_ = 63
+                    self.mark()
+                    self.state = 162
                 else:
                     self.ok = False
                 
@@ -2071,55 +2065,55 @@ class Z80AssemblerScanner:
                 if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 163:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (self.ch == 98) or (101 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
-                elif self.ch == 97:
-                    self.id_ = 66
-                    self.mark()
-                    self.state = 164
-                elif self.ch == 99:
-                    self.id_ = 67
-                    self.mark()
-                    self.state = 165
-                elif self.ch == 100:
-                    self.id_ = 69
-                    self.mark()
-                    self.state = 167
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 164:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (self.ch == 98) or (101 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
+                elif self.ch == 97:
+                    self.id_ = 66
+                    self.mark()
+                    self.state = 165
+                elif self.ch == 99:
+                    self.id_ = 67
+                    self.mark()
+                    self.state = 166
+                elif self.ch == 100:
+                    self.id_ = 69
+                    self.mark()
+                    self.state = 168
                 else:
                     self.ok = False
                 
             elif self.state == 165:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (98 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
-                elif self.ch == 97:
-                    self.id_ = 68
-                    self.mark()
-                    self.state = 166
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 166:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (98 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
+                elif self.ch == 97:
+                    self.id_ = 68
+                    self.mark()
+                    self.state = 167
                 else:
                     self.ok = False
                 
@@ -2127,151 +2121,151 @@ class Z80AssemblerScanner:
                 if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 168:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 115) or (117 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
-                elif self.ch == 116:
-                    self.id_ = 70
-                    self.mark()
-                    self.state = 169
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 169:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 115) or (117 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
+                elif self.ch == 116:
+                    self.id_ = 70
+                    self.mark()
+                    self.state = 170
                 else:
                     self.ok = False
                 
             elif self.state == 170:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (self.ch == 97) or (self.ch == 100) or (102 <= self.ch <= 103) or (105 <= self.ch <= 107) or (109 <= self.ch <= 111) or (self.ch == 113) or (115 <= self.ch <= 116) or (118 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
-                elif self.ch == 98:
-                    self.id_ = self.TOKEN_ident
-                    self.mark()
-                    self.state = 171
-                elif self.ch == 99:
-                    self.id_ = self.TOKEN_ident
-                    self.mark()
-                    self.state = 173
-                elif self.ch == 101:
-                    self.id_ = self.TOKEN_ident
-                    self.mark()
-                    self.state = 175
-                elif self.ch == 104:
-                    self.id_ = self.TOKEN_ident
-                    self.mark()
-                    self.state = 177
-                elif self.ch == 108:
-                    self.id_ = self.TOKEN_ident
-                    self.mark()
-                    self.state = 180
-                elif self.ch == 112:
-                    self.id_ = 95
-                    self.mark()
-                    self.state = 182
-                elif self.ch == 114:
-                    self.id_ = self.TOKEN_ident
-                    self.mark()
-                    self.state = 183
-                elif self.ch == 117:
-                    self.id_ = self.TOKEN_ident
-                    self.mark()
-                    self.state = 186
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 171:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 98) or (100 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (self.ch == 97) or (self.ch == 100) or (102 <= self.ch <= 103) or (105 <= self.ch <= 107) or (109 <= self.ch <= 111) or (self.ch == 113) or (115 <= self.ch <= 116) or (118 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
-                elif self.ch == 99:
-                    self.id_ = 71
+                    self.state = 29
+                elif self.ch == 98:
+                    self.id_ = self.TOKEN_ident
                     self.mark()
                     self.state = 172
+                elif self.ch == 99:
+                    self.id_ = self.TOKEN_ident
+                    self.mark()
+                    self.state = 174
+                elif self.ch == 101:
+                    self.id_ = self.TOKEN_ident
+                    self.mark()
+                    self.state = 176
+                elif self.ch == 104:
+                    self.id_ = self.TOKEN_ident
+                    self.mark()
+                    self.state = 178
+                elif self.ch == 108:
+                    self.id_ = self.TOKEN_ident
+                    self.mark()
+                    self.state = 181
+                elif self.ch == 112:
+                    self.id_ = 95
+                    self.mark()
+                    self.state = 183
+                elif self.ch == 114:
+                    self.id_ = self.TOKEN_ident
+                    self.mark()
+                    self.state = 184
+                elif self.ch == 117:
+                    self.id_ = self.TOKEN_ident
+                    self.mark()
+                    self.state = 187
                 else:
                     self.ok = False
                 
             elif self.state == 172:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 98) or (100 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
+                elif self.ch == 99:
+                    self.id_ = 71
+                    self.mark()
+                    self.state = 173
                 else:
                     self.ok = False
                 
             elif self.state == 173:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 101) or (103 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
-                elif self.ch == 102:
-                    self.id_ = 72
-                    self.mark()
-                    self.state = 174
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 174:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 101) or (103 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
+                elif self.ch == 102:
+                    self.id_ = 72
+                    self.mark()
+                    self.state = 175
                 else:
                     self.ok = False
                 
             elif self.state == 175:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 115) or (117 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
-                elif self.ch == 116:
-                    self.id_ = 73
-                    self.mark()
-                    self.state = 176
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 176:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 115) or (117 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
+                elif self.ch == 116:
+                    self.id_ = 73
+                    self.mark()
+                    self.state = 177
                 else:
                     self.ok = False
                 
             elif self.state == 177:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 107) or (109 <= self.ch <= 113) or (115 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
-                elif self.ch == 108:
-                    self.id_ = 124
-                    self.mark()
-                    self.state = 178
-                elif self.ch == 114:
-                    self.id_ = 125
-                    self.mark()
-                    self.state = 179
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 178:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 107) or (109 <= self.ch <= 113) or (115 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
+                elif self.ch == 108:
+                    self.id_ = 124
+                    self.mark()
+                    self.state = 179
+                elif self.ch == 114:
+                    self.id_ = 125
+                    self.mark()
+                    self.state = 180
                 else:
                     self.ok = False
                 
@@ -2279,27 +2273,27 @@ class Z80AssemblerScanner:
                 if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 180:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (98 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
-                elif self.ch == 97:
-                    self.id_ = 74
-                    self.mark()
-                    self.state = 181
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 181:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (98 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
+                elif self.ch == 97:
+                    self.id_ = 74
+                    self.mark()
+                    self.state = 182
                 else:
                     self.ok = False
                 
@@ -2307,31 +2301,31 @@ class Z80AssemblerScanner:
                 if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 183:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (98 <= self.ch <= 107) or (109 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
-                elif self.ch == 97:
-                    self.id_ = 75
-                    self.mark()
-                    self.state = 184
-                elif self.ch == 108:
-                    self.id_ = 76
-                    self.mark()
-                    self.state = 185
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 184:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (98 <= self.ch <= 107) or (109 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
+                elif self.ch == 97:
+                    self.id_ = 75
+                    self.mark()
+                    self.state = 185
+                elif self.ch == 108:
+                    self.id_ = 76
+                    self.mark()
+                    self.state = 186
                 else:
                     self.ok = False
                 
@@ -2339,59 +2333,59 @@ class Z80AssemblerScanner:
                 if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 186:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (self.ch == 97) or (99 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
-                elif self.ch == 98:
-                    self.id_ = 77
-                    self.mark()
-                    self.state = 187
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 187:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (self.ch == 97) or (99 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
+                elif self.ch == 98:
+                    self.id_ = 77
+                    self.mark()
+                    self.state = 188
                 else:
                     self.ok = False
                 
             elif self.state == 188:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 110) or (112 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
-                elif self.ch == 111:
-                    self.id_ = self.TOKEN_ident
-                    self.mark()
-                    self.state = 189
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 189:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 113) or (115 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 110) or (112 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
-                elif self.ch == 114:
-                    self.id_ = 78
+                    self.state = 29
+                elif self.ch == 111:
+                    self.id_ = self.TOKEN_ident
                     self.mark()
                     self.state = 190
                 else:
                     self.ok = False
                 
             elif self.state == 190:
-                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 113) or (115 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
+                elif self.ch == 114:
+                    self.id_ = 78
+                    self.mark()
+                    self.state = 191
                 else:
                     self.ok = False
                 
@@ -2399,21 +2393,29 @@ class Z80AssemblerScanner:
                 if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
                     self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 28
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 192:
-                if self.ch == 124:
-                    self.id_ = 114
+                if (self.ch == 46) or (48 <= self.ch <= 57) or (65 <= self.ch <= 90) or (self.ch == 95) or (97 <= self.ch <= 122):
+                    self.id_ = self.TOKEN_ident
                     self.mark()
-                    self.state = 193
+                    self.state = 29
                 else:
                     self.ok = False
                 
             elif self.state == 193:
-                self.ok = False
+                if self.ch == 124:
+                    self.id_ = 114
+                    self.mark()
+                    self.state = 194
+                else:
+                    self.ok = False
+                
             elif self.state == 194:
+                self.ok = False
+            elif self.state == 195:
                 self.ok = False
             if self.id_ == 0 and self.ch == 0:
                 return self.eof_token()
@@ -2502,14 +2504,14 @@ class Z80AssemblerParser:
         self.nt = self.scanner.get_next_token()
         self.id_ = self.nt.id_
 
-    # z80<> = {(.k=1.) label CODE|bol [(.k=1.) instruction|directive] (.k=1.) comments|eol|eof} eof
+    # z80<> = {(.k=1.) label CODE|bol [(.k=1.) instruction|directive|macro_invocation] (.k=1.) comments|eol|eof} eof
     def z80(self):
         while (self.id_ == Z80AssemblerScanner.TOKEN_label) or (self.id_ == Z80AssemblerScanner.TOKEN_bol):
             if self.id_ == Z80AssemblerScanner.TOKEN_label:
                 if self.id_ == Z80AssemblerScanner.TOKEN_label:
                     self.next()
                 else:
-                    raise ParserError(t=self.t, nt=self.nt, expected="label")
+                    raise ParserError(t=self.t, nt=self.nt, expected="\":\"")
                 self.instructions.append(Label(self.t.s)) 
             elif self.id_ == Z80AssemblerScanner.TOKEN_bol:
                 if self.id_ == Z80AssemblerScanner.TOKEN_bol:
@@ -2518,13 +2520,15 @@ class Z80AssemblerParser:
                     raise ParserError(t=self.t, nt=self.nt, expected="bol")
             else:
                 raise ParserError(t=self.t, expected="ident,eof")
-            if (12 <= self.id_ <= 78) or (135 <= self.id_ <= 136):
+            if (12 <= self.id_ <= 78) or (135 <= self.id_ <= 136) or (self.id_ == Z80AssemblerScanner.TOKEN_ident):
                 if 12 <= self.id_ <= 78:
                     self.instruction()
                 elif 135 <= self.id_ <= 136:
                     self.directive()
+                elif self.id_ == Z80AssemblerScanner.TOKEN_ident:
+                    self.macro_invocation()
                 else:
-                    raise ParserError(t=self.t, expected="'-','adc','add','and','bit','call','ccf','cp','cpd','cpdr','cpi','cpir','cpl','daa','dec','di','djnz','ei','ex','exx','halt','im','in','inc','ind','indr','ini','inir','jp','jr','ld','ldd','lddr','ldi','ldir','neg','nop','or','otdr','otir','out','outd','outi','pop','push','res','ret','reti','retn','rl','rla','rlc','rlca','rld','rr','rra','rrc','rrca','rrd','rst','sbc','scf','set','sla','sra','srl','sub','^','org'")
+                    raise ParserError(t=self.t, expected="'-','adc','add','and','bit','call','ccf','cp','cpd','cpdr','cpi','cpir','cpl','daa','dec','di','djnz','ei','ex','exx','halt','im','in','inc','ind','indr','ini','inir','jp','jr','ld','ldd','lddr','ldi','ldir','neg','nop','or','otdr','otir','out','outd','outi','pop','push','res','ret','reti','retn','rl','rla','rlc','rlca','rld','rr','rra','rrc','rrca','rrd','rst','sbc','scf','set','sla','sra','srl','sub','^','org',string")
             if self.id_ == Z80AssemblerScanner.TOKEN_comments:
                 if self.id_ == Z80AssemblerScanner.TOKEN_comments:
                     self.next()
@@ -2984,6 +2988,14 @@ class Z80AssemblerParser:
                 raise ParserError(t=self.t, nt=self.nt, expected="\"end\"")
         else:
             raise ParserError(t=self.t, expected="'^','org'")
+
+    # macro_invocation<> = ident CODE
+    def macro_invocation(self):
+        if self.id_ == Z80AssemblerScanner.TOKEN_ident:
+            self.next()
+        else:
+            raise ParserError(t=self.t, nt=self.nt, expected="ident")
+        self.instructions.append(MacroInvocation(self.t.s)) 
 
     # ld_op<> = (.k=1.) ( (.k=1.) hl ) , (.k=1.) register CODE|immediate CODE|ix number_with_sign ) , CODE (.k=1.) regis
     #    ter CODE|immediate CODE|iy number_with_sign ) , CODE (.k=1.) register CODE|immediate CODE|bc ) , a CODE|de ) , 
