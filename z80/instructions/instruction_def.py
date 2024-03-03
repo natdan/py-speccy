@@ -1,8 +1,8 @@
-from abc import ABC
+from abc import ABC, abstractmethod
 from typing import Optional
 
 from z80.instructions import AddrMode
-from z80.instructions.base import InstructionDecoder, Mnemonics, NEXT_BYTE_CALLBACK, IXY, DECODE_MAP, DECODE_MAP_ED, DECODE_MAP_IXY, DECODE_MAP_CB, DECODE_MAP_IDCB
+from z80.instructions.base import InstructionDecoder, Mnemonics, NEXT_BYTE_CALLBACK, IXY, DECODE_MAP
 
 
 def read_bytes(instr: int, next_byte: NEXT_BYTE_CALLBACK) -> list[int]:
@@ -34,9 +34,14 @@ class InstructionDef(InstructionDecoder):
             if addr_mode.can_decode(code, instr, ed, ixy):
                 params.update(addr_mode.decode(address, code, instr, next_byte))
                 if params is not None:
-                    return Instruction(address, self, addr_mode, **params)
+                    return Instruction(0, address, self, addr_mode, **params)
 
         raise ValueError(f"Cannot decode; {instr}, ixy={ixy}")
+
+    def encode(self, address: int, addr_mode: AddrMode, **params) -> list[int]:
+        memory = [0] * (self.size() + addr_mode.size())
+        addr_mode.encode(address, self.addr_mode_code[addr_mode], 0, memory, **params)
+        return memory
 
     def size(self) -> int: return 1
 
@@ -44,13 +49,25 @@ class InstructionDef(InstructionDecoder):
         return self.mnemonic.value
 
 
-class Instruction:
+class MemoryDetail(ABC):
     def __init__(self,
+                 line: int,
+                 address: int) -> None:
+        self.line = line
+        self.address = address
+
+    @abstractmethod
+    def size(self) -> int: pass
+
+
+class Instruction(MemoryDetail):
+    def __init__(self,
+                 line: int,
                  address: int,
                  instruction_def: InstructionDef,
                  addr_mode: AddrMode,
                  **params) -> None:
-        self.address = address
+        super().__init__(line, address)
         self.instruction_def = instruction_def
         self.addr_mode = addr_mode
         self.params = params
@@ -58,6 +75,9 @@ class Instruction:
         self.tstates = 0
 
     def size(self) -> int: return self.instruction_def.size() + self.addr_mode.size()
+
+    def encode(self) -> list[int]:
+        return self.instruction_def.encode(self.address, self.addr_mode, **self.params)
 
     def to_str(self, tab: int = 0) -> str:
         mnemonic = self.instruction_def.to_str() + " "
@@ -76,7 +96,7 @@ class UnknownInstructionDef(InstructionDef):
         pass
 
     def decode(self, address: int, instr: int, next_byte: NEXT_BYTE_CALLBACK, ed: bool, ixy: Optional[IXY], **params) -> 'Instruction':
-        return Instruction(address, self, AddrMode.SIMPLE, **params)
+        return Instruction(0, address, self, AddrMode.SIMPLE, **params)
 
     def to_str(self) -> str:
         s = " ".join(f"{c:02x}" for c in self.code)
@@ -94,6 +114,12 @@ class CBInstructionDef(InstructionDef):
             code = self.addr_mode_code[addr_mode]
             addr_mode.update_decode_maps(self, code, cb=True)
 
+    def encode(self, address: int, addr_mode: AddrMode, **params) -> list[int]:
+        memory = [0] * (self.size() + addr_mode.size())
+        memory[0] = 0xcb
+        addr_mode.encode(address, self.addr_mode_code[addr_mode], 1, memory, **params)
+        return memory
+
     def size(self) -> int: return 2
 
 
@@ -103,4 +129,4 @@ def decode_instruction(address: int, next_byte: NEXT_BYTE_CALLBACK) -> Instructi
         decoder = DECODE_MAP[instr_byte]
         return decoder.decode(address, instr_byte, next_byte, False, None)
 
-    return Instruction(address, UnknownInstructionDef(*read_bytes(instr_byte, next_byte)), AddrMode.SIMPLE)
+    return Instruction(0, address, UnknownInstructionDef(*read_bytes(instr_byte, next_byte)), AddrMode.SIMPLE)

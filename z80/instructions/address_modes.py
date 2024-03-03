@@ -20,9 +20,16 @@ class AddrModeElement(ABC):
     def decode(self, address: int, code: int, instr: int, next_byte: NEXT_BYTE_CALLBACK) -> dict[str, Any]:
         return {}
 
+    def encode(self, address: int, instr: int, ptr: int, memory: list[int], **params):
+        memory[ptr] = instr
+
     def ed(self) -> bool: return False
 
     def size(self) -> int: return 0
+
+    def relative(self) -> bool: return False
+
+    def param_name(self) -> Optional[str]: return None
 
 
 class _R2(AddrModeElement):
@@ -35,6 +42,8 @@ class _R2(AddrModeElement):
         5: "l",
         7: "a",
     }
+
+    def param_name(self) -> Optional[str]: return "r2"
 
     def to_str(self, **params) -> str: return self.rs[params["r2"]]
 
@@ -54,6 +63,9 @@ class _R2(AddrModeElement):
     def decode(self, address: int, code: int, instr: int, next_byte: NEXT_BYTE_CALLBACK) -> dict[str, Any]:
         return {"r2": (instr & 0x38) // 8}
 
+    def encode(self, address: int, instr: int, ptr: int, memory: list[int], **params):
+        memory[ptr] = instr + params["r2"] * 8
+
 
 class _R1(AddrModeElement):
     rs = {
@@ -65,6 +77,8 @@ class _R1(AddrModeElement):
         5: "l",
         7: "a",
     }
+
+    def param_name(self) -> Optional[str]: return "r1"
 
     def to_str(self, **params) -> str: return self.rs[params["r1"]]
 
@@ -84,12 +98,22 @@ class _R1(AddrModeElement):
     def decode(self, address: int, code: int, instr: int, next_byte: NEXT_BYTE_CALLBACK) -> dict[str, Any]:
         return {"r1": instr & 0x07}
 
+    def encode(self, address: int, instr: int, ptr: int, memory: list[int], **params):
+        memory[ptr] = instr + params["r1"]
+
 
 class _N(AddrModeElement):
+
+    def param_name(self) -> Optional[str]: return "n"
+
     def to_str(self, **params) -> str: return str(params["n"])
 
     def decode(self, address: int, code: int, instr: int, next_byte: NEXT_BYTE_CALLBACK) -> dict[str, Any]:
         return {"n": next_byte()}
+
+    def encode(self, address: int, instr: int, ptr: int, memory: list[int], **params):
+        memory[ptr] = instr
+        memory[ptr + 1] = params["n"]
 
     def size(self) -> int: return 1
 
@@ -99,6 +123,8 @@ class _PHLP(AddrModeElement):
 
 
 class _PIXDP(AddrModeElement):
+    def param_name(self) -> Optional[str]: return "d"
+
     def to_str(self, **params) -> str:
         d = params["d"]
         if d > 127: d -= 256
@@ -109,10 +135,17 @@ class _PIXDP(AddrModeElement):
     def decode(self, address: int, code: int, instr: int, next_byte: NEXT_BYTE_CALLBACK) -> dict[str, Any]:
         return {"d": next_byte()}
 
+    def encode(self, address: int, instr: int, ptr: int, memory: list[int], **params):
+        memory[ptr] = 0xdd
+        memory[ptr + 1] = instr
+        memory[ptr + 2] = params["d"]
+
     def size(self) -> int: return 2
 
 
 class _PIYDP(AddrModeElement):
+    def param_name(self) -> Optional[str]: return "d"
+
     def to_str(self, **params) -> str:
         d = params["d"]
         if d > 127: d -= 256
@@ -123,17 +156,58 @@ class _PIYDP(AddrModeElement):
     def decode(self, address: int, code: int, instr: int, next_byte: NEXT_BYTE_CALLBACK) -> dict[str, Any]:
         return {"d": next_byte()}
 
+    def encode(self, address: int, instr: int, ptr: int, memory: list[int], **params):
+        memory[ptr] = 0xfd
+        memory[ptr + 1] = instr
+        memory[ptr + 2] = params["d"]
+
     def size(self) -> int: return 2
 
 
 class _CB_PIXDP(_PIXDP):
     def decode(self, address: int, code: int, instr: int, next_byte: NEXT_BYTE_CALLBACK) -> dict[str, Any]: return {}
 
+    def encode(self, address: int, instr: int, ptr: int, memory: list[int], **params):
+        memory[ptr - 1] = 0xdd
+        memory[ptr] = 0xcb
+        memory[ptr + 1] = params["d"]
+        memory[ptr + 2] = instr
+
     def size(self) -> int: return 2
 
 
 class _CB_PIYDP(_PIYDP):
     def decode(self, address: int, code: int, instr: int, next_byte: NEXT_BYTE_CALLBACK) -> dict[str, Any]: return {}
+
+    def encode(self, address: int, instr: int, ptr: int, memory: list[int], **params):
+        memory[ptr - 1] = 0xfd
+        memory[ptr] = 0xcb
+        memory[ptr + 1] = params["d"]
+        memory[ptr + 2] = instr
+
+    def size(self) -> int: return 2
+
+
+class _CB_BPIXDP(_PIXDP):
+    def decode(self, address: int, code: int, instr: int, next_byte: NEXT_BYTE_CALLBACK) -> dict[str, Any]: return {}
+
+    def encode(self, address: int, instr: int, ptr: int, memory: list[int], **params):
+        memory[ptr - 1] = 0xdd
+        memory[ptr] = 0xcb
+        memory[ptr + 1] = params["d"]
+        memory[ptr + 2] = instr + params["b"] * 8
+
+    def size(self) -> int: return 2
+
+
+class _CB_BPIYDP(_PIYDP):
+    def decode(self, address: int, code: int, instr: int, next_byte: NEXT_BYTE_CALLBACK) -> dict[str, Any]: return {}
+
+    def encode(self, address: int, instr: int, ptr: int, memory: list[int], **params):
+        memory[ptr - 1] = 0xfd
+        memory[ptr] = 0xcb
+        memory[ptr + 1] = params["d"]
+        memory[ptr + 2] = instr + params["b"] * 8
 
     def size(self) -> int: return 2
 
@@ -143,6 +217,10 @@ class _IX(AddrModeElement):
 
     def ixy(self) -> Optional[IXY]: return IXY.IX
 
+    def encode(self, address: int, instr: int, ptr: int, memory: list[int], **params):
+        memory[ptr] = 0xdd
+        memory[ptr + 1] = instr
+
     def size(self) -> int: return 1
 
 
@@ -151,10 +229,14 @@ class _IY(AddrModeElement):
 
     def ixy(self) -> Optional[IXY]: return IXY.IY
 
+    def encode(self, address: int, instr: int, ptr: int, memory: list[int], **params):
+        memory[ptr] = 0xfd
+        memory[ptr + 1] = instr
+
     def size(self) -> int: return 1
 
 
-class _PIXP(AddrModeElement):
+class _PIXP(_IX):
     def to_str(self, **params) -> str: return "(ix)"
 
     def ixy(self) -> Optional[IXY]: return IXY.IX
@@ -162,7 +244,7 @@ class _PIXP(AddrModeElement):
     def size(self) -> int: return 1
 
 
-class _PIYP(AddrModeElement):
+class _PIYP(_IY):
     def to_str(self, **params) -> str: return "(iy)"
 
     def ixy(self) -> Optional[IXY]: return IXY.IY
@@ -171,6 +253,8 @@ class _PIYP(AddrModeElement):
 
 
 class _BIT(AddrModeElement):
+    def param_name(self) -> Optional[str]: return "b"
+
     def to_str(self, **params) -> str: return str(params["b"])
 
     def update_code_maps(self, decoder: InstructionDecoder, code: int, cb: bool = False, ixy: Optional[IXY] = None) -> None:
@@ -186,8 +270,13 @@ class _BIT(AddrModeElement):
     def decode(self, address: int, code: int, instr: int, next_byte: NEXT_BYTE_CALLBACK) -> dict[str, Any]:
         return {"b": (instr & 0x38) // 8}
 
+    def encode(self, address: int, instr: int, ptr: int, memory: list[int], **params):
+        memory[ptr] = instr + params["b"] * 8
+
 
 class _CD_IXYBIT(AddrModeElement):
+    def param_name(self) -> Optional[str]: return "b"
+
     def to_str(self, **params) -> str: return str(params["b"])
 
     def update_code_maps(self, decoder: InstructionDecoder, code: int, cb: bool = False, ixy: Optional[IXY] = None) -> None:
@@ -200,11 +289,16 @@ class _CD_IXYBIT(AddrModeElement):
     def decode(self, address: int, code: int, instr: int, next_byte: NEXT_BYTE_CALLBACK) -> dict[str, Any]:
         return {"b": (instr & 0x38) // 8}
 
+    def encode(self, address: int, instr: int, ptr: int, memory: list[int], **params):
+        memory[ptr] = instr + params["b"] * 8
+
     # Both instances already have IX or IY in address modes
     # def size(self) -> int: return 2
 
 
 class _CD_IXY(AddrModeElement):
+    def param_name(self) -> Optional[str]: return "b"
+
     def to_str(self, **params) -> str: return str(params["b"])
 
     def update_code_maps(self, decoder: InstructionDecoder, code: int, cb: bool = False, ixy: Optional[IXY] = None) -> None:
@@ -218,10 +312,17 @@ class _CD_IXY(AddrModeElement):
 
 
 class _NN(AddrModeElement):
-    def to_str(self, **params) -> str: return f"0x{params['nn']:04x}"
+    def param_name(self) -> Optional[str]: return "n"
+
+    def to_str(self, **params) -> str: return f"${params['nn']:04x}"
 
     def decode(self, address: int, code: int, instr: int, next_byte: NEXT_BYTE_CALLBACK) -> dict[str, Any]:
         return {"nn": next_byte() + 256 * next_byte()}
+
+    def encode(self, address: int, instr: int, ptr: int, memory: list[int], **params):
+        memory[ptr] = instr
+        memory[ptr + 1] = params["nn"] % 256
+        memory[ptr + 2] = params["nn"] // 256
 
     def size(self) -> int: return 2
 
@@ -237,6 +338,9 @@ class _CC(AddrModeElement):
         6: "p",
         7: "m"
     }
+
+    def param_name(self) -> Optional[str]: return "cc"
+
     def to_str(self, **params) -> str: return _CC.CC[params["cc"]]
 
     def update_code_maps(self, decoder: InstructionDecoder, code: int, cb: bool = False, ixy: Optional[IXY] = None) -> None:
@@ -249,9 +353,14 @@ class _CC(AddrModeElement):
     def decode(self, address: int, code: int, instr: int, next_byte: NEXT_BYTE_CALLBACK) -> dict[str, Any]:
         return {"cc": (instr & 0x38) // 8}
 
+    def encode(self, address: int, instr: int, ptr: int, memory: list[int], **params):
+        memory[ptr] = instr + params["cc"] * 8
+
 
 class _E(AddrModeElement):
-    def to_str(self, **params) -> str: return f"0x{params['e']:04x}"
+    def param_name(self) -> Optional[str]: return "e"
+
+    def to_str(self, **params) -> str: return f"${params['e']:04x}"
 
     def decode(self, address: int, code: int, instr: int, next_byte: NEXT_BYTE_CALLBACK) -> dict[str, Any]:
         def calc_relative(e: int) -> int:
@@ -260,10 +369,25 @@ class _E(AddrModeElement):
             return address + 2 + e
         return {"e": calc_relative(next_byte())}
 
+    def encode(self, address: int, instr: int, ptr: int, memory: list[int], **params):
+        def calc_relative(e: int) -> int:
+            delta = e - address - 2
+            if delta > 127 or delta < -128:
+                raise ValueError(f"Out of range; {delta}")
+            if delta < 0:
+                delta = 256 + delta
+            return delta
+        memory[ptr] = instr
+        memory[ptr + 1] = calc_relative(params["e"])
+
+    def relative(self) -> bool: return True
+
     def size(self) -> int: return 1
 
 
 class _C(AddrModeElement):
+    def param_name(self) -> Optional[str]: return "c"
+
     def to_str(self, **params) -> str: return "c"
 
 
@@ -286,6 +410,9 @@ class _QQ(AddrModeElement):
         2: "hl",
         3: "af"
     }
+
+    def param_name(self) -> Optional[str]: return "qq"
+
     def to_str(self, **params) -> str: return _QQ.QQ[params['qq']]
 
     def update_code_maps(self, decoder: InstructionDecoder, code: int, cb: bool = False, ixy: Optional[IXY] = None) -> None:
@@ -298,6 +425,9 @@ class _QQ(AddrModeElement):
     def decode(self, address: int, code: int, instr: int, next_byte: NEXT_BYTE_CALLBACK) -> dict[str, Any]:
         return {"qq": (instr & 0x30) // 16}
 
+    def encode(self, address: int, instr: int, ptr: int, memory: list[int], **params):
+        memory[ptr] = instr + params["qq"] * 16
+
 
 class _DD(AddrModeElement):
     DD = {
@@ -306,6 +436,9 @@ class _DD(AddrModeElement):
         2: "hl",
         3: "sp"
     }
+
+    def param_name(self) -> Optional[str]: return "dd"
+
     def to_str(self, **params) -> str: return f"{_DD.DD[params['dd']]}"
 
     def update_code_maps(self, decoder: InstructionDecoder, code: int, cb: bool = False, ixy: Optional[IXY] = None) -> None:
@@ -318,6 +451,9 @@ class _DD(AddrModeElement):
     def decode(self, address: int, code: int, instr: int, next_byte: NEXT_BYTE_CALLBACK) -> dict[str, Any]:
         return {"dd": (instr & 0x30) // 16}
 
+    def encode(self, address: int, instr: int, ptr: int, memory: list[int], **params):
+        memory[ptr] = instr + params["dd"] * 16
+
 
 class _PP(AddrModeElement):
     PP = {
@@ -326,6 +462,9 @@ class _PP(AddrModeElement):
         2: "ix",
         3: "sp"
     }
+
+    def param_name(self) -> Optional[str]: return "pp"
+
     def to_str(self, **params) -> str: return f"{_PP.PP[params['pp']]}"
 
     def update_code_maps(self, decoder: InstructionDecoder, code: int, cb: bool = False, ixy: Optional[IXY] = None) -> None:
@@ -341,6 +480,9 @@ class _PP(AddrModeElement):
     def decode(self, address: int, code: int, instr: int, next_byte: NEXT_BYTE_CALLBACK) -> dict[str, Any]:
         return {"pp": (instr & 0x30) // 16}
 
+    def encode(self, address: int, instr: int, ptr: int, memory: list[int], **params):
+        memory[ptr] = instr + params["pp"] * 16
+
 
 class _RR(AddrModeElement):
     RR = {
@@ -349,6 +491,9 @@ class _RR(AddrModeElement):
         2: "iy",
         3: "sp"
     }
+
+    def param_name(self) -> Optional[str]: return "rr"
+
     def to_str(self, **params) -> str: return f"{_RR.RR[params['rr']]}"
 
     def update_code_maps(self, decoder: InstructionDecoder, code: int, cb: bool = False, ixy: Optional[IXY] = None) -> None:
@@ -361,6 +506,9 @@ class _RR(AddrModeElement):
     def decode(self, address: int, code: int, instr: int, next_byte: NEXT_BYTE_CALLBACK) -> dict[str, Any]:
         return {"rr": (instr & 0x30) // 16}
 
+    def encode(self, address: int, instr: int, ptr: int, memory: list[int], **params):
+        memory[ptr] = instr + params["rr"] * 16
+
 
 class _ED_DD(AddrModeElement):
     DD = {
@@ -369,6 +517,9 @@ class _ED_DD(AddrModeElement):
         2: "hl",
         3: "sp"
     }
+
+    def param_name(self) -> Optional[str]: return "dd"
+
     def to_str(self, **params) -> str: return f"{_DD.DD[params['dd']]}"
 
     def update_code_maps(self, decoder: InstructionDecoder, code: int, cb: bool = False, ixy: Optional[IXY] = None) -> None:
@@ -380,6 +531,10 @@ class _ED_DD(AddrModeElement):
 
     def decode(self, address: int, code: int, instr: int, next_byte: NEXT_BYTE_CALLBACK) -> dict[str, Any]:
         return {"dd": (instr & 0x30) // 16}
+
+    def encode(self, address: int, instr: int, ptr: int, memory: list[int], **params):
+        memory[ptr] = 0xed
+        memory[ptr + 1] = instr + params["dd"] * 16
 
     def ed(self) -> bool: return True
 
@@ -393,6 +548,9 @@ class _PDDP(AddrModeElement):
         2: "hl",
         3: "sp"
     }
+
+    def param_name(self) -> Optional[str]: return "dd"
+
     def to_str(self, **params) -> str: return f"({_DD.DD[params['dd']]})"
 
     def update_code_maps(self, decoder: InstructionDecoder, code: int, cb: bool = False, ixy: Optional[IXY] = None) -> None:
@@ -404,6 +562,9 @@ class _PDDP(AddrModeElement):
 
     def decode(self, address: int, code: int, instr: int, next_byte: NEXT_BYTE_CALLBACK) -> dict[str, Any]:
         return {"dd": (instr & 0x30) // 16}
+
+    def encode(self, address: int, instr: int, ptr: int, memory: list[int], **params):
+        memory[ptr] = instr + params["dd"] * 16
 
 
 class _DE(AddrModeElement):
@@ -443,19 +604,32 @@ class _PDEP(AddrModeElement):
 
 
 class _PNNP(AddrModeElement):
-    def to_str(self, **params) -> str: return f"(0x{params['nn']:04x})"
+    def param_name(self) -> Optional[str]: return "nn"
+
+    def to_str(self, **params) -> str: return f"(${params['nn']:04x})"
 
     def decode(self, address: int, code: int, instr: int, next_byte: NEXT_BYTE_CALLBACK) -> dict[str, Any]:
         return {"nn": next_byte() + 256 * next_byte()}
+
+    def encode(self, address: int, instr: int, ptr: int, memory: list[int], **params):
+        memory[ptr] = instr
+        memory[ptr + 1] = params["nn"] % 256
+        memory[ptr + 2] = params["nn"] // 256
 
     def size(self) -> int: return 2
 
 
 class _PNP(AddrModeElement):
+    def param_name(self) -> Optional[str]: return "n"
+
     def to_str(self, **params) -> str: return f"({params['n']})"
 
     def decode(self, address: int, code: int, instr: int, next_byte: NEXT_BYTE_CALLBACK) -> dict[str, Any]:
         return {"n": next_byte()}
+
+    def encode(self, address: int, instr: int, ptr: int, memory: list[int], **params):
+        memory[ptr] = instr
+        memory[ptr + 1] = params["n"]
 
     def size(self) -> int: return 1
 
@@ -491,6 +665,9 @@ class _R1R2(AddrModeElement):
     def decode(self, address: int, code: int, instr: int, next_byte: NEXT_BYTE_CALLBACK) -> dict[str, Any]:
         return {"r2": (instr & 0x38) // 8, "r1": instr & 0x07}
 
+    def encode(self, address: int, instr: int, ptr: int, memory: list[int], **params):
+        memory[ptr] = instr + params["r2"] * 8 + params["r1"]
+
 
 class _BITR1(AddrModeElement):
     def to_str(self, **params) -> str: return "<BITR not_to_be_used>"
@@ -510,18 +687,24 @@ class _BITR1(AddrModeElement):
     def decode(self, address: int, code: int, instr: int, next_byte: NEXT_BYTE_CALLBACK) -> dict[str, Any]:
         return {"b": (instr & 0x38) // 8, "r1": instr & 0x07}
 
+    def encode(self, address: int, instr: int, ptr: int, memory: list[int], **params):
+        memory[ptr] = instr + params["b"] * 8 + params["r1"]
+
 
 class _RST(AddrModeElement):
     RST = {
-        0: "00h",
-        1: "08h",
-        2: "10h",
-        3: "18h",
-        4: "20h",
-        5: "28h",
-        6: "30h",
-        7: "38h"
+        0: "$0",
+        1: "$8",
+        2: "$10",
+        3: "$18",
+        4: "$20",
+        5: "$28",
+        6: "$30",
+        7: "$38"
     }
+
+    def param_name(self) -> Optional[str]: return "t"
+
     def to_str(self, **params) -> str: return f"{_RST.RST[params['t']]}"
 
     def can_decode(self, code: int, instr: int) -> bool:
@@ -533,6 +716,9 @@ class _RST(AddrModeElement):
 
     def decode(self, address: int, code: int, instr: int, next_byte: NEXT_BYTE_CALLBACK) -> dict[str, Any]:
         return {"t": (instr & 0x38) // 8}
+
+    def encode(self, address: int, instr: int, ptr: int, memory: list[int], **params):
+        memory[ptr] = instr + params["t"] * 8
 
 
 class _ED_R2(AddrModeElement):
@@ -546,6 +732,8 @@ class _ED_R2(AddrModeElement):
         7: "a",
     }
 
+    def param_name(self) -> Optional[str]: return "r2"
+
     def to_str(self, **params) -> str: return self.rs[params["r2"]]
 
     def update_code_maps(self, decoder: InstructionDecoder, code: int, cb: bool = False, ixy: Optional[IXY] = None) -> None:
@@ -558,6 +746,10 @@ class _ED_R2(AddrModeElement):
 
     def decode(self, address: int, code: int, instr: int, next_byte: NEXT_BYTE_CALLBACK) -> dict[str, Any]:
         return {"r2": (instr & 0x38) // 8}
+
+    def encode(self, address: int, instr: int, ptr: int, memory: list[int], **params):
+        memory[ptr] = 0xed
+        memory[ptr + 1] = instr + params["r2"] * 8
 
     def ed(self) -> bool: return True
 
@@ -577,6 +769,10 @@ class _ED_SIMPLE(AddrModeElement):
 
     def size(self) -> int: return 1
 
+    def encode(self, address: int, instr: int, ptr: int, memory: list[int], **params):
+        memory[ptr] = 0xed
+        memory[ptr + 1] = instr
+
 
 class _IM0(_ED_SIMPLE):
     def to_str(self, **params) -> str: return "0"
@@ -588,6 +784,106 @@ class _IM1(_ED_SIMPLE):
 
 class _IM2(_ED_SIMPLE):
     def to_str(self, **params) -> str: return "2"
+
+
+class _IXPP(_PP):
+    def encode(self, address: int, instr: int, ptr: int, memory: list[int], **params):
+        memory[ptr] = 0xdd
+        memory[ptr + 1] = instr + params["pp"] * 16
+
+
+class _IYRR(_RR):
+    def encode(self, address: int, instr: int, ptr: int, memory: list[int], **params):
+        memory[ptr] = 0xfd
+        memory[ptr + 1] = instr + params["rr"] * 16
+
+
+class _CCNN(_NN):
+    def encode(self, address: int, instr: int, ptr: int, memory: list[int], **params):
+        memory[ptr] = instr + params["cc"] * 8
+        memory[ptr + 1] = params["nn"] % 256
+        memory[ptr + 2] = params["nn"] // 256
+
+
+class _RN(_N):
+    def encode(self, address: int, instr: int, ptr: int, memory: list[int], **params):
+        memory[ptr] = instr + params["r2"] * 8
+        memory[ptr + 1] = params["n"]
+
+
+class _RPIXDP(_R2):
+    def encode(self, address: int, instr: int, ptr: int, memory: list[int], **params):
+        memory[ptr] = 0xdd
+        memory[ptr + 1] = instr + params["r2"] * 8
+        memory[ptr + 2] = params["d"]
+
+
+class _RPIYDP(_R2):
+    def encode(self, address: int, instr: int, ptr: int, memory: list[int], **params):
+        memory[ptr] = 0xfd
+        memory[ptr + 1] = instr + params["r2"] * 8
+        memory[ptr + 2] = params["d"]
+
+
+class _PIXDPR(_R1):
+    def encode(self, address: int, instr: int, ptr: int, memory: list[int], **params):
+        memory[ptr] = 0xdd
+        memory[ptr + 1] = instr + params["r1"]
+        memory[ptr + 2] = params["d"]
+
+
+class _PIYDPR(_R1):
+    def encode(self, address: int, instr: int, ptr: int, memory: list[int], **params):
+        memory[ptr] = 0xfd
+        memory[ptr + 1] = instr + params["r1"]
+        memory[ptr + 2] = params["d"]
+
+
+class _PIXDPN(_N):
+    def encode(self, address: int, instr: int, ptr: int, memory: list[int], **params):
+        memory[ptr] = 0xdd
+        memory[ptr + 1] = instr
+        memory[ptr + 2] = params["d"]
+        memory[ptr + 3] = params["n"]
+
+
+class _PIYDPN(_N):
+    def encode(self, address: int, instr: int, ptr: int, memory: list[int], **params):
+        memory[ptr] = 0xfd
+        memory[ptr + 1] = instr
+        memory[ptr + 2] = params["d"]
+        memory[ptr + 3] = params["n"]
+
+
+class _IXNN(_NN):
+    def encode(self, address: int, instr: int, ptr: int, memory: list[int], **params):
+        memory[ptr] = 0xdd
+        memory[ptr + 1] = instr
+        memory[ptr + 2] = params["nn"] % 256
+        memory[ptr + 3] = params["nn"] // 256
+
+
+class _IYNN(_NN):
+    def encode(self, address: int, instr: int, ptr: int, memory: list[int], **params):
+        memory[ptr] = 0xfd
+        memory[ptr + 1] = instr
+        memory[ptr + 2] = params["nn"] % 256
+        memory[ptr + 3] = params["nn"] // 256
+
+
+class _DDNN(_DD):
+    def encode(self, address: int, instr: int, ptr: int, memory: list[int], **params):
+        memory[ptr] = instr + params["dd"] * 16
+        memory[ptr + 1] = params["nn"] % 256
+        memory[ptr + 2] = params["nn"] // 256
+
+
+class _ED_DDNN(_DD):
+    def encode(self, address: int, instr: int, ptr: int, memory: list[int], **params):
+        memory[ptr] = 0xed
+        memory[ptr + 1] = instr + params["dd"] * 16
+        memory[ptr + 2] = params["nn"] % 256
+        memory[ptr + 3] = params["nn"] // 256
 
 
 _R1 = _R1()
@@ -642,94 +938,110 @@ _IM1 = _IM1()
 _IM2 = _IM2()
 _RST = _RST()
 _PCP = _PCP()
+_IXPP = _IXPP()
+_IYRR = _IYRR()
+_CB_BPIXDP = _CB_BPIXDP()
+_CB_BPIYDP = _CB_BPIYDP()
+_CCNN = _CCNN()
+_RN = _RN()
+_RPIXDP = _RPIXDP()
+_RPIYDP = _RPIYDP()
+_PIXDPR = _PIXDPR()
+_PIYDPR = _PIYDPR()
+_PIXDPN = _PIXDPN()
+_PIYDPN = _PIYDPN()
+_DDNN = _DDNN()
+_IXNN = _IXNN()
+_IYNN = _IYNN()
+_ED_DDNN = _ED_DDNN()
 
 
 class AddrMode(Enum):
-    SIMPLE = [], None
-    SIMPLE_ED = [], _ED_SIMPLE
-    R2 = [_R2], _R2
-    R1 = [_R1], _R1
-    RR = [_R2, _R1], _R1R2
-    N = [_N], None
-    RN = [_R2, _N], _R2
-    IX = [_IX], None
-    IY = [_IY], None
-    PHLP = [_PHLP], None
-    PIXP = [_PIXP], None
-    PIYP = [_PIYP], None
-    PIXDP = [_PIXDP], None
-    PIYDP = [_PIYDP], None
-    CBPIXDP = [_CB_PIXDP], _CD_IXY
-    CBPIYDP = [_CB_PIYDP], _CD_IXY
-    BR = [_BIT, _R1], _BITR1
-    BPHLP = [_BIT, _PHLP], _BIT
-    BPIXDP = [_BIT, _CB_PIXDP], _CD_IXYBIT
-    BPIYDP = [_BIT, _CB_PIYDP], _CD_IXYBIT
-    NN = [_NN], None
-    CC = [_CC], _CC
-    CCNN = [_CC, _NN], _CC
-    E = [_E], None  # Relative
-    CE = [_C, _E], None
-    NCE = [_NC, _E], None
-    ZE = [_Z, _E], None
-    NZE = [_NZ, _E], None
-    QQ = [_QQ], _QQ
-    DEHL = [_DE, _HL], None
-    AFAFp = [_AF, _AFp], None
-    PSPPHL = [_PSPP, _HL], None
-    PSPPIX = [_PSPP, _IX], None
-    PSPPIY = [_PSPP, _IY], None
-    RPHLP = [_R2, _PHLP], _R2
-    RPIXDP = [_R2, _PIXDP], _R2
-    RPIYDP = [_R2, _PIYDP], _R2
-    PHLPR = [_PHLP, _R1], _R1
-    PIXDPR = [_PIXDP, _R1], _R1
-    PIYDPR = [_PIYDP, _R1], _R1
-    PHLPN = [_PHLP, _N], None
-    PIXDPN = [_PIXDP, _N], None
-    PIYDPN = [_PIYDP, _N], None
-    APBCP = [_A, _PBCP], None
-    APDEP = [_A, _PDEP], None
-    APNNP = [_A, _PNNP], None
-    PBCPA = [_PBCP, _A], None
-    PDEPA = [_PDEP, _A], None
-    PNNPA = [_PNNP, _A], None
-    AI = [_A, _I], _ED_SIMPLE
-    AR = [_A, _R], _ED_SIMPLE
-    IA = [_I, _A], _ED_SIMPLE
-    RA = [_R, _A], _ED_SIMPLE
-    DDNN = [_DD, _NN], _DD
-    IXNN = [_IX, _NN], None
-    IYNN = [_IY, _NN], None
-    HLPNNP = [_HL, _PNNP], None
-    DDPNNP = [_DD, _PNNP], _ED_DD
-    IXPNNP = [_IX, _PNNP], None
-    IYPNNP = [_IY, _PNNP], None
-    PNNPHL = [_PNNP, _HL], None
-    PNNPDD = [_PNNP, _DD], _ED_DD
-    PNNPIX = [_PNNP, _IX], None
-    PNNPIY = [_PNNP, _IY], None
-    SPHL = [_SP, _HL], None
-    SPIX = [_SP, _IX], None
-    SPIY = [_SP, _IY], None
-    AR1 = [_A, _R1], _R1
-    AN = [_A, _N], None
-    APHLP = [_A, _PHLP], None
-    APIXDP = [_A, _PIXDP], None
-    APIYDP = [_A, _PIYDP], None
-    HLSS = [_HL, _SS], _SS
-    IXPP = [_IX, _PP], _PP
-    IYRR = [_IY, _RR], _RR
-    SS = [_SS], _SS
-    IM0 = [_IM0], _IM0
-    IM1 = [_IM1], _IM1
-    IM2 = [_IM2], _IM2
-    RST = [_RST], _RST
-    APNP = [_A, _PNP], None
-    RPCP = [_R2, _PCP], _ED_R2
-    PNPA = [_PNP, _A], None
-    PCPR = [_PCP, _R2], _ED_R2
-    ED_HLSS = [_HL, _SS], _ED_DD
+    SIMPLE = [], None, None
+    SIMPLE_ED = [], _ED_SIMPLE, _ED_SIMPLE
+    R2 = [_R2], _R2, _R2
+    R1 = [_R1], _R1, _R1
+    RR = [_R2, _R1], _R1R2, _R1R2
+    N = [_N], None, _N
+    RN = [_R2, _N], _R2, _RN
+    IX = [_IX], None, _IX
+    IY = [_IY], None, _IY
+    PHLP = [_PHLP], None, None
+    PIXP = [_PIXP], None, _PIXP
+    PIYP = [_PIYP], None, _PIYP
+    PIXDP = [_PIXDP], None, _PIXDP
+    PIYDP = [_PIYDP], None, _PIYDP
+    CBPIXDP = [_CB_PIXDP], _CD_IXY, _CB_PIXDP
+    CBPIYDP = [_CB_PIYDP], _CD_IXY, _CB_PIYDP
+    BR = [_BIT, _R1], _BITR1, _BITR1
+    BPHLP = [_BIT, _PHLP], _BIT, _BIT
+    BPIXDP = [_BIT, _CB_PIXDP], _CD_IXYBIT, _CB_BPIXDP
+    BPIYDP = [_BIT, _CB_PIYDP], _CD_IXYBIT, _CB_BPIYDP
+    NN = [_NN], None, _NN
+    CC = [_CC], _CC, _CC
+    CCNN = [_CC, _NN], _CC, _CCNN
+    E = [_E], None, _E  # Relative
+    CE = [_C, _E], None, _E
+    NCE = [_NC, _E], None, _E
+    ZE = [_Z, _E], None, _E
+    NZE = [_NZ, _E], None, _E
+    QQ = [_QQ], _QQ, _QQ
+    DEHL = [_DE, _HL], None, None
+    AFAFp = [_AF, _AFp], None, None
+    PSPPHL = [_PSPP, _HL], None, None
+    PSPPIX = [_PSPP, _IX], None, _IX
+    PSPPIY = [_PSPP, _IY], None, _IY
+    RPHLP = [_R2, _PHLP], _R2, _R2
+    RPIXDP = [_R2, _PIXDP], _R2, _RPIXDP
+    RPIYDP = [_R2, _PIYDP], _R2, _RPIYDP
+    PHLPR = [_PHLP, _R1], _R1, _R1
+    PIXDPR = [_PIXDP, _R1], _R1, _PIXDPR
+    PIYDPR = [_PIYDP, _R1], _R1, _PIYDPR
+    PHLPN = [_PHLP, _N], None, _N
+    PIXDPN = [_PIXDP, _N], None, _PIXDPN
+    PIYDPN = [_PIYDP, _N], None, _PIYDPN
+    APBCP = [_A, _PBCP], None, None
+    APDEP = [_A, _PDEP], None, None
+    APNNP = [_A, _PNNP], None, _NN
+    PBCPA = [_PBCP, _A], None, None
+    PDEPA = [_PDEP, _A], None, None
+    PNNPA = [_PNNP, _A], None, _NN
+    AI = [_A, _I], _ED_SIMPLE, _ED_SIMPLE
+    AR = [_A, _R], _ED_SIMPLE, _ED_SIMPLE
+    IA = [_I, _A], _ED_SIMPLE, _ED_SIMPLE
+    RA = [_R, _A], _ED_SIMPLE, _ED_SIMPLE
+    DDNN = [_DD, _NN], _DD, _DDNN
+    IXNN = [_IX, _NN], None, _IXNN
+    IYNN = [_IY, _NN], None, _IYNN
+    HLPNNP = [_HL, _PNNP], None, _NN
+    DDPNNP = [_DD, _PNNP], _ED_DD, _ED_DDNN  # _ED_DD_NN
+    IXPNNP = [_IX, _PNNP], None, _IXNN
+    IYPNNP = [_IY, _PNNP], None, _IYNN
+    PNNPHL = [_PNNP, _HL], None, _NN
+    PNNPDD = [_PNNP, _DD], _ED_DD, _ED_DDNN  # _ED_DD_NN
+    PNNPIX = [_PNNP, _IX], None, _IXNN
+    PNNPIY = [_PNNP, _IY], None, _IYNN
+    SPHL = [_SP, _HL], None, None
+    SPIX = [_SP, _IX], None, _IX
+    SPIY = [_SP, _IY], None, _IY
+    AR1 = [_A, _R1], _R1, _R1
+    AN = [_A, _N], None, _N
+    APHLP = [_A, _PHLP], None, None
+    APIXDP = [_A, _PIXDP], None, _PIXDP
+    APIYDP = [_A, _PIYDP], None, _PIYDP
+    HLSS = [_HL, _SS], _SS, _SS
+    IXPP = [_IX, _PP], _PP, _IXPP
+    IYRR = [_IY, _RR], _RR, _IYRR
+    SS = [_SS], _SS, _SS
+    IM0 = [_IM0], _IM0, _ED_SIMPLE
+    IM1 = [_IM1], _IM1, _ED_SIMPLE
+    IM2 = [_IM2], _IM2, _ED_SIMPLE
+    RST = [_RST], _RST, _RST
+    APNP = [_A, _PNP], None, _N
+    RPCP = [_R2, _PCP], _ED_R2, _ED_R2
+    PNPA = [_PNP, _A], None, _N
+    PCPR = [_PCP, _R2], _ED_R2, _ED_R2
+    ED_HLSS = [_HL, _SS], _ED_DD, _ED_DD
 
     def __new__(cls, *args, **kwargs):
         value = len(cls.__members__) + 1
@@ -737,9 +1049,10 @@ class AddrMode(Enum):
         obj._value_ = value
         return obj
 
-    def __init__(self, addr_mode_elements: list[AddrModeElement], instr_decoder: Optional[AddrModeElement]):
+    def __init__(self, addr_mode_elements: list[AddrModeElement], instr_decoder: Optional[AddrModeElement], instr_encoder: Optional[AddrModeElement]):
         self.addr_mode_elements = addr_mode_elements
         self.instr_decoder = instr_decoder
+        self.instr_encoder = instr_encoder
 
     def ixy(self) -> Optional[IXY]:
         return next((ixy for ixy in map(lambda x: x.ixy(), self.addr_mode_elements) if ixy is not None), None)
@@ -773,6 +1086,12 @@ class AddrMode(Enum):
                     res.update(r)
 
         return res
+
+    def encode(self, address: int, instr: int, ptr: int, memory: list[int], **params):
+        if self.instr_encoder:
+            self.instr_encoder.encode(address, instr, ptr, memory, **params)
+        else:
+            memory[ptr] = instr
 
     def size(self) -> int:
         extra = self.instr_decoder.size() if self.instr_decoder is not None and self.instr_decoder not in self.addr_mode_elements else 0

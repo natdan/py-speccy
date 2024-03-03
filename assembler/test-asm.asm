@@ -1,12 +1,15 @@
 ;       first comment
 
 l1:
-        org     8000h
+        org     $8000
 
         adc     a, b
         add     a, 3
 
 label1:
+
+        jr      $
+
         and     c
         and     5
         and     (hl)
@@ -17,9 +20,11 @@ label1:
         sub     (ix+1)
         sub     (iy-1)
         bit     3, a
+        jr      method1
 
 method1:
         call    123
+        jr      method1
         call    nz, 124
         ccf
         scf
@@ -124,7 +129,7 @@ method1:
         rld
         rra
         rrca
-        rst     08h
+        rst     $08
         sbc     a, b
         sbc     a, 55
         sbc     a, (hl)

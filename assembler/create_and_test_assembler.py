@@ -1,7 +1,10 @@
+import os
+from typing import cast
 
+from assembler_utils import second_pass, assembler_output
 from buLL.bull_parser import BullParser
 from buLL.parser.toolkit import Toolkit
-from directives import Org, Label
+from directives import Org, Label, Equ, AddressDirective, MemoryDirective
 from z80.instructions import Instruction
 
 args = "-vv --one-file z80-assembler.grammar"
@@ -21,24 +24,26 @@ from z80_assembler import Z80AssemblerParser
 parser = Z80AssemblerParser()
 scanner = Z80AssemblerParser.SCANNER_CLASS()
 
-with open("test-asm.asm", "r") as f:
+test_filename = os.environ.get("TEST_FILE", "test-asm.asm")
+
+with open(test_filename, "r") as f:
     scanner.set_reader(f)
     parser.parse(scanner)
 
-pc = 0
-print("------------------------------------------------------")
-for instruction in parser.instructions:
-    if isinstance(instruction, Instruction):
-        instruction.address = pc
-        pc += instruction.size()
-    elif isinstance(instruction, Org):
-        pc = instruction.address
-    elif isinstance(instruction, Label):
-        instruction.address = pc
+
+second_pass(parser.instructions)
+# pc = 0
+# print("------------------------------------------------------")
+# for instruction in parser.instructions:
+#     if isinstance(instruction, Instruction):
+#         instruction.address = pc
+#         pc += instruction.size()
+#     elif isinstance(instruction, Org):
+#         pc = instruction.address
+#     elif isinstance(instruction, Label):
+#         instruction.address = pc
 
 print("------------------------------------------------------")
-for instruction in parser.instructions:
-    if isinstance(instruction, Instruction):
-        print(f"0x{instruction.address:04x}            {instruction.to_str(2).strip()}")
-    else:
-        print(f"          {instruction.to_str(2)}")
+assembler_output(parser.instructions)
+
+print()
